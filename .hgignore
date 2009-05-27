@@ -1,0 +1,7 @@
+syntax: glob
+*.o
+*.srec
+*.hex
+*.flash
+main
+*.swp
