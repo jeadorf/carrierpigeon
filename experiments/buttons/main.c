@@ -18,9 +18,15 @@ int main(void)
     PORTC |= 0x0E;
     if (!bit_is_set(PIND, 4)) {
       blink();
-      DDRD = 0x10;
       PORTD |= 0x10;
-      DDRD = 0x00; 
+    }
+    if (!bit_is_set(PIND, 5)) {
+      blink();
+      PORTD |= 0x20;
+    }
+    if (!bit_is_set(PIND, 6)) {
+      blink();
+      PORTD |= 0x40;
     }
   }
 
