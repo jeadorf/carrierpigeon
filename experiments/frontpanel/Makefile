@@ -18,14 +18,14 @@ SRECS=\
 
 all: $(SRECS)
 
-main: main.o  #serial.o
+main: main.o
 
 PROGRAMS=$(SRECS:.srec=)
 OBJFILES=$(SRECS:.srec=.o)
 ASSEMBLY=$(SRECS:.srec=.asm)
 
 clean:
-	rm -f $(SRECS) $(PROGRAMS) *.o $(ASSEMBLY) *~
+	rm -f $(SRECS) $(PROGRAMS) *.o $(ASSEMBLY) *.flash *.hex *~
 
 %.o: %.c
 	$(CC)  -O2 $(DEFINES) -mmcu=$(MCU) -c $^ -o $@

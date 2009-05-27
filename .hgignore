@@ -5,3 +5,4 @@ syntax: glob
 *.flash
 main
 *.swp
+*.orig
