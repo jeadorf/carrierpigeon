@@ -11,6 +11,8 @@
 // ALL_LIGHT 0x03
 #define ALL_LIGHT (BLUE_LIGHT + 1)
 
+#define WAIT_TIME 25.0
+
 int main(void)
 {
   int n;
@@ -18,18 +20,21 @@ int main(void)
   DDRB = NONE_LIGHT;
   
   while (1) {
+    // turn on blue leds
     PORTB |= BLUE_LEDS;
-    for(n=0; n < 10; n++)
-      _delay_loop_2(60000);
+    // wait
+    for (n = 0; n < 10; n++)
+      _delay_ms(WAIT_TIME);
 
+    // turn off blue leds, turn on red leds
     PORTB &= ~BLUE_LEDS;
     PORTB |= RED_LEDS;
-    for(n=0; n < 10; n++)
-      _delay_loop_2(60000);
+    // wait
+    for (n = 0; n < 10; n++)
+      _delay_ms(WAIT_TIME);
 
+    // turn off red leds
     PORTB &= ~RED_LEDS;
-    for(n=0; n < 10; n++)
-      _delay_loop_2(60000);
   }
 
   return 0;
