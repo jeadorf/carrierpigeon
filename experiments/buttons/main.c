@@ -20,85 +20,38 @@ int get_key(void)
 	DDRC |= 0b00001111;
 	// set DDRD6-4 to READ
 	DDRD &= 0b10001111;
-	
-	// COL4
-	CLEAR_BIT(PORTC, PC3);
-	SET_BIT(PORTC, PC2);
-	SET_BIT(PORTC, PC1);
-	SET_BIT(PORTC, PC0);
-	
-	if (bit_is_clear(PIND, PIND6)) {
-		SET_BIT(PORTD, PD6);
-		return 12;
-	}
-	if (bit_is_clear(PIND, PIND5)) {
-		SET_BIT(PORTD, PD5);
-		return 11;
-	}
-	if (bit_is_clear(PIND, PIND4)) {
-		SET_BIT(PORTD, PD4);
-		return 10;
+
+	int col, othercol;
+	for (col = PC3; col >= PC0; col--)
+	{
+		SET_BIT(DDRD, DDD6);
+		SET_BIT(DDRD, DDD5);
+		SET_BIT(DDRD, DDD4);
+		for (othercol = PC3; othercol >= PC0; othercol--) {
+			if (othercol != col)
+				SET_BIT(PORTC, othercol);
+		}
+		CLEAR_BIT(PORTC, col);
+
+		CLEAR_BIT(DDRD, DDD6);
+		CLEAR_BIT(DDRD, DDD5);
+		CLEAR_BIT(DDRD, DDD4);
+		
+		
+		if (bit_is_clear(PIND, PIND6)) {
+			SET_BIT(PORTD, PD6);
+			return (col * 3) + 3;
+		}
+		if (bit_is_clear(PIND, PIND5)) {
+			SET_BIT(PORTD, PD5);
+			return (col * 3) + 2;
+		}
+		if (bit_is_clear(PIND, PIND4)) {
+			SET_BIT(PORTD, PD4);
+			return (col * 3) + 1;
+		}
 	}
 
-	// COL3
-	SET_BIT(PORTC, PC3);
-	CLEAR_BIT(PORTC, PC2);
-	SET_BIT(PORTC, PC1);
-	SET_BIT(PORTC, PC0);
-
-	if (bit_is_clear(PIND, PIND6)) {
-		SET_BIT(PORTD, PD6);
-		return 9;
-	}
-	if (bit_is_clear(PIND, PIND5)) {
-		SET_BIT(PORTD, PD5);
-		return 8;
-	}
-	if (bit_is_clear(PIND, PIND4)) {
-		SET_BIT(PORTD, PD4);
-		return 7;
-	}
-	
-	// COL2
-	SET_BIT(PORTC, PC3);
-	SET_BIT(PORTC, PC2);
-	CLEAR_BIT(PORTC, PC1);
-	SET_BIT(PORTC, PC0);
-
-	if (bit_is_clear(PIND, PIND6)) {
-		SET_BIT(PORTD, PD6);
-		return 6;
-	}
-	if (bit_is_clear(PIND, PIND5)) {
-		SET_BIT(PORTD, PD5);
-		return 5;
-	}
-	if (bit_is_clear(PIND, PIND4)) {
-		SET_BIT(PORTD, PD4);
-		return 4;
-	}
-
-	// COL1
-	SET_BIT(PORTC, PC3);
-	SET_BIT(PORTC, PC2);
-	SET_BIT(PORTC, PC1);
-	CLEAR_BIT(PORTC, PC0);
-
-	if (bit_is_clear(PIND, PIND6)) {
-		SET_BIT(PORTD, PD6);
-		return 3;
-	}
-	if (bit_is_clear(PIND, PIND5)) {
-		SET_BIT(PORTD, PD5);
-		return 2;
-	}
-	if (bit_is_clear(PIND, PIND4)) {
-		SET_BIT(PORTD, PD4);
-		return 1;
-	}
-
-	SET_BIT(PORTC, PC0);
-	
 	return keyvalue;
 }
 
