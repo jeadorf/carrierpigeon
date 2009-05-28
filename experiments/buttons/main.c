@@ -13,6 +13,25 @@ int get_key(void);
 int get_key(void) 
 {
 	int keyvalue = 0;
+
+	SET_BIT(DDRC, DDC3);
+	SET_BIT(DDRC, DDC2);
+	SET_BIT(DDRC, DDC1);
+	SET_BIT(DDRC, DDC0);
+	
+	CLEAR_BIT(DDRD, DDD6);
+	CLEAR_BIT(DDRD, DDD5);
+	CLEAR_BIT(DDRD, DDD4);
+	
+	CLEAR_BIT(PORTC, PC3);
+	SET_BIT(PORTC, PC2);
+	SET_BIT(PORTC, PC1);
+	SET_BIT(PORTC, PC0);
+	
+	if (bit_is_clear(PIND, PIND6)) {
+		SET_BIT(PORTD, PD6);
+		return 12;
+	}
 	
 	return keyvalue;
 }
@@ -23,7 +42,7 @@ int main(void)
 	
 	while (1) {
 		key = get_key();
-		if (key == 4)
+		if (key == 12)
 			blink();
 	}
 	
