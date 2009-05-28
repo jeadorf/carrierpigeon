@@ -18,28 +18,24 @@ int get_key(void)
 
 	// set DDRC3-0 to WRITE
 	DDRC |= 0b00001111;
-	// set DDRD6-4 to READ
-	DDRD &= 0b10001111;
 
 	int col, othercol;
 	for (col = PC3; col >= PC0; col--)
 	{
-		SET_BIT(DDRD, DDD6);
-		SET_BIT(DDRD, DDD5);
-		SET_BIT(DDRD, DDD4);
 		for (othercol = PC3; othercol >= PC0; othercol--) {
 			if (othercol != col)
 				SET_BIT(PORTC, othercol);
 		}
 		CLEAR_BIT(PORTC, col);
-
-		CLEAR_BIT(DDRD, DDD6);
-		CLEAR_BIT(DDRD, DDD5);
-		CLEAR_BIT(DDRD, DDD4);
+		// set DDRD6-4 to READ (needs to be in a loop, since DDR is strange)
+		DDRD &= 0b10001111;
 		
-		
+		//int row;
+		//for (row = PD6; row >= PD4; row--) {
+			
 		if (bit_is_clear(PIND, PIND6)) {
 			SET_BIT(PORTD, PD6);
+			
 			return (col * 3) + 3;
 		}
 		if (bit_is_clear(PIND, PIND5)) {
