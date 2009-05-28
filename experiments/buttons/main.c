@@ -13,16 +13,13 @@ void blink_times(int n);
 
 int get_key(void) 
 {
+	// result: default 0 (no key pressed)
 	int keyvalue = 0;
 
-	SET_BIT(DDRC, DDC3);
-	SET_BIT(DDRC, DDC2);
-	SET_BIT(DDRC, DDC1);
-	SET_BIT(DDRC, DDC0);
-	
-	CLEAR_BIT(DDRD, DDD6);
-	CLEAR_BIT(DDRD, DDD5);
-	CLEAR_BIT(DDRD, DDD4);
+	// set DDRC3-0 to WRITE
+	DDRC |= 0b00001111;
+	// set DDRD6-4 to READ
+	DDRD &= 0b10001111;
 	
 	// COL4
 	CLEAR_BIT(PORTC, PC3);
