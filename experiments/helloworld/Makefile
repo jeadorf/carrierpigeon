@@ -5,7 +5,8 @@ STRIP=$(XPATH)/avr-strip
 AVRDUDE=$(XPATH)/avrdude
 OBJDUMP=$(XPATH)/avr-objdump
 
-DEFINES=-DF_CPU=11000000
+# 16 MHz
+DEFINES=-DF_CPU=16000000
 
 MCU=atmega8515
 
