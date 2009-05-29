@@ -8,7 +8,9 @@
 #include "main.h"
 
 /* TODO: Simplify set and read bit operations */
-    
+/* TODO: Do procedure docs belong to the C-file or to the header? */
+/* TODO: Look whether these procedures are predefined in the AVR libraries */
+
 /*
  * Writes one byte to the EEPROM at the specified memory address.
  */
