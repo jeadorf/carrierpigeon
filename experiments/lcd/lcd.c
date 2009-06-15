@@ -33,33 +33,39 @@ void lcd_write(char data)
 	PORTE |= _BV(LCD_CS);
 }
 
+/* reset the display and clear it */
 void lcd_init(void)
 {
-	// reset the display and clear it
+	/* first, force a hardware reset
+	 * there isn't a spec for how long this requires
+	 * - it's suggested to tie it to the CPU reset -
+	 * but it has to wait until power is stable
+	 * so we'll delay for 100ms
+	 */
 
-	// first, force a hardware reset
-	// there isn't a spec for how long this requires
-	// - it's suggested to tie it to the CPU reset -
-	// but it has to wait until power is stable
-	// so we'll delay for 100ms
-
-	// set the ports to be outputs
-	DDRA = 0xff;
+	/* set-up the required ports to be outputs:
+	 * all of PORTA (D0-7)
+	 * one bit on PORTB (RS)
+	 * one bit on PORTC (RST)
+	 * two bits on PORTE (CS, WR)
+	 */
+	DDRA = 0xFF;
 	SET_BIT(DDRB, DDB3);
 	SET_BIT(DDRC, DDC7);
 	SET_BIT(DDRE, DDE0);
 	SET_BIT(DDRE, DDE1);
 	
 	// with control lines all high except reset
-	SET_BIT(PORTE, LCD_CS);
-	CLEAR_BIT(PORTC, LCD_RST);
-	SET_BIT(PORTB, LCD_RS);
-	SET_BIT(PORTE, LCD_WR);
-	SET_BIT(PORTB, LCD_RD);
+	SET_LCD_CS();
+	CLEAR_LCD_RST();
+
+	SET_LCD_RS();
+	SET_LCD_WR();
+	SET_LCD_RD();
 	// startup delay of 100ms
 	_delay_ms(100);
 	// and rst high again
-	SET_BIT(PORTC, LCD_RST);
+	SET_LCD_RST();
 	
 	lcd_control(0xA2);      // <- Bias 1/9
 	lcd_control(0xA0);      // <- ADC Direction L-R

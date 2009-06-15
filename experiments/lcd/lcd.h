@@ -6,8 +6,8 @@ void lcd_control(unsigned char control);
 void lcd_write(char data);
 void lcd_init(void);
 
-// Port Pin Assignments
-// PA0-7 -> D0-7
+// Port-Pin Assignments
+// PA0-7 => D0-7
 
 // chip select
 #define LCD_CS  PE0
@@ -20,3 +20,19 @@ void lcd_init(void);
 // read
 #define LCD_RD  PB2
 
+// line switches
+// CS
+#define SET_LCD_CS() SET_BIT(PORTE, LCD_CS)
+#define CLEAR_LCD_CS() CLEAR_BIT(PORTE, LCD_CS)
+// RST
+#define SET_LCD_RST() SET_BIT(PORTC, LCD_RST)
+#define CLEAR_LCD_RST() CLEAR_BIT(PORTC, LCD_RST)
+// RS
+#define SET_LCD_RS() SET_BIT(PORTB, LCD_RS)
+#define CLEAR_LCD_RS() CLEAR_BIT(PORTB, LCD_RS)
+// WR
+#define SET_LCD_WR() SET_BIT(PORTE, LCD_WR)
+#define CLEAR_LCD_WR() CLEAR_BIT(PORTE, LCD_WR)
+// RD
+#define SET_LCD_RD() SET_BIT(PORTB, LCD_RD)
+#define CLEAR_LCD_RD() CLEAR_BIT(PORTB, LCD_RD)
