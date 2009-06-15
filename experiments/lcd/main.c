@@ -61,18 +61,18 @@ void lcd_init(void)
 
    // set the ports to be outputs
    DDRA = 0xff;
-   DDRB = 0xff;
-   DDRC = 0xff;
-   DDRD = 0xff;
-   DDRE = 0xff;
+   SET_BIT(DDRB, DDB3);
+   SET_BIT(DDRC, DDC7);
+   SET_BIT(DDRE, DDE0);
+   SET_BIT(DDRE, DDE1);
 
    // with control lines all high except reset
    PORTC = (~(_BV(rst)));
    // startup delay of 100ms
-   for (q=0; q<4; q++)
-      _delay_loop_2(50000);
+   _delay_ms(100);
    // and rst high again
    PORTC = 0xff;
+   //SET_BIT(PORTC, rst);
 
    lcd_control(0xA2);      // <- Bias 1/9
    lcd_control(0xA0);      // <- ADC Direction L-R
