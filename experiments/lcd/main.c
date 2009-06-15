@@ -67,12 +67,15 @@ void lcd_init(void)
    SET_BIT(DDRE, DDE1);
 
    // with control lines all high except reset
-   PORTC = (~(_BV(rst)));
+   SET_BIT(PORTE, cs);
+   CLEAR_BIT(PORTC, rst);
+   SET_BIT(PORTB, rs);
+   SET_BIT(PORTE, wr);
+   SET_BIT(PORTB, rd);
    // startup delay of 100ms
    _delay_ms(100);
    // and rst high again
-   PORTC = 0xff;
-   //SET_BIT(PORTC, rst);
+   SET_BIT(PORTC, rst);
 
    lcd_control(0xA2);      // <- Bias 1/9
    lcd_control(0xA0);      // <- ADC Direction L-R
@@ -90,9 +93,6 @@ void lcd_init(void)
    lcd_control(0x10);      // <- column address high = 0
    lcd_control(0x00);      // <- column address low = 0
 
-   // clear screen
-   //lcd_cls();
-      
    return;
 } 
 
