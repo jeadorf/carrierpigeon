@@ -5,7 +5,11 @@ void lcd_light(unsigned char level)
 {
 	if (level >= 2)
 	{
-		DDRE |= _BV(LCD_BRIGHTNESS);
+		SET_BIT(DDRE, LCD_BRIGHTNESS);
+	}
+	else
+	{
+		CLEAR_BIT(DDRE, LCD_BRIGHTNESS);
 	}
 
 	if (level > 0)
@@ -16,6 +20,15 @@ void lcd_light(unsigned char level)
 	{
 		CLEAR_BIT(PORTE, LCD_BRIGHTNESS);
 	}
+}
+
+/* 0 - 63 */
+void lcd_contrast(unsigned char level)
+{
+	// switch to volume mode
+	lcd_control(0x81);
+	// set volume
+	lcd_control(level);
 }
 
 void lcd_control(unsigned char control)
