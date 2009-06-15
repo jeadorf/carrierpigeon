@@ -42,22 +42,3 @@ PE2.O: LCD_BRIGHTNESS (OC1B)
 #define SET_BIT(port, bit)   ((port) |= (1 << (bit)))
 #define CLEAR_BIT(port, bit) ((port) &= ~(1 << (bit)))
 
-//***************************************************************************
-//* Port Pin Assignments
-//***************************************************************************
-
-// pa0-7 ->   d0-7
-
-// note that we have wired the display in 8080 mode
-// so wr and rd rather than r/~w and e
-
-/* chip select  */
-#define LCD_CS  PE0
-/* chip reset   */
-#define LCD_RST PC7
-/* data/control */
-#define LCD_RS  PB3
-/* write        */
-#define LCD_WR  PE1
-/* read         */
-#define LCD_RD  PB2
