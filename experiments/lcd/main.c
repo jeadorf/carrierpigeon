@@ -1,20 +1,6 @@
 #include <stdbool.h>
 #include "main.h"
 
-//***************************************************************************
-//* Port Pin Assignments
-//***************************************************************************
-
-// pa0-7 ->   d0-7
-
-// note that we have wired the display in 8080 mode
-// so wr and rd rather than r/~w and e
-#define   cs  PE0      /* chip select  */
-#define   rst PC7      /* chip reset   */
-#define   rs  PB3      /* data/control */
-#define   wr  PE1      /* write        */
-#define   rd  PB2      /* read         */
-   
 void lcd_control(unsigned char control)
 {
    // write a control value to the KS0713
@@ -26,13 +12,13 @@ void lcd_control(unsigned char control)
    // rs goes high (rs moves before and after
    // the other lines to meet timing constraints)
 
-   PORTB &= ~_BV(rs);
-   PORTE &= ~_BV(cs);
-   PORTE &= ~_BV(wr);
-   PORTB |= _BV(rd);
+   PORTB &= ~_BV(LCD_RS);
+   PORTE &= ~_BV(LCD_CS);
+   PORTE &= ~_BV(LCD_WR);
+   PORTB |= _BV(LCD_RD);
    PORTA = control;
-   PORTE |= _BV(wr);
-   PORTE |= _BV(cs);
+   PORTE |= _BV(LCD_WR);
+   PORTE |= _BV(LCD_CS);
 }
    
 void lcd_write(char data)
@@ -40,60 +26,59 @@ void lcd_write(char data)
    // writes arg0 to the currently selected column of the display
    // rs high for data
 
-   PORTB |= _BV(rs);
-   PORTE &= ~_BV(cs);
-   PORTE &= ~_BV(wr);
+   PORTB |= _BV(LCD_RS);
+   PORTE &= ~_BV(LCD_CS);
+   PORTE &= ~_BV(LCD_WR);
    PORTC = data;
-   PORTE |= _BV(wr);
-   PORTE |= _BV(cs);
+   PORTE |= _BV(LCD_WR);
+   PORTE |= _BV(LCD_CS);
 }
 
 void lcd_init(void)
 {
-   // reset the display and clear it
-   int q;
-   
-   // first, force a hardware reset
-   // there isn't a spec for how long this requires
-   // - it's suggested to tie it to the CPU reset -
-   // but it has to wait until power is stable
-   // so we'll delay for 100ms
+	// reset the display and clear it
 
-   // set the ports to be outputs
-   DDRA = 0xff;
-   SET_BIT(DDRB, DDB3);
-   SET_BIT(DDRC, DDC7);
-   SET_BIT(DDRE, DDE0);
-   SET_BIT(DDRE, DDE1);
+	// first, force a hardware reset
+	// there isn't a spec for how long this requires
+	// - it's suggested to tie it to the CPU reset -
+	// but it has to wait until power is stable
+	// so we'll delay for 100ms
 
-   // with control lines all high except reset
-   SET_BIT(PORTE, cs);
-   CLEAR_BIT(PORTC, rst);
-   SET_BIT(PORTB, rs);
-   SET_BIT(PORTE, wr);
-   SET_BIT(PORTB, rd);
-   // startup delay of 100ms
-   _delay_ms(100);
-   // and rst high again
-   SET_BIT(PORTC, rst);
-
-   lcd_control(0xA2);      // <- Bias 1/9
-   lcd_control(0xA0);      // <- ADC Direction L-R
-   lcd_control(0xC0);      // <- SHL Direction 0-64
-   lcd_control(0x25);      // <- Voltage ref
-   lcd_control(0x81);      // <- Volume mode
-   lcd_control(0x20);      // <- Volume set
-   lcd_control(0x00);      // <- This probably isn't required here - it's set below
-   lcd_control(0x2F);      // <- Vf, Vr, Vc on
-   lcd_control(0x40);      // <- Initial display line
-   lcd_control(0xA7);      // <- Normal display
-   lcd_control(0xAF);      // <- turn display on
-
-   lcd_control(0xB0);      // <- page address = 0
-   lcd_control(0x10);      // <- column address high = 0
-   lcd_control(0x00);      // <- column address low = 0
-
-   return;
+	// set the ports to be outputs
+	DDRA = 0xff;
+	SET_BIT(DDRB, DDB3);
+	SET_BIT(DDRC, DDC7);
+	SET_BIT(DDRE, DDE0);
+	SET_BIT(DDRE, DDE1);
+	
+	// with control lines all high except reset
+	SET_BIT(PORTE, LCD_CS);
+	CLEAR_BIT(PORTC, LCD_RST);
+	SET_BIT(PORTB, LCD_RS);
+	SET_BIT(PORTE, LCD_WR);
+	SET_BIT(PORTB, LCD_RD);
+	// startup delay of 100ms
+	_delay_ms(100);
+	// and rst high again
+	SET_BIT(PORTC, LCD_RST);
+	
+	lcd_control(0xA2);      // <- Bias 1/9
+	lcd_control(0xA0);      // <- ADC Direction L-R
+	lcd_control(0xC0);      // <- SHL Direction 0-64
+	lcd_control(0x25);      // <- Voltage ref
+	lcd_control(0x81);      // <- Volume mode
+	lcd_control(0x20);      // <- Volume set
+	lcd_control(0x00);      // <- This probably isn't required here - it's set below
+	lcd_control(0x2F);      // <- Vf, Vr, Vc on
+	lcd_control(0x40);      // <- Initial display line
+	lcd_control(0xA7);      // <- Normal display
+	lcd_control(0xAF);      // <- turn display on
+	
+	lcd_control(0xB0);      // <- page address = 0
+	lcd_control(0x10);      // <- column address high = 0
+	lcd_control(0x00);      // <- column address low = 0
+	
+	return;
 } 
 
 int main(void)
