@@ -5,6 +5,9 @@
 void lcd_control(unsigned char control);
 void lcd_write(char data);
 void lcd_init(void);
+void lcd_light(unsigned char level);
+
+#define LCD_BRIGHTNESS PE2
 
 // Port-Pin Assignments
 // PA0-7 => D0-7

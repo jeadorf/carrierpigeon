@@ -1,5 +1,23 @@
 #include "lcd.h"
 
+/* 0 (off), 1 (normal), 2 (bright) */
+void lcd_light(unsigned char level)
+{
+	if (level >= 2)
+	{
+		DDRE |= _BV(LCD_BRIGHTNESS);
+	}
+
+	if (level > 0)
+	{
+		SET_BIT(PORTE, LCD_BRIGHTNESS);
+	}
+	else
+	{
+		CLEAR_BIT(PORTE, LCD_BRIGHTNESS);
+	}
+}
+
 void lcd_control(unsigned char control)
 {
 	// write a control value to the KS0713
