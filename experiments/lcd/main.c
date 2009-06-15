@@ -29,6 +29,7 @@ void lcd_control(unsigned char control)
    PORTB &= ~_BV(rs);
    PORTE &= ~_BV(cs);
    PORTE &= ~_BV(wr);
+   PORTB |= _BV(rd);
    PORTA = control;
    PORTE |= _BV(wr);
    PORTE |= _BV(cs);
@@ -98,6 +99,7 @@ void lcd_init(void)
 int main(void)
 {
 	lcd_init();
+	lcd_control(0xA5);
 
 	return 0;
 }
