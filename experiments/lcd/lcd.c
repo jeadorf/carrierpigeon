@@ -123,7 +123,7 @@ void lcd_init(void)
 	lcd_control(0x00);      // <- This probably isn't required here - it's set below
 	lcd_control(0x2F);      // <- Vf, Vr, Vc on
 	lcd_control(0x40);      // <- Initial display line
-	lcd_control(0xA7);      // <- Normal display
+	lcd_control(0xA6);      // <- Normal display
 	lcd_control(0xAF);      // <- turn display on
 	
 	lcd_control(0xB0);      // <- page address = 0

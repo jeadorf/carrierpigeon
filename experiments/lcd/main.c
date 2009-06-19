@@ -29,7 +29,7 @@ int main(void)
 	    PORTE |= _BV(LCD_CS);
 	
 	    // data write
-	    lcd_write(0x00);
+	    lcd_write(0xff);
     }
     lcd_control(0b11101110);
     
