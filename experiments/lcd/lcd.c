@@ -119,7 +119,7 @@ void lcd_init(void)
 	lcd_control(0xC0);      // <- SHL Direction 0-64
 	lcd_control(0x25);      // <- Voltage ref
 	lcd_control(0x81);      // <- Volume mode
-	lcd_control(0x20);      // <- Volume set
+	lcd_control(0x30);      // <- Volume set
 	lcd_control(0x00);      // <- This probably isn't required here - it's set below
 	lcd_control(0x2F);      // <- Vf, Vr, Vc on
 	lcd_control(0x40);      // <- Initial display line
