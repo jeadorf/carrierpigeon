@@ -65,7 +65,35 @@ void lcd_write(char data)
 	PORTE |= _BV(LCD_CS);
 }
 
-/* reset the display and clear it */
+void lcd_set_page(char address)
+{
+    lcd_control(0xB0 + address);
+}
+
+void lcd_set_column(char address)
+{
+    // 4 most significant bits
+    lcd_control(0x10 + (address >> 4));
+    // 4 least significant bits
+    lcd_control(0x00 + (address & 0x0F)); 
+}
+
+void lcd_clear(void)
+{
+    int i;
+    for (i = 0; i < 8; i++)
+    {
+        lcd_set_page(i);
+        lcd_set_column(0);
+        int j;
+        for (j = 0; j < 132; j++)
+        {
+            lcd_write(0x00);
+        }
+    } 
+}
+
+/* reset the display */
 void lcd_init(void)
 {
 	/* first, force a hardware reset

@@ -9,13 +9,17 @@ int main(void)
 {
     lcd_init();
     
+    lcd_clear();
+    
+    lcd_set_page(5);
+    lcd_set_column(0);
     
     int i;
     for (i = 0; i < 132; i++)
     {
 	    // data write
 	    lcd_write(i % 0xff);
-    }  
+    }
 }
 
 int m_ain(void)
