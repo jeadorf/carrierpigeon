@@ -59,9 +59,25 @@ void lcd_write(char data)
 	PORTB |= _BV(LCD_RS);
 	PORTE &= ~_BV(LCD_CS);
 	PORTE &= ~_BV(LCD_WR);
-	PORTC = data;
+	PORTB |= _BV(LCD_RD);
+	PORTA = data;
 	PORTE |= _BV(LCD_WR);
 	PORTE |= _BV(LCD_CS);
+	
+	/* deleteme
+	SET_LCD_RS();
+	CLEAR_LCD_CS();
+	SET_LCD_RD();
+    CLEAR_LCD_WR();
+    
+    PORTA = data;
+    
+    CLEAR_LCD_RS();
+    SET_LCD_RD();
+    CLEAR_LCD_WR();
+    SET_LCD_CS();
+    
+    // end signal PORTA = 0b11101110; */
 }
 
 /* reset the display and clear it */
