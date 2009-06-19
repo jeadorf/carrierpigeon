@@ -1,7 +1,6 @@
 #include "main.h"
 
 // TODO: Simplify set and read bit operations
-// TODO: Are these procedures are predefined in the AVR libraries (probably not)
 
 void eeprom_write(unsigned int address, unsigned char data)
 {

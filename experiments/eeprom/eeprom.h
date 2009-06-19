@@ -1,7 +1,7 @@
 /*
  * Utils for IO operations on the EEPROM. The atmega8515 provides an EEPROM with
- * 512 bytes, each of them can be addressed using the EEPROM address register
- * EEAR (two registers EEARH and EEARL).
+ * 512 bytes, each of them can be addressed using the 9 least significant bits
+ * of the EEPROM address register EEAR (two registers EEARH and EEARL).
  */
 
 #include <avr/io.h>
