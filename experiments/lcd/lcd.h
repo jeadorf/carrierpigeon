@@ -7,7 +7,6 @@
  */
 
 #include <avr/io.h> 
-#include <util/delay.h>
 #include "main.h"
 
 /*
@@ -31,17 +30,19 @@ void lcd_init(void);
 /*
  * Wipes out all display RAM data.
  */
-void lcd_clear(void)
+void lcd_clear(void);
 
 /* Sets brightness. 
- * level  --  0 (off), 1 (normal), 2 (bright) */
+ * level  --  0 (off), 1 (normal), 2 (bright)
+ */
 void lcd_light(unsigned char level);
 
 /* level  --  0 - 63 */
-void lcd_contrast(unsigned char level)
+void lcd_contrast(unsigned char level);
 
 /* Sets the current page of the display RAM. The address
- * num  --  0 - 7 */
+ * has to be in the range 0 - 7
+ */
 void lcd_set_page(unsigned char num);
 
 #define LCD_BRIGHTNESS PE2
@@ -53,7 +54,7 @@ void lcd_set_page(unsigned char num);
 #define LCD_CS  PE0
 // chip reset
 #define LCD_RST PC7
-// data/control
+// data/control (aka A0)
 #define LCD_RS  PB3
 // write
 #define LCD_WR  PE1
@@ -62,17 +63,17 @@ void lcd_set_page(unsigned char num);
 
 // line switches
 // CS
-#define SET_LCD_CS() SET_BIT(PORTE, LCD_CS)
-#define CLEAR_LCD_CS() CLEAR_BIT(PORTE, LCD_CS)
+#define set_lcd_cs() set_bit(PORTE, LCD_CS)
+#define clear_lcd_cs() clear_bit(PORTE, LCD_CS)
 // RST
-#define SET_LCD_RST() SET_BIT(PORTC, LCD_RST)
-#define CLEAR_LCD_RST() CLEAR_BIT(PORTC, LCD_RST)
+#define set_lcd_rst() set_bit(PORTC, LCD_RST)
+#define clear_lcd_rst() clear_bit(PORTC, LCD_RST)
 // RS
-#define SET_LCD_RS() SET_BIT(PORTB, LCD_RS)
-#define CLEAR_LCD_RS() CLEAR_BIT(PORTB, LCD_RS)
+#define set_lcd_rs() set_bit(PORTB, LCD_RS)
+#define clear_lcd_rs() clear_bit(PORTB, LCD_RS)
 // WR
-#define SET_LCD_WR() SET_BIT(PORTE, LCD_WR)
-#define CLEAR_LCD_WR() CLEAR_BIT(PORTE, LCD_WR)
+#define set_lcd_wr() set_bit(PORTE, LCD_WR)
+#define clear_lcd_wr() clear_bit(PORTE, LCD_WR)
 // RD
-#define SET_LCD_RD() SET_BIT(PORTB, LCD_RD)
-#define CLEAR_LCD_RD() CLEAR_BIT(PORTB, LCD_RD)
+#define set_lcd_rd() set_bit(PORTB, LCD_RD)
+#define clear_lcd_rd() clear_bit(PORTB, LCD_RD)

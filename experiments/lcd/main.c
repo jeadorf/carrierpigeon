@@ -1,6 +1,5 @@
 #include <stdbool.h>
 #include "main.h"
-#include "lcd.h"
 
 // the smaller the faster
 #define DELAY_MS 20

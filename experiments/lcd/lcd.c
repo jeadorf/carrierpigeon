@@ -4,20 +4,20 @@ void lcd_light(unsigned char level)
 {
 	if (level >= 2)
 	{
-		SET_BIT(DDRE, LCD_BRIGHTNESS);
+		set_bit(DDRE, LCD_BRIGHTNESS);
 	}
 	else
 	{
-		CLEAR_BIT(DDRE, LCD_BRIGHTNESS);
+		clear_bit(DDRE, LCD_BRIGHTNESS);
 	}
 
 	if (level > 0)
 	{
-		SET_BIT(PORTE, LCD_BRIGHTNESS);
+		set_bit(PORTE, LCD_BRIGHTNESS);
 	}
 	else
 	{
-		CLEAR_BIT(PORTE, LCD_BRIGHTNESS);
+		clear_bit(PORTE, LCD_BRIGHTNESS);
 	}
 }
 
@@ -108,22 +108,22 @@ void lcd_init(void)
 	 * two bits on PORTE (CS, WR)
 	 */
 	DDRA = 0xFF;
-	SET_BIT(DDRB, DDB3);
-	SET_BIT(DDRC, DDC7);
-	SET_BIT(DDRE, DDE0);
-	SET_BIT(DDRE, DDE1);
+	set_bit(DDRB, DDB3);
+	set_bit(DDRC, DDC7);
+	set_bit(DDRE, DDE0);
+	set_bit(DDRE, DDE1);
 	
 	// with control lines all high except reset
-	SET_LCD_CS();
-	CLEAR_LCD_RST();
+	set_lcd_cs();
+	clear_lcd_rst();
 
-	SET_LCD_RS();
-	SET_LCD_WR();
-	SET_LCD_RD();
+	set_lcd_rs();
+	set_lcd_wr();
+	set_lcd_rd();
 	// startup delay of 100ms
 	_delay_ms(100);
 	// and rst high again
-	SET_LCD_RST();
+	set_lcd_rst();
 	
 	lcd_control(0xA2);      // <- Bias 1/9
 	lcd_control(0xA0);      // <- ADC Direction L-R

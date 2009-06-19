@@ -39,6 +39,6 @@ PE1.O: LCD_WR
 PE2.O: LCD_BRIGHTNESS (OC1B)
 */
 
-#define SET_BIT(port, bit)   ((port) |= (1 << (bit)))
-#define CLEAR_BIT(port, bit) ((port) &= ~(1 << (bit)))
+#define set_bit(port, bit)   ((port) |= (1 << (bit)))
+#define clear_bit(port, bit) ((port) &= ~(1 << (bit)))
 
