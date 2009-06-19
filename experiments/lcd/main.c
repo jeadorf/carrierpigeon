@@ -17,12 +17,11 @@ int main(void)
     int i;
     for (i = 0; i < 132; i++)
     {
-	    // data write
 	    lcd_write(i % 0xff);
     }
 }
 
-int m_ain(void)
+int _main(void)
 {
 	int contrast = 0;
 	bool rising = true;

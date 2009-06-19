@@ -1,6 +1,5 @@
 #include "lcd.h"
 
-/* 0 (off), 1 (normal), 2 (bright) */
 void lcd_light(unsigned char level)
 {
 	if (level >= 2)
@@ -22,7 +21,6 @@ void lcd_light(unsigned char level)
 	}
 }
 
-/* 0 - 63 */
 void lcd_contrast(unsigned char level)
 {
 	// switch to volume mode
@@ -51,7 +49,7 @@ void lcd_control(unsigned char control)
 	PORTE |= _BV(LCD_CS);
 }
    
-void lcd_write(char data)
+void lcd_write(unsigned char data)
 {
 	// writes arg0 to the currently selected column of the display
 	// rs high for data
@@ -65,17 +63,17 @@ void lcd_write(char data)
 	PORTE |= _BV(LCD_CS);
 }
 
-void lcd_set_page(char address)
+void lcd_set_page(unsigned char pagenum)
 {
-    lcd_control(0xB0 + address);
+    lcd_control(0xB0 + pagenum);
 }
 
-void lcd_set_column(char address)
+void lcd_set_column(unsigned char colnum)
 {
     // 4 most significant bits
-    lcd_control(0x10 + (address >> 4));
+    lcd_control(0x10 + (colnum >> 4));
     // 4 least significant bits
-    lcd_control(0x00 + (address & 0x0F)); 
+    lcd_control(0x00 + (colnum & 0x0F)); 
 }
 
 void lcd_clear(void)

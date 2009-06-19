@@ -1,4 +1,3 @@
-#include <avr/io.h>
 #include "main.h"
 
 // TODO: Simplify set and read bit operations

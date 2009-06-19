@@ -3,6 +3,8 @@
  * 512 bytes, each of them can be addressed using the EEPROM address register
  * EEAR (two registers EEARH and EEARL).
  */
+
+#include <avr/io.h>
  
 /*
  * Writes exactly one byte to the EEPROM at the specified memory address.

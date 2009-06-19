@@ -1,12 +1,49 @@
+/* LCD library
+ *
+ * The LCD display is a 65x135 bit matrix. Bits cannot addressed directly.
+ * Instead, the display is divided into 8 horizontal segments that are called
+ * "pages". Each page consists of 132 columns. One column consists of 8 bit 
+ * stacked vertically on top of another.
+ */
+
 #include <avr/io.h> 
 #include <util/delay.h>
 #include "main.h"
 
+/*
+ * Writes a control byte to the display. See both lcd_init method and the 
+ * display manual for further reference.
+ */
 void lcd_control(unsigned char control);
-void lcd_write(char data);
+
+/*
+ * Writes a byte to one display column. The write operation automatically 
+ * increments the current column address.
+ */
+void lcd_write(unsigned char data);
+
+/*
+ * Sets display mode, contrast, brightness and makes sure the LCD is in a valid
+ * state.
+ */
 void lcd_init(void);
+
+/*
+ * Wipes out all display RAM data.
+ */
+void lcd_clear(void)
+
+/* Sets brightness. 
+ * level  --  0 (off), 1 (normal), 2 (bright) */
 void lcd_light(unsigned char level);
-void lcd_set_page(char address);
+
+/* level  --  0 - 63 */
+void lcd_contrast(unsigned char level)
+
+/* Sets the current page of the display RAM. The address
+ * num  --  0 - 7 */
+void lcd_set_page(unsigned char num);
+
 #define LCD_BRIGHTNESS PE2
 
 // Port-Pin Assignments
