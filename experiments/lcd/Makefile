@@ -19,7 +19,7 @@ SRECS=\
 
 all: $(SRECS)
 
-main: main.o lcd.o
+main: main.o lcd.o text.o
 
 PROGRAMS=$(SRECS:.srec=)
 OBJFILES=$(SRECS:.srec=.o)

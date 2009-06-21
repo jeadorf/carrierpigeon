@@ -1,5 +1,5 @@
-#include <text.h>
-#include <lcd.h>
+#include "text.h"
+#include "lcd.h"
 
 // TODO: Test
 // TODO: Think about storing bit matrix data externally and not within 8kb flash 
