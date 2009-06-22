@@ -15,17 +15,19 @@ int main(void)
     // char* text = "abcdef123";
     
     unsigned char invert = 0xff;
-    lcd_draw_char_masked('a', invert);
-    lcd_draw_char_masked('b', invert);
-    lcd_draw_char_masked('c', invert);
-    lcd_draw_char_masked('d', invert);
-    lcd_draw_char_masked('e', invert);
-    lcd_draw_char_masked('f', invert);
+    lcd_write(0xff);
+    lcd_draw_char_masked('D', invert);
+    lcd_draw_char_masked('E', invert);
+    lcd_draw_char_masked('A', invert);
+    lcd_draw_char_masked('D', invert);
+    lcd_draw_char_masked('B', invert);
+    lcd_draw_char_masked('E', invert);
+    lcd_draw_char_masked('E', invert);
+    lcd_draw_char_masked('F', invert);
+    lcd_draw_char_masked('@', invert);
     lcd_draw_char_masked('1', invert);
     lcd_draw_char_masked('2', invert);
     lcd_draw_char_masked('3', invert);
-    lcd_draw_char_masked('@', invert);
-    lcd_write(0xff);
     
     /*
     lcd_set_page(6);

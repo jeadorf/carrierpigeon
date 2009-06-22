@@ -46,12 +46,12 @@
  *  1      
  *  1      
  */         
-#define CHAR_TABLE_LENGTH 10
+#define CHAR_TABLE_LENGTH 13
 
 // some fun, configurable stuff
 #define BOTTOM {0x04, 0x04, 0x7c, 0x04, 0x04}
 #define UNIFAIL {0x7c, 0x44, 0x44, 0x7c, 0x00}
-#define UNDEFINED_CHARACTER UNIFAIL
+#define UNDEFINED_CHAR UNIFAIL
 
 char characters[CHAR_TABLE_LENGTH][5] = {
     // A
@@ -66,6 +66,12 @@ char characters[CHAR_TABLE_LENGTH][5] = {
     {0x7c, 0x54, 0x54, 0x44, 0x00},
     // F
     {0x7c, 0x50, 0x50, 0x40, 0x00},
+    // G
+    UNDEFINED_CHAR,
+    // H
+    UNDEFINED_CHAR,
+    // I
+    {0x44, 0x7c, 0x44, 0x00, 0x00},
     // 1
     {0x10, 0x20, 0x7c, 0x00, 0x00},
     // 2
@@ -74,7 +80,7 @@ char characters[CHAR_TABLE_LENGTH][5] = {
     {0x44, 0x54, 0x54, 0x38, 0x00},
     // <undefined> at position CHAR_TABLE_LENGTH - 1
     // 
-    UNDEFINED_CHARACTER,
+    UNDEFINED_CHAR,
 };
 
 // TODO: Test
@@ -87,8 +93,6 @@ void lcd_draw_char(unsigned char c)
 
 void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
 {
-    // Insert a little space
-    lcd_write(0x0 ^ xor_mask);
     char i;
     
     // Map character
@@ -97,6 +101,8 @@ void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
     {
         lcd_write(characters[j][i] ^ xor_mask);
     }  
+    // Insert a little space
+    lcd_write(0x0 ^ xor_mask);
 }
 
 char lcd_char_to_index(unsigned char c)
@@ -107,7 +113,7 @@ char lcd_char_to_index(unsigned char c)
     } else if (c >= 'a' && c <= 'z') {
         return c - 'a';
     } else if (c >= '0' && c <= '9') {
-        return c - '0' + 5;
+        return c - '0' + 8;
     } else {
         return CHAR_TABLE_LENGTH - 1;
     } 
