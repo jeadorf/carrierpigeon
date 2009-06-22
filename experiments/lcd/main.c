@@ -7,6 +7,23 @@
 int main(void)
 {
     lcd_init();
+    lcd_clear();
+    lcd_set_page(7);
+    lcd_set_column(0);
+    lcd_draw_char('a');
+    lcd_draw_char('b');
+    lcd_draw_char('c');
+    lcd_draw_char('d');
+    lcd_draw_char('e');
+    lcd_draw_char('f');
+    lcd_draw_char('1');
+    lcd_draw_char('2');
+    lcd_draw_char('3');
+}
+
+int __main(void)
+{
+    lcd_init();
     
     lcd_clear();
     

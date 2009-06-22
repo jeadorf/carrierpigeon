@@ -69,7 +69,7 @@ void lcd_draw_char(unsigned char c)
             lcd_write(0x7c);
             lcd_write(0x54);
             lcd_write(0x54);
-            lcd_write(0x28);
+            lcd_write(0x2c);
             break;
         case 'c':
         case 'C':
@@ -87,7 +87,7 @@ void lcd_draw_char(unsigned char c)
             break;
         case 'e':
         case 'E':
-            lcd_write(0x7d);
+            lcd_write(0x7c);
             lcd_write(0x54);
             lcd_write(0x54);
             lcd_write(0x44);
@@ -105,10 +105,10 @@ void lcd_draw_char(unsigned char c)
             lcd_write(0x7c);
             break;
         case '2':
-            lcd_write(0x20);
-            lcd_write(0x40);
-            lcd_write(0x5c);
-            lcd_write(0x20);
+            lcd_write(0x24);
+            lcd_write(0x4c);
+            lcd_write(0x54);
+            lcd_write(0x24);
             break;
         case '3':
             lcd_write(0x44);
