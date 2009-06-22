@@ -8,8 +8,42 @@ int main(void)
 {
     lcd_init();
     lcd_clear();
-    lcd_set_page(7);
+    
+    lcd_set_page(0);
+    lcd_set_column(10);
+    
+    // char* text = "abcdef123";
+    
+    unsigned char invert = 0xff;
+    lcd_draw_char_masked('a', invert);
+    lcd_draw_char_masked('b', invert);
+    lcd_draw_char_masked('c', invert);
+    lcd_draw_char_masked('d', invert);
+    lcd_draw_char_masked('e', invert);
+    lcd_draw_char_masked('f', invert);
+    lcd_draw_char_masked('1', invert);
+    lcd_draw_char_masked('2', invert);
+    lcd_draw_char_masked('3', invert);
+    lcd_write(0xff);
+    
+    /*
+    lcd_set_page(6);
     lcd_set_column(0);
+    
+    lcd_draw_char_masked('a', invert);
+    lcd_draw_char_masked('b', invert);
+    lcd_draw_char_masked('c', invert);
+    lcd_draw_char_masked('d', invert);
+    lcd_draw_char_masked('e', invert);
+    lcd_draw_char_masked('f', invert);
+    lcd_draw_char_masked('1', invert);
+    lcd_draw_char_masked('2', invert);
+    lcd_draw_char_masked('3', invert);
+    lcd_write(0xff);
+    
+    lcd_set_page(3);
+    lcd_set_column(0);
+    
     lcd_draw_char('a');
     lcd_draw_char('b');
     lcd_draw_char('c');
@@ -19,6 +53,15 @@ int main(void)
     lcd_draw_char('1');
     lcd_draw_char('2');
     lcd_draw_char('3');
+    
+    lcd_set_page(5);
+    lcd_set_column(0);
+    
+    int i;
+    for (i = 0; i < 132; i++)
+    {
+	    lcd_write(i % 0xff);
+    } */
 }
 
 int __main(void)
