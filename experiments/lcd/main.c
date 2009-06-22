@@ -29,6 +29,14 @@ int main(void)
     lcd_draw_char_masked('2', invert);
     lcd_draw_char_masked('3', invert);
     
+    lcd_set_page(1);
+    lcd_set_column(0);
+    char i;
+    for (i = 'A'; i <= 'Z'; i++)
+    {
+        lcd_draw_char(i);
+    }
+    
     /*
     lcd_set_page(6);
     lcd_set_column(0);
