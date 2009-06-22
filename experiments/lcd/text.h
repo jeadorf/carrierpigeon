@@ -21,5 +21,5 @@ void lcd_draw_char(unsigned char c);
 /* Draws a string. Does not care about line-wrapping. */
 void lcd_draw_string(unsigned char* s);
 
-/* */
+/* Maps a character to an index in the character table */
 char lcd_char_to_index(unsigned char c);

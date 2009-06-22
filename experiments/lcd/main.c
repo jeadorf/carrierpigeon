@@ -24,6 +24,7 @@ int main(void)
     lcd_draw_char_masked('1', invert);
     lcd_draw_char_masked('2', invert);
     lcd_draw_char_masked('3', invert);
+    lcd_draw_char_masked('@', invert);
     lcd_write(0xff);
     
     /*
