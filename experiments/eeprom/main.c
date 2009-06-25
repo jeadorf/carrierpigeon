@@ -1,8 +1,3 @@
-/* TODO: Does stdbool allow to use true and false as boolean constants? */
-
-#include <stdbool.h>
-#include "main.h"
-#include "eeprom.h"
 
 /* 
  * Fills the first 256 bytes of the EEPROM with numbers from 0 to 255 and
