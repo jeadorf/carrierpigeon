@@ -4,7 +4,8 @@
  * on the display.
  *
  * There is no line-wrapping, and no EOL detection. This function does not do
- * anything else than drawing the bit matrix that represents the given character.
+ * anything else than drawing the 8x5-bit matrix that represents the given
+ * character plus an extra 1-bit spacer column.
  *
  * c  --  A character value such as c = 'a'. For information regarding the
  *        supported characters, refer to the implementation.
