@@ -1,35 +1,35 @@
 #include "main.h"
-
-// TODO: Simplify set and read bit operations
+#include "../../main/global.h"
 
 void eeprom_write(unsigned int address, unsigned char data)
 {
-    // wait for completion of previous write
+    // Wait for completion of previous write
     while (EECR & (1 << EEWE))
         ;
     
-    // set up address register
+    // Set up address register
     EEAR = address;    
-    // set up data register
+    // Set up data register
     EEDR = data;
     
-    // no write takes place unless the EEMWE bit is set
-    EECR |= (1 << EEMWE);
+    // No write takes place unless the EEMWE bit is set
+    set(EECR, EEMWE); 
     
-    /* initiate eeprom write */
-    EECR |= (1 << EEWE);
+    /* Initiate eeprom write */
+    set(EECR, EEWE); 
 }
 
 unsigned char eeprom_read(unsigned int address)
 {
-    // wait for completion of previous write
+    // Wait for completion of previous write
     while (EECR & (1 << EEWE))
         ;
         
-    // set up address register
+    // Set up address register
     EEAR = address;   
-    // start eeprom read
-    EECR |= (1 << EERE);
+    
+    // Start eeprom read
+    set(EECR, EERE);
     
     return EEDR;
 }
