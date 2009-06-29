@@ -126,15 +126,18 @@ void lcd_init(void)
 	set_lcd_rst();
 	
 	lcd_control(0xA2);      // <- Bias 1/9
-	lcd_control(0xA0);      // <- ADC Direction L-R
-	lcd_control(0xC0);      // <- SHL Direction 0-64
-	lcd_control(0x25);      // <- Voltage ref
+    
+    // both directions on reverse ("reverse" according to LCD datasheet)
+    lcd_control(0xA1);      // <- ADC Direction L-R
+	lcd_control(0xC8);      // <- SHL Direction 0-64
+	
+    lcd_control(0x25);      // <- Voltage ref
 	lcd_control(0x81);      // <- Volume mode
 	lcd_control(0x30);      // <- Volume set
 	lcd_control(0x00);      // <- This probably isn't required here - it's set below
 	lcd_control(0x2F);      // <- Vf, Vr, Vc on
 	lcd_control(0x40);      // <- Initial display line
-	lcd_control(0xA6);      // <- Normal display
+    lcd_control(0xA6);      // <- Normal display
 	lcd_control(0xAF);      // <- turn display on
 	
 	lcd_control(0xB0);      // <- page address = 0
