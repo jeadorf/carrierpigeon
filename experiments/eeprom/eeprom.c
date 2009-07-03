@@ -13,10 +13,10 @@ void eeprom_write(unsigned int address, unsigned char data)
     EEDR = data;
     
     // No write takes place unless the EEMWE bit is set
-    set(EECR, EEMWE); 
+    set_bit(EECR, EEMWE); 
     
     /* Initiate eeprom write */
-    set(EECR, EEWE); 
+    set_bit(EECR, EEWE); 
 }
 
 unsigned char eeprom_read(unsigned int address)
@@ -29,7 +29,7 @@ unsigned char eeprom_read(unsigned int address)
     EEAR = address;   
     
     // Start eeprom read
-    set(EECR, EERE);
+    set_bit(EECR, EERE);
     
     return EEDR;
 }

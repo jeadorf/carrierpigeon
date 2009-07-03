@@ -1,4 +1,3 @@
-#include "main.h"
 #include "eeprom.h"
 
 #include <avr/io.h> 
