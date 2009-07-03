@@ -5,9 +5,9 @@
 
 /* Use this macro to set a single bit. To set more than one bit, use the
  * following pattern: PORTX |= (1 << PX2) | (1 << PX4) | (1 << PX7); */
-#define set(port, bit)   ((port) |= (1 << (bit)))
+#define set_bit(port, bit)   ((port) |= (1 << (bit)))
 
 /* Use this macro to clear a single bit. To clear more than one bit, use the
  * following pattern: PORTX &= ~(1 << PX2) | (1 << PX4) | (1 << PX7); */
-#define clear(port, bit) ((port) &= ~(1 << (bit)))
+#define clear_bit(port, bit) ((port) &= ~(1 << (bit)))
 

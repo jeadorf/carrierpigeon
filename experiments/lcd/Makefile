@@ -24,12 +24,12 @@ main: main.o lcd.o text.o
 PROGRAMS=$(SRECS:.srec=)
 OBJFILES=$(SRECS:.srec=.o)
 ASSEMBLY=$(SRECS:.srec=.asm)
-
+INCLUDEPATH=../../main
 clean:
 	rm -f $(SRECS) $(PROGRAMS) *.o $(ASSEMBLY) *.flash *.hex *~
 
 %.o: %.c
-	$(CC)  -O2 $(DEFINES) -mmcu=$(MCU) -c $^ -o $@
+	$(CC)  -O2 $(DEFINES) -mmcu=$(MCU) -c $^ -o $@ -I$(INCLUDEPATH)
 
 %: %.o 
 	$(CC)  -O2 -mmcu=$(MCU) $(LDFLAGS) $^ -o $@

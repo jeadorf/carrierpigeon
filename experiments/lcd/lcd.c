@@ -1,3 +1,4 @@
+#include "global.h"
 #include "lcd.h"
 
 void lcd_light(unsigned char level)
