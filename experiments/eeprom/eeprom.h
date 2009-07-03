@@ -5,7 +5,9 @@
  */
 
 #include <avr/io.h>
- 
+
+/* TODO: Check for AVR eeprom library (look at GNU AVR tools) */
+
 /*
  * Writes exactly one byte to the EEPROM at the specified memory address.
  */

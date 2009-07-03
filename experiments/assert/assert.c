@@ -1,19 +1,11 @@
-#include "assert.h"
+include "assert.h
 
-void assert_equals(char* error_msg, bool expected, bool actual) 
-{
-    if (expected != actual)
-    {
-        fail(error_msg);
-    }
-}
+// TODO: test assertions
 
 void assert_true(char* error_msg, bool actual)
 {
     if (actual == false)
     {
-        fail(error_msg);
-    }
 }
 
 void assert_false(char* error_msg, bool actual)
@@ -26,7 +18,16 @@ void assert_false(char* error_msg, bool actual)
 
 void fail(char* error_msg)
 {
-    // stop and communicate failure
+    // Write message to EEPROM, truncate message if running
+    // out of memory
+    int i = 0;
+    while (error_msg[i] != '\0' && (i < EEPROM_SIZE / 2))
+    {
+        eeprom_write(i + EEPROM_SIZE / 2, error_msg[i]);
+        i++;
+    }
+
+    // Signal that something is wrong. Run forever.
     while (true)
     {
         blink();

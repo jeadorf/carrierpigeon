@@ -11,3 +11,6 @@
  * following pattern: PORTX &= ~(1 << PX2) | (1 << PX4) | (1 << PX7); */
 #define clear_bit(port, bit) ((port) &= ~(1 << (bit)))
 
+/* set to whatever represents 8 bits */
+/* TODO: test this */
+typedef unsigned char byte;
