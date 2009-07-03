@@ -1,5 +1,4 @@
 #include "assert.h"
-#include "led.h"
 
 void assert_equals(char* error_msg, bool expected, bool actual) 
 {

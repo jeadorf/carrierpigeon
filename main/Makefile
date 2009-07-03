@@ -19,7 +19,7 @@ SRECS=\
 
 all: $(SRECS)
 
-main: main.o led.o assert.o
+main: main.o assert.o
 
 PROGRAMS=$(SRECS:.srec=)
 OBJFILES=$(SRECS:.srec=.o)
