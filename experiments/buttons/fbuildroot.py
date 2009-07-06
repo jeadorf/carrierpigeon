@@ -10,8 +10,8 @@ def build():
     static = fbuild.builders.c.guess_static(
             platform={'avr', 'gcc'},
             mmcu=MCU,
-            optimize=['-O2'],
-            macros={'F_CPU': CPU_HZ})
+            optimize=True,
+            macros=['F_CPU=%d' % CPU_HZ])
     exe = static.build_exe('main', ['main.c', 'buttons.c', 'led.c'])
 
     fbuild.execute(['avr-strip', exe])
