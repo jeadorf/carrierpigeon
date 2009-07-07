@@ -16,8 +16,6 @@ def build():
 
     fbuild.execute(['avr-strip', exe])
     fbuild.execute(['avr-objcopy', '-O', 'srec', exe, 'main.srec'])
-    fbuild.execute(['avr-objcopy', '-O', 'ihex', exe, 'main.hex'])
-    fbuild.execute(['avr-objcopy', '-O', 'binary', exe, 'main.flash'])
     fbuild.execute(['avrdude', '-c', PROG_METHOD,
         '-P', PORT, '-p', MCU,
         '-U', 'hfuse:w:0xdd:m',
