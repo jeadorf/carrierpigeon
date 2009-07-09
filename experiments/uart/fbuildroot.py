@@ -12,7 +12,7 @@ def build():
             mmcu=MCU,
             optimize=True,
             macros=['F_CPU=%d' % CPU_HZ])
-    exe = static.build_exe('main', ['main.c', 'uart.c', 'led.c'])
+    exe = static.build_exe('main', ['main.c', 'usart.c', 'led.c'])
 
     fbuild.execute(['avr-strip', exe])
     fbuild.execute(['avr-objcopy', '-O', 'srec', exe, 'main.srec'])
