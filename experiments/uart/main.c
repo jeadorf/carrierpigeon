@@ -1,15 +1,18 @@
+#include <stdbool.h>
 #include "main.h"
 #include "led.h"
 
 int main(void)
 {
-	USART_Init( 11 );   /* Set the baudrate to 19,200 bps using a 3.6864MHz crystal */
+	// set the baudrate to 19,200 bps using a 3.6864MHz crystal
+	USART_Init(11);
+	// enable interrupts => enable UART interrupts
+	sei();
 
-	sei();           /* Enable interrupts => enable UART interrupts */
-
-	for( ; ; )        /* Forever */
+	while (true)
 	{
-		USART_Transmit( USART_Receive() ); /* Echo the received character */
+		/* Echo the received character */
+		USART_Transmit(USART_Receive()); 
 	}
 
 	return 0;
