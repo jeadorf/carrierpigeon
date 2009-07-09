@@ -5,7 +5,7 @@ int main(void)
 {
 	USART_Init( 11 );   /* Set the baudrate to 19,200 bps using a 3.6864MHz crystal */
 
-	_SEI();           /* Enable interrupts => enable UART interrupts */
+	sei();           /* Enable interrupts => enable UART interrupts */
 
 	for( ; ; )        /* Forever */
 	{
