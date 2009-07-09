@@ -1,8 +1,3 @@
-// AVR306: Using the AVR UART in C
-// Routines for interrupt controlled USART
-// Last modified: 02-06-21
-// Modified by: AR
-
 #include <avr/io.h>
 
 /* UART Buffer Defines */
@@ -26,12 +21,12 @@ static volatile unsigned char USART_TxHead;
 static volatile unsigned char USART_TxTail;
 
 /* Prototypes */
-void USART0_Init( unsigned int baudrate );
-unsigned char USART0_Receive( void );
-void USART0_Transmit( unsigned char data );
+void USART_Init( unsigned int baudrate );
+unsigned char USART_Receive( void );
+void USART_Transmit( unsigned char data );
 
 /* Initialize USART */
-void USART0_Init( unsigned int baudrate )
+void USART_Init( unsigned int baudrate )
 {
 	unsigned char x;
 
@@ -62,14 +57,15 @@ void USART0_Init( unsigned int baudrate )
 }
 
 /* Interrupt handlers */
-#pragma vector=USART0_RXC_vect 
-__interrupt void USART0_RX_interrupt(void)
+//#pragma vector=USART0_RXC_vect 
+//__interrupt void USART_RX_interrupt(void)
+ISR(USART_RX_vect)
 {
 	unsigned char data;
 	unsigned char tmphead;
 
 	/* Read the received data */
-	data = UDR0;                 
+	data = UDR;                 
 	/* Calculate buffer index */
 	tmphead = ( USART_RxHead + 1 ) & USART_RX_BUFFER_MASK;
 	USART_RxHead = tmphead;      /* Store new index */
@@ -82,8 +78,10 @@ __interrupt void USART0_RX_interrupt(void)
 	USART_RxBuf[tmphead] = data; /* Store received data in buffer */
 }
 
-#pragma vector=USART0_UDRE_vect 
-__interrupt void USART0_TX_interrupt( void )
+//#pragma vector=USART0_UDRE_vect 
+//__interrupt void USART_TX_interrupt( void )
+// TX interrupt
+ISR(USART_UDRE_vect)
 {
 	unsigned char tmptail;
 
@@ -94,16 +92,16 @@ __interrupt void USART0_TX_interrupt( void )
 		tmptail = ( USART_TxTail + 1 ) & USART_TX_BUFFER_MASK;
 		USART_TxTail = tmptail;      /* Store new index */
 	
-		UDR0 = USART_TxBuf[tmptail];  /* Start transmition */
+		UDR = USART_TxBuf[tmptail];  /* Start transmition */
 	}
 	else
 	{
-		UCSR0B &= ~(1<<UDRIE0);         /* Disable UDRE interrupt */
+		UCSRB &= ~(1<<UDRIE);         /* Disable UDRE interrupt */
 	}
 }
 
 /* Read and write functions */
-unsigned char USART0_Receive( void )
+unsigned char USART_Receive( void )
 {
 	unsigned char tmptail;
 	
@@ -116,7 +114,7 @@ unsigned char USART0_Receive( void )
 	return USART_RxBuf[tmptail];           /* Return data */
 }
 
-void USART0_Transmit( unsigned char data )
+void USART_Transmit( unsigned char data )
 {
 	unsigned char tmphead;
 	/* Calculate buffer index */
