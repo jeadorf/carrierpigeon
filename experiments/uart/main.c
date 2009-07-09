@@ -11,7 +11,7 @@ int main(void)
 
 	while (true)
 	{
-		/* Echo the received character */
+		// echo the received character
 		USART_Transmit(USART_Receive()); 
 	}
 
