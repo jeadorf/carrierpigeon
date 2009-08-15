@@ -1,4 +1,4 @@
-include "assert.h
+include "assert.h"
 
 // TODO: test assertions
 
@@ -6,6 +6,8 @@ void assert_true(char* error_msg, bool actual)
 {
     if (actual == false)
     {
+        fail(error_msg);
+    }
 }
 
 void assert_false(char* error_msg, bool actual)
