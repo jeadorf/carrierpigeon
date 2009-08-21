@@ -19,41 +19,74 @@ dependencies = (
 )
 
 # -- ACTUAL BUILD PROCESS --
+# TODO: do error checking
+# TODO: add documentation
+# TODO: make compiler options configurable
+# TODO: make linker options configurable
+# TODO: support verbosity configuration
+# TODO: add target clean (clean)
+# TODO: add target objcopy (copy)
+# TODO: add target objdump (dump)
+# TODO: add target avrstrip (strip)
+# TODO: add target avrdude (flash)
 import subprocess
+import os
 
-compile = [
-    "avr-gcc",
-    "-O2",
-    "-DF_CPU=16000000",
-    "-mmcu=atmega8515",
-    "-c"]
+verbose = False
 
-for f in files:
-    compile.append(f + ".c")
+def _info(message):
+    print message
 
-for d in dependencies:
-    compile.append("-I%s%s" % (path_to_root, "/".join(d[:-1])))
+def _fine(message):
+    if verbose:
+        print message
 
-print " ".join(compile)
+class Builder:
+    def __init__(self, path_to_root, files, dependencies):
+        self.path_to_root = path_to_root
+        self.files = files
+        self.dependencies = dependencies
+    def compile(self):
+        _info("Compiling ...")
+        compile_cmd = [
+            "avr-gcc",
+            "-c",
+            "-O2",
+            "-DF_CPU=16000000",
+            "-mmcu=atmega8515"] 
+        self._append_compile_sources(compile_cmd)
+        self._append_include_paths(compile_cmd)
+        self._execute(compile_cmd)
+    def _append_compile_sources(self, cmd):
+        for f in self.files:
+            cmd.append(f + ".c")
+    def _append_include_paths(self, cmd):
+        for d in self.dependencies:
+            cmd.append("-I%s%s" % (path_to_root, "/".join(d[:-1])))
+    def link(self):
+        _info("Linking ...")
+        link_cmd = [
+            "avr-gcc",
+            "-O2",
+            "-mmcu=atmega8515",
+            "-o main"]
+        self._append_compile_output_files(link_cmd)
+        self._append_dependencies_output_files(link_cmd)
+        self._execute(link_cmd)
+    def _append_compile_output_files(self, cmd):
+        for f in files:
+            cmd.append(f + ".o")
+    def _append_dependencies_output_files(self, cmd):
+        for d in dependencies:
+            cmd.append("%s%s.o" % (path_to_root, "/".join(d)))
+    def _execute(self, cmd):
+        _fine("Running '%s'" % " ".join(cmd))
+        proc = subprocess.Popen(cmd)
+        proc.communicate()
+        return proc
 
-compile_proc = subprocess.Popen(compile)
-compile_proc.communicate()
-
-link = [
-    "avr-gcc",
-    "-O2",
-    "-mmcu=atmega8515",
-    "-o main.o"]
-
-for f in files:
-    link.append(f + ".o")
-
-for d in dependencies:
-    link.append("%s%s.o" % (path_to_root, "/".join(d)))
-
-print " ".join(link)
-
-link_proc = subprocess.Popen(link)
-link_proc.communicate()
-
-
+if __name__ == "__main__":
+    builder = Builder(path_to_root, files, dependencies)
+    builder.compile()
+    builder.link()
+    print "Done."
