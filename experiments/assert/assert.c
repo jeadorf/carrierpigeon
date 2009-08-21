@@ -1,6 +1,8 @@
-include "assert.h"
-
+#include "assert.h"
+#include "eeprom.h"
+#include "led.h"
 // TODO: test assertions
+// TODO: make assertion lib compile
 
 void assert_true(char* error_msg, bool actual)
 {
