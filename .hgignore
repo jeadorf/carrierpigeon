@@ -7,4 +7,5 @@ main
 *.swp
 *.orig
 build/
+target/
 *.py[cod]

@@ -40,7 +40,7 @@ PE2.O: LCD_BRIGHTNESS (OC1B)
 */
 
 
-void main(void)
+int main(void)
 {
   int n;
   DDRC=0xf0;

@@ -17,6 +17,9 @@
 # TODO: add target avrdude (flash)
 # TODO: write some tests, especially for configuration parsing
 # TODO: wrap command line arguments with quotes if necessary
+# TODO: support inclusion of header files only
+# TODO: improve error handling if project with name xyz does not exist
+# TODO: add command-line option to control verbosity
 import subprocess
 import os
 import sys
