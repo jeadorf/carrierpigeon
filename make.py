@@ -2,6 +2,7 @@
 #
 # Build script.
 #
+"""Compiles and links projects."""
 
 # -- ACTUAL BUILD PROCESS --
 # TODO: do error checking
@@ -14,12 +15,14 @@
 # TODO: add target objdump (dump)
 # TODO: add target avrstrip (strip)
 # TODO: add target avrdude (flash)
+# TODO: write some tests, especially for configuration parsing
+# TODO: wrap command line arguments with quotes if necessary
 import subprocess
 import os
 import sys
 import ConfigParser
 
-verbose = False
+verbose = False 
 
 def _info(message):
     print message
@@ -29,21 +32,31 @@ def _fine(message):
         print message
 
 class ProjectManager:
-    """Retrieves project information when given a project name"""
+    """Retrieves project information when given a project name and keeps track
+    of the build status."""
+    # def get_project(self, name) -- retrieves a project
+    # def build(self, name)       -- ensures that a certain project is built
     pass
 
 class ConfigProjectManager:
+    # TODO: implement caching
     def __init__(self, config):
         self.config = config
-    def get_project(self, project_name):
-        sect = "project:" + project_name
+        self.projects = {}
+        self.builds = set()
+    def get_project(self, name):
+        if not name in self.projects:
+            self._load_project(name)
+        return self.projects[name]
+    def _load_project(self, name):
+        sect = "project:" + name 
         # path is required
         path = self.config.get(sect, "path")
         # files is optional
         if self.config.has_option(sect, "files"):
-            files = self.config.get(sect, "files").split(",")
+            files = [f.strip() for f in self.config.get(sect, "files").split(",")]
         else:
-            files = tuple() 
+            files = [] 
         # dependencies is optional
         if self.config.has_option(sect, "dependencies"):
             dep_tokens = self.config.get(sect, "dependencies").split(",")
@@ -51,11 +64,21 @@ class ConfigProjectManager:
                             dep[:dep.find(":")].strip(),
                             dep[dep.find(":")+1:].strip()) for dep in dep_tokens]
         else:
-            dependencies = tuple() 
-        print "Project: " + project_name
-        print "Dependencies: " + str(dependencies)
-        print
-        return Project(path, files, dependencies, self) 
+            dependencies = [] 
+        _fine("Loaded project '%s'" % name) 
+        # TODO: check conflicts
+        self.projects[name] = Project(name, path, files, dependencies, self) 
+    def build(self, name):
+        if self._needs_build(name):
+            project = self.get_project(name)
+            project.build()
+            self._set_build_completed(name)
+        else:
+            _fine("Nothing to do. Project '%s' has already been built." % name)
+    def _set_build_completed(self, name):
+        self.builds.add(name)
+    def _needs_build(self, name):
+        return name not in self.builds
 
 class Dependency:
     """Models a dependency. It does not hardlink to the project. Thus, it is
@@ -70,83 +93,88 @@ class Dependency:
 class Project:
     """Responsible for compilation, linking, flashing, cleaning and all other
     build targets. The builder class does not automatically build dependencies."""
-    def __init__(self, path, files, dependencies, project_manager):
+    def __init__(self, name, path, files, dependencies, project_manager):
         """path -- a relative path from the working directory where
                            the build script is executed. This parameter is
                            likely to vanish in future versions.
            files -- a list of C source files (names only, and no extension!) 
            dependencies -- a list of dependencies"""
+        self.name = name
         self.path = path
         self.files = files
         self.dependencies = dependencies
         self.project_manager = project_manager
+        # path from target subdir to script location
+        self.path_to_root = "../../"
+        path_copy = path
+        while os.path.split(path_copy)[0] != "":
+            self.path_to_root += "../"
+            path_copy = os.path.split(path_copy)[0]
+    def build(self):
+        """Compiles and links this project."""
+        _info("Building '%s' ..." % self.name)
+        self.compile()
+        self.link()
     def compile(self):
-        _info("Compiling ...")
+        _info("Compiling '%s' ..." % self.name)
         compile_cmd = [
             "avr-gcc",
             "-c",
             "-O2",
             "-DF_CPU=16000000",
-            "-mmcu=atmega8515"] 
+            "-mmcu=atmega8515"]
         self._append_compile_sources(compile_cmd)
         self._append_include_paths(compile_cmd)
         self._execute(compile_cmd)
     def _append_compile_sources(self, cmd):
         for f in self.files:
-            cmd.append(f + ".c")
+            cmd.append(os.path.join(self.path_to_root, self.path, f + ".c"))
     def _append_include_paths(self, cmd):
         for d in self.dependencies:
             dp = project_manager.get_project(d.project_name)
-            cmd.append("-I%s%s" % (dp.path, "/".join(d.file)))
+            cmd.append("-I%s" % os.path.join(self.path_to_root, dp.path, os.path.dirname(d.file)))
     def link(self):
-        _info("Linking ...")
+        _info("Linking '%s' ..." % self.name)
         link_cmd = [
             "avr-gcc",
             "-O2",
             "-mmcu=atmega8515",
-            "-o main"]
+            "-o", "main"]
+        self._build_dependencies()
         self._append_compile_output_files(link_cmd)
         self._append_dependencies_output_files(link_cmd)
         self._execute(link_cmd)
     def _append_compile_output_files(self, cmd):
-        for f in files:
+        for f in self.files:
             cmd.append(f + ".o")
     def _append_dependencies_output_files(self, cmd):
-        for d in dependencies:
-            cmd.append("%s%s.o" % (d.project.path, "/".join(d)))
+        for d in self.dependencies:
+            dp = project_manager.get_project(d.project_name)
+            cmd.append("%s.o" % os.path.join(self.path_to_root, "target", dp.path, d.file))
+    def _build_dependencies(self):
+        for d in self.dependencies:
+            project_manager.build(d.project_name)
     def _execute(self, cmd):
         _fine("Running '%s'" % " ".join(cmd))
-        proc = subprocess.Popen(cmd)
+        wd = os.path.join("target", self.path)
+        if not os.path.exists(wd):
+            _fine("Creating directory '%s'" % wd)
+            os.makedirs(wd)
+        _fine("Working directory is '%s'" % wd)
+        proc = subprocess.Popen(cmd, cwd = wd)
         proc.communicate()
         return proc
 
 
 if __name__ == "__main__":
-    project = sys.argv[1]
-    print "Building project '%s'" % project
+    _info("Building")
+    _info("-------------------------------------------------------------------")
 
     cfg = ConfigParser.ConfigParser()
     cfg.read("make.cfg")
-
-    # -- PREREQUISITES --
-    # TODO: move to configuration file
-    # TODO: replace examples
-    path = "experiments/assert"
-
-    files = (
-        "main",
-        "assert"
-    )
-
-    dependencies = (
-        Dependency("buttons", "led")
-        #("experiments", "buttons", "led"),
-        #("experiments", "eeprom", "eeprom")
-    )
-
-    # builder = Project(path, files, dependencies)
     project_manager = ConfigProjectManager(cfg)
-    project = project_manager.get_project("assert")
-    project.compile()
-    project.link()
-    print "Done."
+    for project_name in sys.argv[1:]:
+        project_manager.build(project_name)
+        
+    _info("-------------------------------------------------------------------")
+    _info("Done.")
