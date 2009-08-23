@@ -118,6 +118,9 @@ class Project:
         _info("Building '%s' ..." % self.name)
         self.compile()
         self.link()
+        self.strip()
+        # TODO: find out was avr dump does (in makefile)
+        self.objcopy()
     def compile(self):
         _info("Compiling '%s' ..." % self.name)
         compile_cmd = [
@@ -157,6 +160,34 @@ class Project:
     def _build_dependencies(self):
         for d in self.dependencies:
             project_manager.build(d.project_name)
+    def strip(self):
+        _info("Stripping '%s' ..." % self.name)
+        strip_cmd = [
+            "avr-strip",
+            "main",
+            "-o", "main-stripped"]
+        self._execute(strip_cmd)
+    def objcopy(self):
+        # TODO: find better name for this function
+        _info("Objcopy '%s' ..." % self.name)
+        srec_cmd = [
+            "avr-objcopy",
+            "-O", "srec",
+            "main-stripped",
+            "main.srec"]
+        ihex_cmd = [
+            "avr-objcopy",
+            "-O", "ihex",
+            "main-stripped",
+            "main.hex"]
+        binary_cmd = [
+            "avr-objcopy",
+            "-O", "binary",
+            "main-stripped",
+            "main.flash"]
+        self._execute(srec_cmd)
+        self._execute(ihex_cmd)
+        self._execute(binary_cmd)
     def _execute(self, cmd):
         _fine("Running '%s'" % " ".join(cmd))
         wd = os.path.join("target", self.path)
