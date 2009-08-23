@@ -38,9 +38,7 @@ project at maximum once.
 # TODO: make linker options configurable
 # TODO: support verbosity configuration
 # TODO: add target clean (clean)
-# TODO: add target objcopy (copy)
 # TODO: add target objdump (dump)
-# TODO: add target avrstrip (strip)
 # TODO: add target avrdude (flash)
 # TODO: write some tests, especially for configuration parsing
 # TODO: wrap command line arguments with quotes if necessary
@@ -51,6 +49,7 @@ import subprocess
 import os
 import sys
 import ConfigParser
+import optparse
 
 verbose = False 
 
@@ -224,6 +223,20 @@ class Project:
         self._execute(srec_cmd)
         self._execute(ihex_cmd)
         self._execute(binary_cmd)
+    def program(self):
+        program_cmd = [
+            "avrdude",
+            "-c", "avrisp2",
+            "-P", "usb",
+            "-p", "atmega8515",
+            "-U", "hfuse:w:0xdd:m",
+            "-U", "lfuse:w:0x3f:m",
+            "-U", "lock:w:0x3f:m",
+            "-U", "flash:w:main.srec"]
+        self._execute(program_cmd)
+    def clean(self):
+        # untested
+        print "[TODO]: Do you really Want to remove '%s'?" % os.path.join("target", self.path)
     def _execute(self, cmd):
         _fine("Running '%s'" % " ".join(cmd))
         wd = os.path.join("target", self.path)
@@ -236,15 +249,79 @@ class Project:
         return proc
 
 
+def add_build_option(option_parser):
+    option_parser.add_option(
+        "-b",
+        "--build",
+        action="store_true",
+        dest="build",
+        default=False,
+        help="Build projects.")
+
+def add_clean_option(option_parser):
+    option_parser.add_option(
+        "-c",
+        "--clean",
+        action="store_true",
+        dest="clean",
+        default=False,
+        help="Clean target directory."
+    )
+
+def add_program_option(option_parser):
+    option_parser.add_option(
+        "-p",
+        "--program",
+        action="store_true",
+        dest="program",
+        default=False,
+        help="Flash binary on target platform."
+    )
+
+
 if __name__ == "__main__":
-    _info("Building")
-    _info("-------------------------------------------------------------------")
+    option_parser = optparse.OptionParser()
+    add_build_option(option_parser)
+    add_clean_option(option_parser)
+    add_program_option(option_parser)
+    options, args = option_parser.parse_args()
+
+    if len(args) == 0:
+        _info("Nothing to do.")
+        exit(0)
+    
+    if not options.clean and not options.program:
+        options.build = True
 
     cfg = ConfigParser.ConfigParser()
     cfg.read("make.cfg")
     project_manager = ConfigProjectManager(cfg)
-    for project_name in sys.argv[1:]:
-        project_manager.build(project_name)
+
+    if options.clean:
+        _info("-------------------------------------------------------------------")
+        _info("Cleaning")
+        _info("-------------------------------------------------------------------")
+        for project_name in args: 
+            proj = project_manager.get_project(project_name)
+            proj.clean()
+   
+    if options.program or options.build:
+        _info("-------------------------------------------------------------------")
+        _info("Building")
+        _info("-------------------------------------------------------------------")
         
-    _info("-------------------------------------------------------------------")
-    _info("Done.")
+        for project_name in args: 
+            project_manager.build(project_name)
+            
+        _info("-------------------------------------------------------------------")
+        _info("Done.")
+        _info("-------------------------------------------------------------------")
+
+    if options.program:
+        _info("-------------------------------------------------------------------")
+        _info("Programming")
+        _info("-------------------------------------------------------------------")
+        
+        proj = project_manager.get_project(args[-1])
+        proj.program()
+
