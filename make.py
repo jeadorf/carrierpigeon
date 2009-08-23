@@ -2,7 +2,34 @@
 #
 # Build script.
 #
-"""Compiles and links projects."""
+"""Builds projects using the avr-gcc compiler. Projects are defined in a
+configuration file named 'make.cfg' that follows the Python ConfigParser
+syntax. The syntax is explained by example:
+    
+    [general]
+    # Options that apply to all projects are defined in this special section.
+    # There are no such options yet.
+
+    [project:foo]
+    # Defines a project identified by 'foo'. The identifier 'foo' will
+    # represent the project throughout the whole config file as well as the 
+    # build process.
+    path = examples/foo
+    # The path is relative to the location of the config file and it is required.
+    files = main, bar
+    # Specifies the names of the C source files without extension (please do not
+    # use fancy names here) that should be compiled during the build process.
+    dependencies = mylib:sensor, mylib2:led
+    # Tells the build script which files this project depends on. The script will
+    # automatically add the project paths to the GCC include path such that the
+    # C header files can be found during the compilation. Also, these directives
+    # will tell the script on what binaries to link.
+
+In order to build projects, call 'python make.py <project1> <project2> ...'.
+The script will automatically build dependencies and also build each
+project at maximum once.
+"""
+
 
 # -- ACTUAL BUILD PROCESS --
 # TODO: do error checking
@@ -41,8 +68,8 @@ class ProjectManager:
     # def build(self, name)       -- ensures that a certain project is built
     pass
 
-class ConfigProjectManager:
-    # TODO: implement caching
+class ConfigProjectManager(ProjectManager):
+    """Retrieves project information from a configuration file"""
     def __init__(self, config):
         self.config = config
         self.projects = {}
@@ -84,9 +111,10 @@ class ConfigProjectManager:
         return name not in self.builds
 
 class Dependency:
-    """Models a dependency. It does not hardlink to the project. Thus, it is
-    not required to initialize a valid project instance before declaring a
-    dependency on that project."""
+    """Models a dependency. A dependency object only links projects using
+    identifiers and not using instances of 'Project'. This makes it possible
+    to declare dependencies on projects solely on ID without having to load
+    them before."""
     def __init__(self, project_name, file):
         self.project_name = project_name
         self.file = file
@@ -98,9 +126,9 @@ class Project:
     build targets. The builder class does not automatically build dependencies."""
     def __init__(self, name, path, files, dependencies, project_manager):
         """path -- a relative path from the working directory where
-                           the build script is executed. This parameter is
-                           likely to vanish in future versions.
+                   the build script is executed.
            files -- a list of C source files (names only, and no extension!) 
+                    Do not use any fancy names here.
            dependencies -- a list of dependencies"""
         self.name = name
         self.path = path
@@ -108,13 +136,18 @@ class Project:
         self.dependencies = dependencies
         self.project_manager = project_manager
         # path from target subdir to script location
-        self.path_to_root = "../../"
-        path_copy = path
-        while os.path.split(path_copy)[0] != "":
-            self.path_to_root += "../"
-            path_copy = os.path.split(path_copy)[0]
+        self.path_to_root = self._construct_path_to_root(path)
+    def _construct_path_to_root(self, path):
+        # a bit hacky
+        ptr = "../../"
+        while os.path.split(path)[0] != "":
+            ptr += "../"
+            path = os.path.split(path)[0]
+        return ptr
     def build(self):
-        """Compiles and links this project."""
+        """Triggers all necessary actions to create a 'flashable' binary for
+        this project. Do not call this function directly, use an instance of
+        ProjectManager instead."""
         _info("Building '%s' ..." % self.name)
         self.compile()
         self.link()
@@ -122,6 +155,8 @@ class Project:
         # TODO: find out was avr dump does (in makefile)
         self.objcopy()
     def compile(self):
+        """Compiles all sources. This step needs access to the header files
+        but does not require other projects to be built"""
         _info("Compiling '%s' ..." % self.name)
         compile_cmd = [
             "avr-gcc",
@@ -140,6 +175,7 @@ class Project:
             dp = project_manager.get_project(d.project_name)
             cmd.append("-I%s" % os.path.join(self.path_to_root, dp.path, os.path.dirname(d.file)))
     def link(self):
+        """Builds all projects this project depends on and then links the binaries."""
         _info("Linking '%s' ..." % self.name)
         link_cmd = [
             "avr-gcc",
