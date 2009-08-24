@@ -243,7 +243,7 @@ class Project:
         return proc
 
 
-def add_build_option(option_parser):
+def _add_build_option(option_parser):
     option_parser.add_option(
         "-b",
         "--build",
@@ -252,7 +252,7 @@ def add_build_option(option_parser):
         default=False,
         help="Build projects.")
 
-def add_clean_option(option_parser):
+def _add_clean_option(option_parser):
     option_parser.add_option(
         "-c",
         "--clean",
@@ -262,7 +262,7 @@ def add_clean_option(option_parser):
         help="Clean target directory."
     )
 
-def add_program_option(option_parser):
+def _add_program_option(option_parser):
     option_parser.add_option(
         "-p",
         "--program",
@@ -272,7 +272,7 @@ def add_program_option(option_parser):
         help="Flash binary on target platform."
     )
 
-def add_verbosity_option(option_parser):
+def _add_verbosity_option(option_parser):
     option_parser.add_option(
         "-v",
         "--verbose",
@@ -284,10 +284,10 @@ def add_verbosity_option(option_parser):
 
 if __name__ == "__main__":
     option_parser = optparse.OptionParser()
-    add_build_option(option_parser)
-    add_clean_option(option_parser)
-    add_program_option(option_parser)
-    add_verbosity_option(option_parser)
+    _add_build_option(option_parser)
+    _add_clean_option(option_parser)
+    _add_program_option(option_parser)
+    _add_verbosity_option(option_parser)
     options, args = option_parser.parse_args()
 
     verbose = options.verbose
