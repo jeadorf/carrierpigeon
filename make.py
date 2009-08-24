@@ -33,18 +33,12 @@ project at maximum once.
 
 # -- ACTUAL BUILD PROCESS --
 # TODO: do error checking
-# TODO: add documentation
 # TODO: make compiler options configurable
 # TODO: make linker options configurable
-# TODO: support verbosity configuration
-# TODO: add target clean (clean)
-# TODO: add target objdump (dump)
-# TODO: add target avrdude (flash)
+# TODO: implement target clean (clean)
 # TODO: write some tests, especially for configuration parsing
-# TODO: wrap command line arguments with quotes if necessary
 # TODO: support inclusion of header files only
 # TODO: improve error handling if project with name xyz does not exist
-# TODO: add command-line option to control verbosity
 import subprocess
 import os
 import sys
@@ -278,13 +272,25 @@ def add_program_option(option_parser):
         help="Flash binary on target platform."
     )
 
+def add_verbosity_option(option_parser):
+    option_parser.add_option(
+        "-v",
+        "--verbose",
+        action="store_true",
+        dest="verbose",
+        default=False,
+        help="Be talkative."
+    )
 
 if __name__ == "__main__":
     option_parser = optparse.OptionParser()
     add_build_option(option_parser)
     add_clean_option(option_parser)
     add_program_option(option_parser)
+    add_verbosity_option(option_parser)
     options, args = option_parser.parse_args()
+
+    verbose = options.verbose
 
     if len(args) == 0:
         _info("Nothing to do.")
