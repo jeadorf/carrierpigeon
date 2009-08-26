@@ -240,6 +240,9 @@ class Project:
         _fine("Working directory is '%s'" % wd)
         proc = subprocess.Popen(cmd, cwd = wd)
         proc.communicate()
+        # fail-fast
+        if proc.returncode != 0:
+            exit(1)
         return proc
 
 

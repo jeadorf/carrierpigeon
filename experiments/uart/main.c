@@ -2,7 +2,7 @@
 #include "main.h"
 #include "led.h"
 
-int main(void)
+int _main(void)
 {
 	// set the baudrate to 19,200 bps using a 3.6864MHz crystal
 	USART_Init(11);

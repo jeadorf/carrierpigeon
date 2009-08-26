@@ -175,6 +175,18 @@ char lcd_char_to_index(unsigned char c)
         return c - 'a';
     } else if (c >= '0' && c <= '9') {
         return c - '0' + 26;
+    } else if (c == '?') {
+        return 36;
+    } else if (c == '!') {
+        return 37;
+    } else if (c == '.') {
+        return 38;
+    } else if (c == ',') {
+        return 39;
+    } else if (c == '-') {
+        return 40;
+    } else if (c == '+') {
+        return 41;
     } else {
         return CHAR_TABLE_LENGTH - 1;
     } 
