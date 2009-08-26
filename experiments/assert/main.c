@@ -4,5 +4,5 @@
 
 int main(void)
 {
-    assert_true("Expected to be true", false);
+    assert_true("Expected this to be true", false);
 }
