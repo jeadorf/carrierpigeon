@@ -303,7 +303,7 @@ def _add_clean_option(option_parser):
         action="store_true",
         dest="clean",
         default=False,
-        help="Clean target directory."
+        help="Clean project directory. Will only empty directories not remove them completely."
     )
 
 def _add_program_option(option_parser):
@@ -327,7 +327,7 @@ def _add_verbosity_option(option_parser):
     )
 
 if __name__ == "__main__":
-    option_parser = optparse.OptionParser()
+    option_parser = optparse.OptionParser("./make.py [OPTIONS] [PROJECT...]")
     _add_build_option(option_parser)
     _add_clean_option(option_parser)
     _add_program_option(option_parser)
@@ -374,8 +374,6 @@ if __name__ == "__main__":
             _info("Programming")
             _info("-------------------------------------------------------------------")
             
-            # the project that is specified as the last argument will be programmed
-            # to the device
             proj = project_manager.get_project(args[-1])
             proj.program()
                 
