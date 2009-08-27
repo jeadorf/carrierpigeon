@@ -6,6 +6,7 @@ syntax: glob
 main
 *.swp
 *.orig
+*~
 build/
 target/
 *.py[cod]
