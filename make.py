@@ -19,6 +19,7 @@ syntax. The syntax is explained by example:
     files = main, bar
     # Specifies the names of the C source files without extension (please do not
     # use fancy names here) that should be compiled during the build process.
+    # Note that you have also have to include transitive dependencies.
     dependencies = mylib:sensor, mylib2:led
     # Tells the build script which files this project depends on. The script will
     # automatically add the project paths to the GCC include path such that the
@@ -32,7 +33,6 @@ project at maximum once.
 
 
 # -- ACTUAL BUILD PROCESS --
-# TODO: do error checking
 # TODO: make compiler options configurable
 # TODO: make linker options configurable
 # TODO: implement target clean (clean)
@@ -54,11 +54,24 @@ def _fine(message):
     if verbose:
         print message
 
+def _recursively_remove_dir(top):
+    for root, dirs, files in os.walk(top, topdown=False):
+        for name in files:
+            _fine("Removing '%s'" % os.path.join(root, name))
+            os.remove(os.path.join(root, name))
+        for name in dirs:
+            _fine("Removing '%s'" % os.path.join(root, name))
+            os.rmdir(os.path.join(root, name))
+
+class BuildException(Exception):
+    pass
+
 class ProjectManager:
     """Retrieves project information when given a project name and keeps track
     of the build status."""
-    # def get_project(self, name) -- retrieves a project
-    # def build(self, name)       -- ensures that a certain project is built
+    # def get_project(self, name)  -- retrieves a project
+    # def list_project_names(self) -- list the names of all defined projects
+    # def build(self, name)        -- ensures that a certain project is built
     pass
 
 class ConfigProjectManager(ProjectManager):
@@ -91,6 +104,12 @@ class ConfigProjectManager(ProjectManager):
         _fine("Loaded project '%s'" % name) 
         # TODO: check conflicts
         self.projects[name] = Project(name, path, files, dependencies, self) 
+    def list_project_names(self):
+        names = []
+        for sect in self.config.sections():
+            if sect.startswith("project:"):
+                names.append(sect.split(":")[1])
+        return names
     def build(self, name):
         if self._needs_build(name):
             project = self.get_project(name)
@@ -151,6 +170,7 @@ class Project:
         """Compiles all sources. This step needs access to the header files
         but does not require other projects to be built"""
         _info("Compiling '%s' ..." % self.name)
+        # TODO: f_cpu and other compiler options are hard-coded
         compile_cmd = [
             "avr-gcc",
             "-c",
@@ -164,9 +184,12 @@ class Project:
         for f in self.files:
             cmd.append(os.path.join(self.path_to_root, self.path, f + ".c"))
     def _append_include_paths(self, cmd):
+        # change script here if you want to automatically include transitive dependencies
         for d in self.dependencies:
             dp = project_manager.get_project(d.project_name)
-            cmd.append("-I%s" % os.path.join(self.path_to_root, dp.path, os.path.dirname(d.file)))
+            ipath = "-I%s" % os.path.join(self.path_to_root, dp.path, os.path.dirname(d.file))
+            if ipath not in cmd:
+                cmd.append(ipath)
     def link(self):
         """Builds all projects this project depends on and then links the binaries."""
         _info("Linking '%s' ..." % self.name)
@@ -183,9 +206,12 @@ class Project:
         for f in self.files:
             cmd.append(f + ".o")
     def _append_dependencies_output_files(self, cmd):
+        # change script here if you want to automatically include transitive dependencies
         for d in self.dependencies:
             dp = project_manager.get_project(d.project_name)
-            cmd.append("%s.o" % os.path.join(self.path_to_root, "target", dp.path, d.file))
+            of = "%s.o" % os.path.join(self.path_to_root, "target", dp.path, d.file)
+            if of not in cmd:
+                cmd.append(of)
     def _build_dependencies(self):
         for d in self.dependencies:
             project_manager.build(d.project_name)
@@ -229,10 +255,23 @@ class Project:
             "-U", "flash:w:main.srec"]
         self._execute(program_cmd)
     def clean(self):
-        # untested
-        print "[TODO]: Do you really Want to remove '%s'?" % os.path.join("target", self.path)
+        # Check for marker
+        if os.path.exists("target"):
+            if os.path.exists("target/build_marker"):
+                top = os.path.join("target", self.path)
+                _recursively_remove_dir(top)
+            else:
+                raise BuildException("Cleaning aborted as a safety restriction against "
+                                     "accidental removal. Target directory does not seem "
+                                     "to contain a build marker file.")
     def _execute(self, cmd):
         _fine("Running '%s'" % " ".join(cmd))
+        # mark the target directory. This is a safety mechanism used by the
+        # clean function which checks for the marker before deleting any
+        # files or directories on the file system.
+        open("target/build_marker", "a").close()
+        # construct working directory in order to make all commands put their output
+        # into the designated target subfolder.
         wd = os.path.join("target", self.path)
         if not os.path.exists(wd):
             _fine("Creating directory '%s'" % wd)
@@ -242,8 +281,10 @@ class Project:
         proc.communicate()
         # fail-fast
         if proc.returncode != 0:
-            exit(1)
+            raise BuildException("Build failed. Received bad status code "
+                                 "'%d' from command '%s'" % (proc.returncode, cmd))
         return proc
+
 
 
 def _add_build_option(option_parser):
@@ -295,42 +336,53 @@ if __name__ == "__main__":
 
     verbose = options.verbose
 
-    if len(args) == 0:
-        _info("Nothing to do.")
-        exit(0)
-    
-    if not options.clean and not options.program:
-        options.build = True
-
     cfg = ConfigParser.ConfigParser()
     cfg.read("make.cfg")
     project_manager = ConfigProjectManager(cfg)
+    
+    if len(args) == 0:
+        if options.program:
+            _info("Cannot use --program and without specifying a project")
+            exit(1)
+        else:
+            # get ALL projects
+            _fine("No projects explicitly specified - operating on all projects!")
+            args = project_manager.list_project_names()
 
-    if options.clean:
-        _info("-------------------------------------------------------------------")
-        _info("Cleaning")
-        _info("-------------------------------------------------------------------")
-        for project_name in args: 
-            proj = project_manager.get_project(project_name)
-            proj.clean()
-   
-    if options.program or options.build:
-        _info("-------------------------------------------------------------------")
-        _info("Building")
-        _info("-------------------------------------------------------------------")
-        
-        for project_name in args: 
-            project_manager.build(project_name)
+    if not options.clean and not options.program:
+        options.build = True
+
+    try:
+        if options.clean:
+            _info("-------------------------------------------------------------------")
+            _info("Cleaning")
+            _info("-------------------------------------------------------------------")
+            for project_name in args: 
+                proj = project_manager.get_project(project_name)
+                proj.clean()
+       
+        if options.program or options.build:
+            _info("-------------------------------------------------------------------")
+            _info("Building")
+            _info("-------------------------------------------------------------------")
             
+            for project_name in args: 
+                project_manager.build(project_name)
+
+        if options.program:
+            _info("-------------------------------------------------------------------")
+            _info("Programming")
+            _info("-------------------------------------------------------------------")
+            
+            # the project that is specified as the last argument will be programmed
+            # to the device
+            proj = project_manager.get_project(args[-1])
+            proj.program()
+                
         _info("-------------------------------------------------------------------")
         _info("Done.")
         _info("-------------------------------------------------------------------")
-
-    if options.program:
-        _info("-------------------------------------------------------------------")
-        _info("Programming")
-        _info("-------------------------------------------------------------------")
-        
-        proj = project_manager.get_project(args[-1])
-        proj.program()
-
+    except BuildException as be:
+        _fine(be)
+        _info("BUILD FAILED!") # speak up on failure
+        exit(1)
