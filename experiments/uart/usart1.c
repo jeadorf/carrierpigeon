@@ -11,10 +11,9 @@
 #include "global.h"
 
 /* Prototypes */
-void USART0_Init(unsigned int baudrate);
-unsigned char USART0_Receive(void);
-void USART0_Transmit(unsigned char data);
-
+void usart_init(unsigned int baud_register_value);
+unsigned char usart_receive(void);
+void usart_transmit(unsigned char data);
 
 int main(void)
 {
@@ -23,14 +22,14 @@ int main(void)
     lcd_init();
     lcd_clear();
 
-    USART0_Init(51);
+    usart_init(51);
 
     lcd_set_page(0);
     lcd_set_column(10);
     lcd_draw_char('!');
     while (1)
     {
-        unsigned char c = USART0_Receive();
+        unsigned char c = usart_receive();
         eeprom_write(i, c);
         i++;
         lcd_draw_char(c);
@@ -52,24 +51,50 @@ int main(void)
 }
 
 /* Initialize UART */
-void USART0_Init(unsigned int baudrate)
+void usart_init(unsigned int baud_register_value)
 {
-    /* Set the baud rate */
-    UBRRH = (unsigned char) (baudrate >> 8);
-    UBRRL = (unsigned char) baudrate;
+    // select UBRRH
+    clear_bit(UCSRC, URSEL);
+
+    /* Set the baud rate - note that register value and baud rate of
+       target are not the same but can be calculated from each other */
+    UBRRH = (unsigned char) (baud_register_value >> 8);
+    UBRRL = (unsigned char) baud_register_value;
 
     /* Enable UART receiver and transmitter */
-    UCSRB = ((1 << RXEN) | (1 << TXEN));
+    set_bit(UCSRB, RXEN);
+    set_bit(UCSRB, TXEN);
 
-    /* Set frame format: 8 data 2stop */
+    // do not use double speed mode
+    clear_bit(UCSRA, U2X);
+   
+   /* probably does not work because UCSRC must be set at once
+      because of URSEL bit 
+    // select UCSRC
+    set_bit(UCSRC, URSEL);
+
+    // 8 data bits
+    set_bit(UCSRC, UCSZ2);
+    clear_bit(UCSRC, UCSZ1);
+    clear_bit(UCSRC, UCSZ0);
+     
+    // no parity bit
+    clear_bit(UCSRC, UPM1);
+
+    // only one stop bit
+    clear_bit(UCSRC, USBS);
+    */
+
+    
+    UCSRC = (1 << URSEL) | (3 << UCSZ0);
+
     //UCSRC = (1<<USBS)|(1<<UCSZ1)|(1<<UCSZ0);              //For devices with Extended IO
     //UCSR0C = (1<<URSEL)|(1<<USBS0)|(1<<UCSZ01)|(1<<UCSZ00);   //For devices without Extended IO
-    UCSRC = (1 << URSEL) | (0 << USBS) | (3 << UCSZ0);
 }
 
 
 /* Read and write functions */
-unsigned char USART0_Receive(void)
+unsigned char usart_receive(void)
 {
     /* Wait for incomming data */
     while (!(UCSRA & (1 << RXC)))
@@ -78,7 +103,7 @@ unsigned char USART0_Receive(void)
     return UDR;
 }
 
-void USART0_Transmit(unsigned char data)
+void usart_transmit(unsigned char data)
 {
     /* Wait for empty transmit buffer */
     while (!(UCSRA & (1 << UDRE)))
