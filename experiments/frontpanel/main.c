@@ -16,25 +16,26 @@
 
 int main(void)
 {
-  int n;
-  // the lightness that is desired
-  DDRB = NONE_LIGHT;
-  
-  while (1) {
-    // turn on blue leds
-    PORTB |= BLUE_LEDS;
-    // wait
-    _delay_ms(WAIT_TIME);
+    int n;
+    // the lightness that is desired
+    DDRB = NONE_LIGHT;
 
-    // turn off blue leds, turn on red leds
-    PORTB &= ~BLUE_LEDS;
-    PORTB |= RED_LEDS;
-    // wait
-    _delay_ms(WAIT_TIME);
+    while (1)
+    {
+        // turn on blue leds
+        PORTB |= BLUE_LEDS;
+        // wait
+        _delay_ms(WAIT_TIME);
 
-    // turn off red leds
-    PORTB &= ~RED_LEDS;
-  }
+        // turn off blue leds, turn on red leds
+        PORTB &= ~BLUE_LEDS;
+        PORTB |= RED_LEDS;
+        // wait
+        _delay_ms(WAIT_TIME);
 
-  return 0;
+        // turn off red leds
+        PORTB &= ~RED_LEDS;
+    }
+
+    return 0;
 }

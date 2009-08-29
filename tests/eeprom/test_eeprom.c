@@ -18,12 +18,13 @@ void test_read_write_char(void)
     char actual;
     eeprom_write(15, expected);
     actual = eeprom_read(15);
-    assert_true("EEPROM read/write char operation failed.", actual == expected);
+    assert_true("EEPROM read/write char operation failed.",
+                actual == expected);
 }
 
 void test_read_write_string(void)
 {
-    char* expected = "hitchhikers\0";
+    char *expected = "hitchhikers\0";
     int i;
     char actual;
     for (i = 0; expected[i] != '\0'; i++)
@@ -34,6 +35,6 @@ void test_read_write_string(void)
     {
         actual = eeprom_read(44 + i);
         assert_true("EEPROM read/write string operation failed.",
-                expected[i] == actual);
+                    expected[i] == actual);
     }
 }

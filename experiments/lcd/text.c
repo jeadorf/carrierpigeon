@@ -45,7 +45,7 @@
  *  1 1 1 1
  *  1      
  *  1      
- */         
+ */
 #define CHAR_TABLE_LENGTH 43
 
 // define representation for undefined characters 
@@ -155,13 +155,13 @@ void lcd_draw_char(unsigned char c)
 void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
 {
     char i;
-    
+
     // Map character
     char j = lcd_char_to_index(c);
     for (i = 0; i < 5; i++)
     {
         lcd_write(characters[j][i] ^ xor_mask);
-    }  
+    }
     // Insert a little space
     lcd_write(0x0 ^ xor_mask);
 }
@@ -171,23 +171,41 @@ char lcd_char_to_index(unsigned char c)
     if (c >= 'A' && c <= 'Z')
     {
         return c - 'A';
-    } else if (c >= 'a' && c <= 'z') {
+    }
+    else if (c >= 'a' && c <= 'z')
+    {
         return c - 'a';
-    } else if (c >= '0' && c <= '9') {
+    }
+    else if (c >= '0' && c <= '9')
+    {
         return c - '0' + 26;
-    } else if (c == '?') {
+    }
+    else if (c == '?')
+    {
         return 36;
-    } else if (c == '!') {
+    }
+    else if (c == '!')
+    {
         return 37;
-    } else if (c == '.') {
+    }
+    else if (c == '.')
+    {
         return 38;
-    } else if (c == ',') {
+    }
+    else if (c == ',')
+    {
         return 39;
-    } else if (c == '-') {
+    }
+    else if (c == '-')
+    {
         return 40;
-    } else if (c == '+') {
+    }
+    else if (c == '+')
+    {
         return 41;
-    } else {
+    }
+    else
+    {
         return CHAR_TABLE_LENGTH - 1;
-    } 
+    }
 }

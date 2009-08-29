@@ -1,4 +1,4 @@
-#include <avr/io.h> 
+#include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
@@ -42,15 +42,16 @@ PE2.O: LCD_BRIGHTNESS (OC1B)
 
 int main(void)
 {
-  int n;
-  DDRC=0xf0;
-  
-  while(1) {
-    PORTC|=0x10;
-    for(n=0;n<10;n++)
-      _delay_loop_2(60000);
-    PORTC&=~0x10;
-    for(n=0;n<10;n++)
-      _delay_loop_2(60000);    
-  }
+    int n;
+    DDRC = 0xf0;
+
+    while (1)
+    {
+        PORTC |= 0x10;
+        for (n = 0; n < 10; n++)
+            _delay_loop_2(60000);
+        PORTC &= ~0x10;
+        for (n = 0; n < 10; n++)
+            _delay_loop_2(60000);
+    }
 }
