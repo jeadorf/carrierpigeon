@@ -162,14 +162,16 @@ class Project:
         ProjectManager instead."""
         _info("Building '%s' ..." % self.name)
         self.compile()
-        # only link if main
-        if "main" in self.files:
+        if self._is_executable():
             self.link()
             self.strip()
             # TODO: find out was avr dump does (in makefile)
             self.objcopy()
         else:
             _fine("Skipping link, strip and objcopy. Project '%s' does not have a main file." % self.name)
+    def _is_executable(self):
+        # only link if main
+        return "main" in self.files
     def compile(self):
         """Compiles all sources. This step needs access to the header files
         but does not require other projects to be built"""
@@ -220,6 +222,8 @@ class Project:
         for d in self.dependencies:
             project_manager.build(d.project_name)
     def strip(self):
+        if not self._is_executable():
+            raise BuildException("Project is not executable")
         _info("Stripping '%s' ..." % self.name)
         strip_cmd = [
             "avr-strip",
@@ -227,6 +231,8 @@ class Project:
             "-o", "main-stripped"]
         self._execute(strip_cmd)
     def objcopy(self):
+        if not self._is_executable():
+            raise BuildException("Project is not executable")
         # TODO: find better name for this function
         _info("Objcopy '%s' ..." % self.name)
         srec_cmd = [
@@ -248,6 +254,8 @@ class Project:
         self._execute(ihex_cmd)
         self._execute(binary_cmd)
     def program(self):
+        if not self._is_executable():
+            raise BuildException("Project is not executable")
         program_cmd = [
             "avrdude",
             "-c", "avrisp2",
@@ -385,6 +393,6 @@ if __name__ == "__main__":
         _info("Done.")
         _info("-------------------------------------------------------------------")
     except BuildException as be:
-        _fine(be)
+        _info(be)
         _info("BUILD FAILED!") # speak up on failure
         exit(1)
