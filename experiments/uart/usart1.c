@@ -67,25 +67,25 @@ void usart_init(unsigned int baud_register_value)
 
     // do not use double speed mode
     clear_bit(UCSRA, U2X);
-   
-   /* probably does not work because UCSRC must be set at once
-      because of URSEL bit 
-    // select UCSRC
-    set_bit(UCSRC, URSEL);
 
-    // 8 data bits
-    set_bit(UCSRC, UCSZ2);
-    clear_bit(UCSRC, UCSZ1);
-    clear_bit(UCSRC, UCSZ0);
-     
-    // no parity bit
-    clear_bit(UCSRC, UPM1);
+    /* probably does not work because UCSRC must be set at once
+       because of URSEL bit 
+       // select UCSRC
+       set_bit(UCSRC, URSEL);
 
-    // only one stop bit
-    clear_bit(UCSRC, USBS);
-    */
+       // 8 data bits
+       set_bit(UCSRC, UCSZ2);
+       clear_bit(UCSRC, UCSZ1);
+       clear_bit(UCSRC, UCSZ0);
 
-    
+       // no parity bit
+       clear_bit(UCSRC, UPM1);
+
+       // only one stop bit
+       clear_bit(UCSRC, USBS);
+     */
+
+
     UCSRC = (1 << URSEL) | (3 << UCSZ0);
 
     //UCSRC = (1<<USBS)|(1<<UCSZ1)|(1<<UCSZ0);              //For devices with Extended IO
