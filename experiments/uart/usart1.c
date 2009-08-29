@@ -8,6 +8,7 @@
 #include "text.h"
 #include "eeprom.h"
 #include <stdio.h>
+#include "global.h"
 
 /* Prototypes */
 void USART0_Init(unsigned int baudrate);
