@@ -162,10 +162,14 @@ class Project:
         ProjectManager instead."""
         _info("Building '%s' ..." % self.name)
         self.compile()
-        self.link()
-        self.strip()
-        # TODO: find out was avr dump does (in makefile)
-        self.objcopy()
+        # only link if main
+        if "main" in self.files:
+            self.link()
+            self.strip()
+            # TODO: find out was avr dump does (in makefile)
+            self.objcopy()
+        else:
+            _fine("Skipping link, strip and objcopy. Project '%s' does not have a main file." % self.name)
     def compile(self):
         """Compiles all sources. This step needs access to the header files
         but does not require other projects to be built"""
