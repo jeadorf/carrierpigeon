@@ -7,7 +7,7 @@ char get_key(void)
     char col, othercol, row, keyvalue = 0;
 
     // set DDRC3-0 to WRITE
-    DDRC |= 0x0F                //0b00001111;
+    DDRC |= 0x0F;                //0b00001111;
         // iterate over all 4 COLs
         for (col = PC3; col >= PC0; col--)
     {
