@@ -392,7 +392,7 @@ if __name__ == "__main__":
         _info("-------------------------------------------------------------------")
         _info("Done.")
         _info("-------------------------------------------------------------------")
-    except BuildException as be:
+    except BuildException, be:
         _info(be)
         _info("BUILD FAILED!") # speak up on failure
         exit(1)
