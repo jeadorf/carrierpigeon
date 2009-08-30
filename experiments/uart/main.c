@@ -1,19 +1,20 @@
-#include <stdbool.h>
 #include "main.h"
-#include "led.h"
 
-int _main(void)
-{
-    // set the baudrate to 19,200 bps using a 3.6864MHz crystal
-    USART_Init(11);
-    // enable interrupts => enable UART interrupts
+int main(void) {
+    int c;
+    uart_init(UART_BAUD_SELECT(UART_BAUD_RATE,11059200UL));
     sei();
 
-    while (true)
-    {
-        // echo the received character
-        USART_Transmit(USART_Receive());
-    }
+    lcd_init();
+    lcd_clear();
+    lcd_set_page(0);
+    lcd_set_column(10);
+    lcd_draw_char('S');
 
-    return 0;
+    while (1) {
+        c = uart_getc();
+        if (!(c & UART_NO_DATA)) {
+            lcd_draw_char(c & 0xFF);
+        }
+    }
 }
