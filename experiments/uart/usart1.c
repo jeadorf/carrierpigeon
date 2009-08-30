@@ -22,7 +22,8 @@ int main(void)
     lcd_init();
     lcd_clear();
 
-    usart_init(51);
+    // 11.0592 MHz external quarz
+    usart_init(35);
 
     lcd_set_page(0);
     lcd_set_column(10);
