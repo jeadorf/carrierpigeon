@@ -5,6 +5,7 @@
 
 /* Includes */
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "text.h"
 #include "eeprom.h"
 #include <stdio.h>
@@ -14,8 +15,28 @@
 void usart_init(unsigned int baud_register_value);
 unsigned char usart_receive(void);
 void usart_transmit(unsigned char data);
+#define UART_BAUD_RATE      19200
+#include "uart.h"
 
-int main(void)
+int main(void) {
+	uart_init( UART_BAUD_SELECT(UART_BAUD_RATE,11059200UL) );
+	sei();
+	int c;
+
+    lcd_init();
+    lcd_clear();
+    lcd_set_page(0);
+    lcd_set_column(10);
+    lcd_draw_char('S');
+	while (1) {
+		c = uart_getc();
+		if (!(c & UART_NO_DATA)) {
+			lcd_draw_char(c & 0xFF);
+		}
+	}
+}
+
+int _main(void)
 {
     int i = 0;
 
@@ -31,9 +52,11 @@ int main(void)
     while (1)
     {
         unsigned char c = usart_receive();
-        eeprom_write(i, c);
-        i++;
+        //eeprom_write(i, c);
+        //i++;
         lcd_draw_char(c);
+	lcd_draw_char('F');
+	while(1) {};
         /*unsigned char result[4];
            sprintf(result, "%3d", c);
            for (i = 0; i < 3; i++) 
@@ -87,6 +110,7 @@ void usart_init(unsigned int baud_register_value)
      */
 
 
+    set_bit(UCSRC, URSEL);
     UCSRC = (1 << URSEL) | (3 << UCSZ0);
 
     //UCSRC = (1<<USBS)|(1<<UCSZ1)|(1<<UCSZ0);              //For devices with Extended IO
