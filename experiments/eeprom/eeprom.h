@@ -4,8 +4,6 @@
  * of the EEPROM address register EEAR (two registers EEARH and EEARL).
  */
 
-#include <avr/io.h>
-
 /* TODO: Check for AVR eeprom library (look at GNU AVR tools) */
 
 /*

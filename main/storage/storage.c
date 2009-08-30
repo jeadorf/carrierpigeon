@@ -60,20 +60,23 @@ void _storage_save_message_at(unsigned char mem_addr, unsigned char *text)
 
 bool storage_save_message(unsigned char state, unsigned char *text)
 {
-    int i;
+    // 1. Find the next free node
+    
+
+    /* int i;
     for (i = 0; i < MAX_MESSAGE_COUNT; i++)
     {
         unsigned char b = eeprom_read(NODE_STORAGE_OFFSET + i);
-        if (b == STATE_EMPTY)
+        if (b == )
         {
             unsigned char mem_addr =
-                MESSAGE_STORAGE_OFFSET + (b - 1) * MESSAGE_SIZE;
+                MESSAGE_STORAGE_OFFSET + i * MESSAGE_SIZE;
             _storage_save_message_at(mem_addr, text);
             return true;
         }
     }
 
-    return false;
+    return false; */
 }
 
 unsigned char storage_get_state(unsigned int message_number)

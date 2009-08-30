@@ -6,25 +6,27 @@
 configuration file named 'make.cfg' that follows the Python ConfigParser
 syntax. The syntax is explained by example:
     
-    [general]
     # Options that apply to all projects are defined in this special section.
     # There are no such options yet.
+    [general]
 
-    [project:foo]
     # Defines a project identified by 'foo'. The identifier 'foo' will
     # represent the project throughout the whole config file as well as the 
     # build process.
-    path = examples/foo
+    [project:foo]
     # The path is relative to the location of the config file and it is required.
-    files = main, bar
+    path = examples/foo
     # Specifies the names of the C source files without extension (please do not
     # use fancy names here) that should be compiled during the build process.
     # Note that you have also have to include transitive dependencies.
-    dependencies = mylib:sensor, mylib2:led
+    files = main, bar
     # Tells the build script which files this project depends on. The script will
     # automatically add the project paths to the GCC include path such that the
     # C header files can be found during the compilation. Also, these directives
     # will tell the script on what binaries to link.
+    dependencies = mylib:sensor, mylib2:led
+    # Set to false if project does not define a main method, true by default
+    executable = 1
 
 In order to build projects, call 'python make.py <project1> <project2> ...'.
 The script will automatically build dependencies and also build each
@@ -100,10 +102,16 @@ class ConfigProjectManager(ProjectManager):
                             dep[:dep.find(":")].strip(),
                             dep[dep.find(":")+1:].strip()) for dep in dep_tokens]
         else:
-            dependencies = [] 
+            dependencies = []
+        # executable is optional
+        if self.config.has_option(sect, "executable"):
+            executable = self.config.getboolean(sect, "executable");
+        else:
+            executable = True
+
         _fine("Loaded project '%s'" % name) 
         # TODO: check conflicts
-        self.projects[name] = Project(name, path, files, dependencies, self) 
+        self.projects[name] = Project(name, path, files, dependencies, executable, self) 
     def list_project_names(self):
         names = []
         for sect in self.config.sections():
@@ -136,7 +144,7 @@ class Dependency:
 class Project:
     """Responsible for compilation, linking, flashing, cleaning and all other
     build targets. The builder class does not automatically build dependencies."""
-    def __init__(self, name, path, files, dependencies, project_manager):
+    def __init__(self, name, path, files, dependencies, executable, project_manager):
         """path -- a relative path from the working directory where
                    the build script is executed.
            files -- a list of C source files (names only, and no extension!) 
@@ -146,6 +154,7 @@ class Project:
         self.path = path
         self.files = files
         self.dependencies = dependencies
+        self.executable = executable
         self.project_manager = project_manager
         # path from target subdir to script location
         self.path_to_root = self._construct_path_to_root(path)
@@ -170,8 +179,7 @@ class Project:
         else:
             _fine("Skipping link, strip and objcopy. Project '%s' does not have a main file." % self.name)
     def _is_executable(self):
-        # only link if main
-        return "main" in self.files
+        return self.executable 
     def compile(self):
         """Compiles all sources. This step needs access to the header files
         but does not require other projects to be built"""
