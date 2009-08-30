@@ -14,12 +14,11 @@
  */
 
 #include <stdbool.h>
-//#include "global.h"
 
 // see MESSAGE status byte
-#define STATE_EMPTY 0
-#define STATE_NEW   1
-#define STATE_READ  2
+#define STATE_EMPTY 'e'
+#define STATE_NEW   'n'
+#define STATE_READ  'r'
 
 /*
  * Saves a message on the EEPROM. Returns false if memory is full,
@@ -39,6 +38,12 @@ unsigned char storage_get_state(unsigned int message_number);
  * of stored messages is less than the specified message_number.
  */
 unsigned char* storage_get_text(unsigned int message_number);
+
+/*
+ * Removes the n-th oldest message. Returns true, if deleted successfully
+ * (i.e. there was at such a message)
+ */
+bool storage_delete_message(unsigned int message_number);
 
 /*
  * Get the number of stored messages.

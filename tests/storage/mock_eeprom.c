@@ -18,14 +18,15 @@ void mock_eeprom_print(void)
     for (i = 0; i < 512; i++) {
         c = eeprom_memory[i];
         if (c < 10 || c > 140) {
-            printf("-");
+            printf("%d", c);
         } else {
             printf("%c", c);
         }
-        if ((i+1) % 32 == 0) {
+        if ((i+1) % 120 == 0) {
             printf("\n");
         }
     }
+    printf("\n");
 }
 
 void mock_eeprom_reset(void)
