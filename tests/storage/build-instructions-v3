@@ -1,1 +1,3 @@
-gcc ../../main/storage/storage.c test_storage.c mock_eeprom.c -I . -I ../../main -I ../../main/storage -I ../../experiments/eeprom && ./a.out
+#!/bin/sh
+gcc ../../main/storage/storage.c test_storage.c mock_eeprom.c assert.c -I . -I ../../main -I ../../main/storage -I ../../experiments/eeprom && ./a.out
+
