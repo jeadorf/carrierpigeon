@@ -43,7 +43,7 @@ unsigned char storage_get_state(unsigned int message_number);
  * stored messages is less than the specified message_number. Returns
  * true on success.
  */
-bool storage_get_text(unsigned int message_number);
+bool storage_load_message(unsigned int message_number);
 
 /*
  * Removes the n-th oldest message. Returns true, if deleted successfully

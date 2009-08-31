@@ -93,7 +93,7 @@ void test_message_save_read_text(void)
     // scramble buffer
     strcpy(storage_get_buffer(), "someotherstuff");
     // restore buffer
-    storage_get_text(0);
+    storage_load_message(0);
 
     assert_equals_string("saved text should be restored correctly",
         expected_text, storage_get_buffer()); 
@@ -167,7 +167,7 @@ void test_save_max_full_message(void)
         "QWERTZUI";
     strcpy(storage_get_buffer(), expected);
     storage_save_message();
-    storage_get_text(0);
+    storage_load_message(0);
     assert_equals_string("full message should be recovered",
                                 expected, storage_get_buffer());
 
@@ -197,7 +197,7 @@ void test_save_too_long_message(void)
         "QWERTZUIopasd";
     storage_save_message(STATE_NEW, text);
     assert_equals_string("text should be truncated",
-                expected, storage_get_text(0));
+                expected, storage_load_message(0));
     mock_eeprom_print();
 }*/
 
@@ -220,13 +220,13 @@ void test_save_too_many_messages(void)
     strcpy(storage_get_buffer(), "WayOff2");
     storage_save_message();
 
-    storage_get_text(0);
+    storage_load_message(0);
     assert_equals_string("test1", "FooBar", storage_get_buffer());
-    storage_get_text(1);
+    storage_load_message(1);
     assert_equals_string("test2", "Grazie", storage_get_buffer());
-    storage_get_text(2);
+    storage_load_message(2);
     assert_equals_string("test3", "DonaldK", storage_get_buffer());
-    storage_get_text(3);
+    storage_load_message(3);
     assert_equals_string("test4", "EdgarD", storage_get_buffer());
 
     mock_eeprom_print();

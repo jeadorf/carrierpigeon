@@ -121,7 +121,7 @@ unsigned char storage_get_state(unsigned int message_num)
     return STATE_EMPTY;
 }
 
-bool storage_get_text(unsigned int message_num)
+bool storage_load_message(unsigned int message_num)
 {
     if (message_num < message_count) {
         unsigned char block = storage_nodes[message_num];
@@ -167,6 +167,7 @@ unsigned int storage_message_count(void)
     return message_count;
 }
 
+/* for testing purposes */
 void storage_reset(void)
 {
     int i;
