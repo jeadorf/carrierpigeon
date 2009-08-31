@@ -47,39 +47,36 @@
 // n denotes that the message is actually stored in the n-th memory
 // block (counting begins with 1)
 unsigned char storage_nodes[4] = { 0, 0, 0, 0 };
+// Points to the next free slot in storage_nodes 
 unsigned char message_count = 0;
+// A buffer that is used for IO operations
+unsigned char storage_message_buffer[MAX_MESSAGE_TEXT_LENGTH];
 
-bool storage_is_empty()
+bool storage_is_empty(void)
 {
     return message_count == 0;
 }
 
-bool storage_is_full()
+bool storage_is_full(void)
 {
     return message_count == MAX_MESSAGE_COUNT;
 }
 
-void _storage_save_message_to_eeprom(unsigned char block, unsigned char *text)
+void _storage_save_message_to_eeprom(unsigned char block)
 {
     eeprom_write((block - 1) * MESSAGE_SIZE, STATE_NEW);
     unsigned int text_addr = (block - 1) * MESSAGE_SIZE + MESSAGE_RESERVED_SIZE + 1;
     int i;
     for (i = 0; i < MAX_MESSAGE_TEXT_LENGTH; i++)
     {
-        eeprom_write(text_addr + i, *text);
-        text++;
-        if (*text == '\0') {
-            if (i < MAX_MESSAGE_TEXT_LENGTH - 1) {
-                // we are not at the end of the block, so mark the end
-                // of the message with the \0 character.
-                eeprom_write(text_addr + i + 1, '\0');
-            }
+        eeprom_write(text_addr + i, storage_message_buffer[i]);
+        if (storage_message_buffer[i] == '\0') {
             break;
         }
     }
 }
 
-bool storage_save_message(unsigned char state, unsigned char *text)
+bool storage_save_message(void)
 {
     if (storage_is_full()) {
         return false;
@@ -103,11 +100,12 @@ bool storage_save_message(unsigned char state, unsigned char *text)
                 // Found a free memory block
                 storage_nodes[message_count] = block;
                 // Write message to the eeprom memory
-                _storage_save_message_to_eeprom(block, text);
+                _storage_save_message_to_eeprom(block);
                 message_count++;
                 break;
             }
         }
+        return true;
     }
 }
 
@@ -123,27 +121,24 @@ unsigned char storage_get_state(unsigned int message_num)
     return STATE_EMPTY;
 }
 
-unsigned char *storage_get_text(unsigned int message_num)
+bool storage_get_text(unsigned int message_num)
 {
     if (message_num < message_count) {
         unsigned char block = storage_nodes[message_num];
         unsigned int text_addr = (block - 1) * MESSAGE_SIZE + MESSAGE_RESERVED_SIZE + 1;
-        // FIXME: calling malloc should use system-wide buffer here!!
-        unsigned char *text = malloc(MAX_MESSAGE_TEXT_LENGTH);
         int i;
         char c;
         for (i = 0; i < MAX_MESSAGE_TEXT_LENGTH; i++) {
             c = eeprom_read(text_addr + i);
-            // printf("'%d', '%c'\n", c, c);
-            text[i] = c;
+            storage_message_buffer[i] = c;
             if (c == '\0') {
                 break;
             }
         }
-        return text;
+        return true;
+    } else {
+        return false;
     }
-    
-    return NULL;
 }
 
 bool storage_delete_message(unsigned int message_num)
@@ -162,12 +157,17 @@ bool storage_delete_message(unsigned int message_num)
     }
 }
 
-unsigned int storage_message_count()
+unsigned char* storage_get_buffer(void)
+{
+    return storage_message_buffer;
+}
+
+unsigned int storage_message_count(void)
 {
     return message_count;
 }
 
-void storage_reset()
+void storage_reset(void)
 {
     int i;
     for (i = 0; i < MAX_MESSAGE_COUNT; i++) {
