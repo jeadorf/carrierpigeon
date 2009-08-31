@@ -31,15 +31,12 @@
  */
 
 #include "storage.h"
-#include "global.h"
 #include "eeprom.h"
-#include "stddef.h"
-#include "stdlib.h"
 
 // avoid magic numbers
-#define MAX_MESSAGE_COUNT 4
+#define MAX_MESSAGES 4
 #define MESSAGE_SIZE 120
-#define MAX_MESSAGE_TEXT_LENGTH 112
+#define MESSAGE_TEXT_LENGTH 112
 #define MESSAGE_RESERVED_SIZE 7
 
 // List of nodes that point to message blocks. Zero marks a free slot
@@ -48,18 +45,18 @@
 // block (counting begins with 1)
 unsigned char storage_nodes[4] = { 0, 0, 0, 0 };
 // Points to the next free slot in storage_nodes 
-unsigned char message_count = 0;
+unsigned char storage_count = 0;
 // A buffer that is used for IO operations
-unsigned char storage_message_buffer[MAX_MESSAGE_TEXT_LENGTH];
+unsigned char storage_buffer[MESSAGE_TEXT_LENGTH];
 
 bool storage_is_empty(void)
 {
-    return message_count == 0;
+    return storage_count == 0;
 }
 
 bool storage_is_full(void)
 {
-    return message_count == MAX_MESSAGE_COUNT;
+    return storage_count == MAX_MESSAGES;
 }
 
 void _storage_save_message_to_eeprom(unsigned char block)
@@ -67,10 +64,10 @@ void _storage_save_message_to_eeprom(unsigned char block)
     eeprom_write((block - 1) * MESSAGE_SIZE, STATE_NEW);
     unsigned int text_addr = (block - 1) * MESSAGE_SIZE + MESSAGE_RESERVED_SIZE + 1;
     int i;
-    for (i = 0; i < MAX_MESSAGE_TEXT_LENGTH; i++)
+    for (i = 0; i < MESSAGE_TEXT_LENGTH; i++)
     {
-        eeprom_write(text_addr + i, storage_message_buffer[i]);
-        if (storage_message_buffer[i] == '\0') {
+        eeprom_write(text_addr + i, storage_buffer[i]);
+        if (storage_buffer[i] == '\0') {
             break;
         }
     }
@@ -86,11 +83,11 @@ bool storage_save_message(void)
         outer:
         // Check all blocks, do not do this by reading the
         // EEPROM message status bit, it should be faster this way.
-        for (block = 1; block <= MAX_MESSAGE_COUNT; block++) {
+        for (block = 1; block <= MAX_MESSAGES; block++) {
             int i;
             bool free = true;
             // Look whether one node points to this block.
-            for (i = 0; i < MAX_MESSAGE_COUNT; i++) {
+            for (i = 0; i < MAX_MESSAGES; i++) {
                 if (storage_nodes[i] == block) {
                     free = false;
                     break;
@@ -98,10 +95,10 @@ bool storage_save_message(void)
             }
             if (free) {
                 // Found a free memory block
-                storage_nodes[message_count] = block;
+                storage_nodes[storage_count] = block;
                 // Write message to the eeprom memory
                 _storage_save_message_to_eeprom(block);
-                message_count++;
+                storage_count++;
                 break;
             }
         }
@@ -111,7 +108,7 @@ bool storage_save_message(void)
 
 unsigned char storage_get_state(unsigned int message_num)
 {
-    if (message_num < message_count)
+    if (message_num < storage_count)
     {
         unsigned char block = storage_nodes[message_num];
         unsigned char mem_addr = (block - 1) * MESSAGE_SIZE; 
@@ -123,14 +120,14 @@ unsigned char storage_get_state(unsigned int message_num)
 
 bool storage_load_message(unsigned int message_num)
 {
-    if (message_num < message_count) {
+    if (message_num < storage_count) {
         unsigned char block = storage_nodes[message_num];
         unsigned int text_addr = (block - 1) * MESSAGE_SIZE + MESSAGE_RESERVED_SIZE + 1;
         int i;
         char c;
-        for (i = 0; i < MAX_MESSAGE_TEXT_LENGTH; i++) {
+        for (i = 0; i < MESSAGE_TEXT_LENGTH; i++) {
             c = eeprom_read(text_addr + i);
-            storage_message_buffer[i] = c;
+            storage_buffer[i] = c;
             if (c == '\0') {
                 break;
             }
@@ -143,14 +140,14 @@ bool storage_load_message(unsigned int message_num)
 
 bool storage_delete_message(unsigned int message_num)
 {
-    if (message_num < message_count) {
+    if (message_num < storage_count) {
         // Shift all message pointers left, thus removing one pointer.
         int i;
-        for (i = message_num + 1; i < message_count; i++) {
+        for (i = message_num + 1; i < storage_count; i++) {
             storage_nodes[i - 1] = storage_nodes[i];
         }
-        storage_nodes[message_count - 1] = 0;
-        message_count--;
+        storage_nodes[storage_count - 1] = 0;
+        storage_count--;
         return true;
     } else {
         return false;
@@ -159,21 +156,21 @@ bool storage_delete_message(unsigned int message_num)
 
 unsigned char* storage_get_buffer(void)
 {
-    return storage_message_buffer;
+    return storage_buffer;
 }
 
 unsigned int storage_message_count(void)
 {
-    return message_count;
+    return storage_count;
 }
 
 /* for testing purposes */
 void storage_reset(void)
 {
     int i;
-    for (i = 0; i < MAX_MESSAGE_COUNT; i++) {
+    for (i = 0; i < MAX_MESSAGES; i++) {
         storage_nodes[i] = 0;
     }
-    message_count = 0;
+    storage_count = 0;
 }
 

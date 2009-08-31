@@ -14,6 +14,11 @@ bool assert_true(char *msg, bool b)
     return true;
 }
 
+bool assert_false(char *msg, bool b)
+{
+    return assert_true(msg, !b);
+}
+
 bool assert_equals(char *msg, char expected, char actual)
 {
     if (expected != actual) {
@@ -55,6 +60,18 @@ bool assert_equals_string(char *msg, char *expected, char *actual)
     return true;
 }
 
+void setup_test_storage(char* test_name)
+{
+    printf("%s\n", test_name);
+    mock_eeprom_reset();
+    storage_reset();
+}
+
+void teardown_test_storage(char* test_name)
+{
+    // mock_eeprom_print();
+}
+
 void test_mock_eeprom_reset(void)
 {
     printf("test_mock_eeprom_reset\n");
@@ -73,17 +90,16 @@ void test_mock_eeprom_read_write(void)
 
 void test_storage_reset(void)
 {
-    printf("test_storage_reset\n");
+    setup_test_storage("test_storage_reset");
     storage_save_message();
     storage_reset();
     assert_equals_int("count should be zero", 0, storage_message_count());
+    teardown_test_storage("test_storage_reset");
 }
 
 void test_message_save_read_text(void)
 {
-    printf("test_message_save_read_text\n");
-    mock_eeprom_reset();
-    storage_reset();
+    setup_test_storage("test_message_save_read_text");
 
     char *expected_text = "FooBar";
     strcpy(storage_get_buffer(), expected_text);
@@ -98,66 +114,55 @@ void test_message_save_read_text(void)
     assert_equals_string("saved text should be restored correctly",
         expected_text, storage_get_buffer()); 
 
-    mock_eeprom_print();
+    teardown_test_storage("test_message_save_read");
 }
 
 void test_message_initial_state(void)
 {
-    printf("test_message_initial_state\n");
-    mock_eeprom_reset();
-    storage_reset();
+    setup_test_storage("test_message_initial_state");
     
     storage_save_message();
     assert_equals_int("state should be STATE_NEW", STATE_NEW, 
        storage_get_state(0));
 
-    mock_eeprom_print();
+    teardown_test_storage("test_message_initial_state");
 }
 
 void test_save_message_count(void)
 {
-    printf("test_save_message_count\n");
-    mock_eeprom_reset();
-    storage_reset();
+    setup_test_storage("test_save_message_count");
 
     storage_save_message();
     assert_equals_int("count should be one", 1, storage_message_count());
 
-    mock_eeprom_print();
+    teardown_test_storage("test_message_initial_state");
 }
 
 void test_delete_message_count(void)
 {
-    printf("test_delete_message_count\n");
-    mock_eeprom_reset();
-    storage_reset();
+    setup_test_storage("test_delete_message_count");
 
     storage_save_message();
     storage_delete_message(0);
     assert_equals_int("count should be zero", 0, storage_message_count());
 
-    mock_eeprom_print();
+    teardown_test_storage("test_delete_message_count");
 }
 
 void test_save_two_messages_count(void)
 {
-    printf("test_save_two_messages_count\n");
-    mock_eeprom_reset();
-    storage_reset();
-    // TODO: introduce setup and teardown methods
+    setup_test_storage("test_save_two_messages_count");
 
     storage_save_message();
     storage_save_message();
     assert_equals_int("count should be two", 2, storage_message_count());
 
-    mock_eeprom_print();
+    teardown_test_storage("test_save_two_messages_count");
 }
 
 void test_save_max_full_message(void)
 {
-    printf("test_save_max_full_message\n");
-    mock_eeprom_reset();
-    storage_reset();
+    setup_test_storage("test_save_max_full_message");
 
     char *expected =
         "abcdefghijklmnopqrstuvwxyz"
@@ -171,7 +176,7 @@ void test_save_max_full_message(void)
     assert_equals_string("full message should be recovered",
                                 expected, storage_get_buffer());
 
-    mock_eeprom_print();
+    teardown_test_storage("test_save_max_full_message");
 }
 
 /* will lead to segmentation fault
@@ -203,9 +208,7 @@ void test_save_too_long_message(void)
 
 void test_save_too_many_messages(void)
 {
-    printf("test_save_too_many_messages\n");
-    mock_eeprom_reset();
-    storage_reset();
+    setup_test_storage("test_save_too_many_messages");
 
     strcpy(storage_get_buffer(), "FooBar");
     storage_save_message();
@@ -216,9 +219,12 @@ void test_save_too_many_messages(void)
     strcpy(storage_get_buffer(), "EdgarD");
     storage_save_message();
     strcpy(storage_get_buffer(), "WayOff1");
-    storage_save_message();
+    bool wayoff1 = storage_save_message();
     strcpy(storage_get_buffer(), "WayOff2");
-    storage_save_message();
+    bool wayoff2 = storage_save_message();
+
+    assert_false("should indicate failure (1)", wayoff1);
+    assert_false("should indicate failure (2)", wayoff2);
 
     storage_load_message(0);
     assert_equals_string("test1", "FooBar", storage_get_buffer());
@@ -229,7 +235,7 @@ void test_save_too_many_messages(void)
     storage_load_message(3);
     assert_equals_string("test4", "EdgarD", storage_get_buffer());
 
-    mock_eeprom_print();
+    teardown_test_storage("test_save_too_many_messages");
 }
 
 /* run the tests */
