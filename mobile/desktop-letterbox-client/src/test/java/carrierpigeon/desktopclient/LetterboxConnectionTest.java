@@ -35,7 +35,7 @@ public class LetterboxConnectionTest {
                 ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
         StreamConnection conn = (StreamConnection) Connector.open(serviceUrl);
         DataInputStream in = conn.openDataInputStream();
-        Assert.assertEquals("expectgreeting", LetterboxEmulator.GREETING, in.readUTF());
+        Assert.assertEquals("expect greeting", LetterboxEmulator.GREETING, in.readUTF());
         in.close();
     }
 
