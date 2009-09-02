@@ -10,7 +10,7 @@ import javax.bluetooth.ServiceRecord;
 /**
  * quick case study
  * 
- * @author julius
+ * @author Julius Adorf
  */
 public class DesktopLetterboxClient {
 
@@ -18,12 +18,20 @@ public class DesktopLetterboxClient {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
+        System.out.println("Usage: DesktopLetterboxClient");
+        DesktopLetterboxClient client = new DesktopLetterboxClient();
+        client.discoverDevices();
+    }
+
+    public void discoverDevices() throws Exception {
         LocalDevice ld = LocalDevice.getLocalDevice();
-        DiscoveryAgent agent = ld.getDiscoveryAgent();
-        agent.startInquiry(DiscoveryAgent.LIAC, new DiscoveryListener() {
+        final DiscoveryAgent agent = ld.getDiscoveryAgent();
+        final DiscoveryListener listener = new DiscoveryListener() {
+
             public void deviceDiscovered(RemoteDevice device, DeviceClass arg1) {
                 System.out.println("deviceDiscovered: " + device.getBluetoothAddress());
             }
+
             public void servicesDiscovered(int arg0, ServiceRecord[] arg1) {
                 System.out.println("servicesDiscovered");
             }
@@ -35,6 +43,8 @@ public class DesktopLetterboxClient {
             public void inquiryCompleted(int arg0) {
                 System.out.println("inquiryCompleted");
             }
-        });
+        };
+        System.out.println("Starting LIAC inquiry");
+        agent.startInquiry(DiscoveryAgent.LIAC, listener);
     }
 }

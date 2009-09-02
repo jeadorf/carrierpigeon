@@ -20,9 +20,39 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <!-- NOTE: not the only reference to the main-class -->
                     <mainClass>carrierpigeon.desktopclient.DesktopLetterboxClient</mainClass>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <!-- NOTE: not the only reference to the main-class -->
+                            <mainClass>carrierpigeon.desktopclient.DesktopLetterboxClient</mainClass>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin> 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/bin.xml</descriptor>
+                    </descriptors>
+                    <archive>
+                        <manifest>
+                            <!-- NOTE: not the only reference to the main-class -->
+                            <mainClass>carrierpigeon.desktopclient.DesktopLetterboxClient</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>    
+ 
         </plugins>
     </build>
     <dependencies>
