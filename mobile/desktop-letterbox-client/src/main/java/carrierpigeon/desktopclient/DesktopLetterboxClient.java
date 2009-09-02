@@ -1,3 +1,5 @@
+package carrierpigeon.desktopclient;
+
 import javax.bluetooth.DeviceClass;
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.DiscoveryListener;
@@ -10,7 +12,7 @@ import javax.bluetooth.ServiceRecord;
  * 
  * @author julius
  */
-public class BluetoothDiscovery {
+public class DesktopLetterboxClient {
 
     /**
      * @param args the command line arguments
