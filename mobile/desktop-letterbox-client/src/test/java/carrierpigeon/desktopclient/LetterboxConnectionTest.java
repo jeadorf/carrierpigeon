@@ -30,18 +30,18 @@ public class LetterboxConnectionTest {
     }
 
     @Test
-    public void testConnect() throws Exception { // TODO: finalize correctly
+    public void testSendReceiveMessage() throws Exception {
+        System.out.println("testSendReceiveMessage");
         LocalDevice localDev = LocalDevice.getLocalDevice();
         DiscoveryAgent agent = localDev.getDiscoveryAgent();
         String serviceUrl = agent.selectService(LetterboxServer.uuid,
                 ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
-        StreamConnection conn = (StreamConnection) Connector.open(serviceUrl);
-        DataInputStream in = conn.openDataInputStream();
-        assertEquals("expect greeting", LetterboxServer.GREETING, in.readUTF());
+        
+        DesktopLetterboxClient client = new DesktopLetterboxClient();
+        client.sendMessage(serviceUrl, "test message");
         assertFalse("error from letterbox emulator", letterboxServer.isError());
-        in.close();
     }
-
+    
     @After
     public void tearDown() throws Exception {
         if ((serverThread != null) && (serverThread.isAlive())) {
