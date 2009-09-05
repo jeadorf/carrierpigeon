@@ -26,7 +26,13 @@ int main(void)
         reset_lcd();
         if (!(c & UART_NO_DATA))
         {
-            lcd_draw_char(c & 0xFF);
+            //TODO: implement 'CONNECT' detection to only echo back relevant
+            // stuff
+
+            // echo it back to the sender
+            //uart_putc(c);
+            // display it on the LCD (zero the higher byte before)
+            lcd_draw_char(c & 0xff);
         }
     }
 }
@@ -34,7 +40,8 @@ int main(void)
 void reset_lcd(void)
 {
     // fire every 2 seconds
-    if (TCNT1 >= 21600) {
+    if (TCNT1 >= 21600)
+    {
         lcd_clear();
         lcd_set_page(0);
         lcd_set_column(10);
