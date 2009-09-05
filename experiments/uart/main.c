@@ -33,12 +33,13 @@ int main(void)
 
 void reset_lcd(void)
 {
-    // fire every 1 second
-    if (TCNT1 >= 10800) {
-        //lcd_clear();
-        //lcd_set_page(0);
-        //lcd_set_column(10);
+    // fire every 2 seconds
+    if (TCNT1 >= 21600) {
+        lcd_clear();
+        lcd_set_page(0);
+        lcd_set_column(10);
         lcd_draw_char('S');
+        // reset timer to prevent overflow
         TCNT1 = 0;
     }
 }
