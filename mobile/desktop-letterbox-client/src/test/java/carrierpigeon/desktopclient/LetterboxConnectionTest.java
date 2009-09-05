@@ -10,7 +10,7 @@ import javax.microedition.io.StreamConnection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.After;
-import org.junit.Assert;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -19,23 +19,26 @@ import org.junit.Assert;
 public class LetterboxConnectionTest {
 
     private Thread serverThread;
+    private LetterboxServer letterboxServer;
 
     @Before
     public void setUp() throws Exception {
         EmulatorTestsHelper.startInProcessServer();
         EmulatorTestsHelper.useThreadLocalEmulator();
-        serverThread = EmulatorTestsHelper.runNewEmulatorStack(new LetterboxEmulator());
+        letterboxServer = new LetterboxServer();
+        serverThread = EmulatorTestsHelper.runNewEmulatorStack(letterboxServer);
     }
 
     @Test
     public void testConnect() throws Exception { // TODO: finalize correctly
         LocalDevice localDev = LocalDevice.getLocalDevice();
         DiscoveryAgent agent = localDev.getDiscoveryAgent();
-        String serviceUrl = agent.selectService(LetterboxEmulator.uuid,
+        String serviceUrl = agent.selectService(LetterboxServer.uuid,
                 ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
         StreamConnection conn = (StreamConnection) Connector.open(serviceUrl);
         DataInputStream in = conn.openDataInputStream();
-        Assert.assertEquals("expect greeting", LetterboxEmulator.GREETING, in.readUTF());
+        assertEquals("expect greeting", LetterboxServer.GREETING, in.readUTF());
+        assertFalse("error from letterbox emulator", letterboxServer.isError());
         in.close();
     }
 
@@ -47,4 +50,5 @@ public class LetterboxConnectionTest {
         }
         EmulatorTestsHelper.stopInProcessServer();
     }
+    
 }
