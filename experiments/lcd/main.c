@@ -41,12 +41,20 @@ int main(void)
     lcd_set_page(5);
     lcd_set_column(0);
 
-    /* draw some sort of gray code
-       int i;
-       for (i = 0; i < 132; i++)
-       {
+    // draw some sort of gray code
+    /*
+    int i;
+    for (i = 0; i < 132; i++)
+    {
        lcd_write(i % 0xff);
-       } */
+    }
+    */
+
+    lcd_set_page(7);
+    lcd_set_column(5);
+    lcd_display_string("Hello world!");
+    lcd_display_char(' ');
+    lcd_display_string("This should get split.");
 }
 
 int __main(void)

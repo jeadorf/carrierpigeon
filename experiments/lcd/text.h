@@ -24,3 +24,9 @@ void lcd_draw_string(unsigned char* s);
 
 /* Maps a character to an index in the character table */
 char lcd_char_to_index(unsigned char c);
+
+/* displays a char so that it can actually be seen on the display, handling
+ * line feeds and wraparound
+ */
+void lcd_display_char(unsigned char c);
+void lcd_display_string(const char* s);

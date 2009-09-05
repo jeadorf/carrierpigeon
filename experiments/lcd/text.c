@@ -147,7 +147,7 @@ char characters[CHAR_TABLE_LENGTH][5] = {
     UNDEFINED_CHAR
 };
 
-// TODO: Think about storing bit matrix data externally and not within 8kb flash 
+// TODO: Think about storing bit matrix data externally and not within 8kb flash
 
 void lcd_draw_char(unsigned char c)
 {
@@ -168,6 +168,38 @@ void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
     lcd_write(0x0 ^ xor_mask);
 }
 
+void lcd_display_char(unsigned char c)
+{
+    static int current_page = 7, current_column = 5;
+
+    if (current_column == 105)
+    {
+        current_column = 5;
+        current_page--;
+        lcd_set_page(current_page);
+        lcd_set_column(current_column);
+    }
+
+    if (current_page <= 0)
+    {
+        current_page = 0;
+        lcd_set_page(current_page);
+    }
+
+    lcd_draw_char(c);
+}
+
+void lcd_display_string(const char* s)
+{
+    const char *p = s;
+    while (*p != '\0')
+    {
+        lcd_display_char(*p);
+        p++;
+    }
+}
+
+/* maps a char to their index in the font definition array */
 char lcd_char_to_index(unsigned char c)
 {
     if (c >= 'A' && c <= 'Z')
