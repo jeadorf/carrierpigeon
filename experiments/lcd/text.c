@@ -46,7 +46,7 @@
  *  1      
  *  1      
  */
-#define CHAR_TABLE_LENGTH 43
+#define CHAR_TABLE_LENGTH 44
 
 // define representation for undefined characters 
 #define BOTTOM {0x04, 0x04, 0x7c, 0x04, 0x04}
@@ -140,6 +140,8 @@ char characters[CHAR_TABLE_LENGTH][5] = {
     {0x00, 0x10, 0x10, 0x10, 0x00},
     // +
     {0x00, 0x10, 0x38, 0x10, 0x00},
+    // (SPACE)
+    {0x00, 0x00, 0x00, 0x00, 0x00},
     // <undefined> at position CHAR_TABLE_LENGTH - 1
     // 
     UNDEFINED_CHAR
@@ -203,6 +205,10 @@ char lcd_char_to_index(unsigned char c)
     else if (c == '+')
     {
         return 41;
+    }
+    else if (c == ' ')
+    {
+        return 42;
     }
     else
     {
