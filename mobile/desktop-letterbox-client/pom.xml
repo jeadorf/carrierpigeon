@@ -8,6 +8,10 @@
     <version>0.1-SNAPSHOT</version>
     <name>desktop-letterbox-client</name>
     <url>http://maven.apache.org</url>
+    <properties>
+        <project.main.class>carrierpigeon.desktopclient.DesktopLetterboxClient</project.main.class>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -21,8 +25,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- NOTE: not the only reference to the main-class -->
-                    <mainClass>carrierpigeon.desktopclient.DesktopLetterboxClient</mainClass>
+                    <mainClass>${project.main.class}</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -31,8 +34,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <!-- NOTE: not the only reference to the main-class -->
-                            <mainClass>carrierpigeon.desktopclient.DesktopLetterboxClient</mainClass>
+                            <mainClass>${project.main.class}</mainClass>
                             <addClasspath>true</addClasspath>
                         </manifest>
                     </archive>
@@ -47,8 +49,7 @@
                     </descriptors>
                     <archive>
                         <manifest>
-                            <!-- NOTE: not the only reference to the main-class -->
-                            <mainClass>carrierpigeon.desktopclient.DesktopLetterboxClient</mainClass>
+                            <mainClass>${project.main.class}</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -56,7 +57,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.0.2</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
