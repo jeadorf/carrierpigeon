@@ -15,13 +15,15 @@ import javax.microedition.io.StreamConnectionNotifier;
  */
 public class LetterboxServer implements Runnable {
 
-    public static final UUID uuid = new UUID(0x2208); // number is random
+    public static final UUID uuid = new UUID("1101", true);
 
     public static final String GREETING = "HI";
 
     public static final String CONFIRM = "OK";
 
     private boolean error = false;
+
+    // see http://www.jsr82.com/jsr-82-sample-spp-server-and-client
 
     /**
      * Accepts one single connection to a client and writes
@@ -30,7 +32,7 @@ public class LetterboxServer implements Runnable {
     public void run() {
         StreamConnectionNotifier service = null;
         try {
-            String serviceUrl = String.format("btspp://localhost:%s;name=TServer", uuid);
+            String serviceUrl = String.format("btspp://localhost:%s;name=letterbox-server", uuid);
             service = (StreamConnectionNotifier) Connector.open(serviceUrl);
             StreamConnection connection = (StreamConnection) service.acceptAndOpen();
 
