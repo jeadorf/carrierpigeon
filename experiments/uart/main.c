@@ -2,6 +2,7 @@
 #include <avr/io.h> 
 #include <avr/interrupt.h>
 #include "main.h"
+#include "global.h"
 #include "uart.h"
 
 int main(void)
@@ -15,6 +16,9 @@ int main(void)
     lcd_set_page(0);
     lcd_set_column(10);
     lcd_draw_char('S');
+    // set the prescaler of the timer to 1024
+    set_bit(TCCR1B, CS12);
+    set_bit(TCCR1B, CS10);
 
     while (true)
     {
@@ -29,14 +33,12 @@ int main(void)
 
 void reset_lcd(void)
 {
-    static unsigned long numcalls = 0;
-
-    numcalls++;
-    if (numcalls >= 120000) {
-        lcd_clear();
-        lcd_set_page(0);
-        lcd_set_column(10);
+    // fire every 1 second
+    if (TCNT1 >= 10800) {
+        //lcd_clear();
+        //lcd_set_page(0);
+        //lcd_set_column(10);
         lcd_draw_char('S');
-        numcalls = 0;
+        TCNT1 = 0;
     }
 }
