@@ -50,11 +50,14 @@ int main(void)
     }
     */
 
+    // initialize with 7 and 5 since the function expects it like this
     lcd_set_page(7);
     lcd_set_column(5);
     lcd_display_string("Hello world!");
     lcd_display_char(' ');
     lcd_display_string("This should get split.");
+    // after much text, it even wraps over and replaces text
+    // at the top, so all new text can be seen.
 }
 
 int __main(void)

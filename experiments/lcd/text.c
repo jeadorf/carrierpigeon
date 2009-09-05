@@ -170,22 +170,28 @@ void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
 
 void lcd_display_char(unsigned char c)
 {
+    // static: preserve their values across function calls
     static int current_page = 7, current_column = 5;
 
-    if (current_column == 105)
+    // split after column 110 has been reached
+    if (current_column == 110)
     {
+        // first place to put a character on is column 5
         current_column = 5;
         current_page--;
         lcd_set_page(current_page);
         lcd_set_column(current_column);
     }
 
-    if (current_page <= 0)
+    if (current_page < 0)
     {
-        current_page = 0;
+        // the highest line is number 7, wraparound to that
+        current_page = 7;
         lcd_set_page(current_page);
     }
 
+    // any character has width 5, so add it to the counter
+    current_column += 5;
     lcd_draw_char(c);
 }
 
