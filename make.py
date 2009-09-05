@@ -289,6 +289,7 @@ class Project:
         # mark the target directory. This is a safety mechanism used by the
         # clean function which checks for the marker before deleting any
         # files or directories on the file system.
+        if not os.path.isdir("target"): os.mkdir("target")
         open("target/build_marker", "a").close()
         # construct working directory in order to make all commands put their output
         # into the designated target subfolder.
