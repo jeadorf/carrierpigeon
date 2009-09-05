@@ -32,7 +32,7 @@ public class LetterboxServer implements Runnable {
     public void run() {
         StreamConnectionNotifier service = null;
         try {
-            String serviceUrl = String.format("btspp://localhost:%s;name=letterbox-server", uuid);
+            String serviceUrl = String.format("btspp://localhost:%s;name=letterbox-server;authenticate=false;encrypt=false;", uuid);
             service = (StreamConnectionNotifier) Connector.open(serviceUrl);
             StreamConnection connection = (StreamConnection) service.acceptAndOpen();
 
