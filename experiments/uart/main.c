@@ -40,25 +40,33 @@ char* uart_readline(void)
     c = uart_getc();
     if (!(c & UART_NO_DATA))
     {
+        // mask out all higher level bits that might be set
         c = c & 0xFF;
+
         if (c == '\r') {
+            // found a \r, add it to the count
             cr++;
         }
         else if (c == '\n') {
             lf++;
-            if (lf == 2)
+            if (lf == 2 && cr == 2)
             {
+                // we found the terminal \n
+                // reset all static variables back to their initial values
                 cr = 0;
                 lf = 0;
                 size = 1;
+                // return what we got now
                 return result;
             }
         }
         else {
+            // not a \r or \n, add it to our string
             result = realloc(result, ++size);
             result[size-2] = c;
             result[size-1] = '\0';
         }
     }
+    // if we aren't done, always return NULL
     return NULL;
 }
