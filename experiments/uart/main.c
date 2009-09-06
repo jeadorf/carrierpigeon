@@ -17,10 +17,6 @@ int main(void)
     lcd_clear();
     lcd_set_page(7);
     lcd_set_column(5);
-    // set the prescaler of the timer to 1024
-    set_bit(TCCR1B, CS12);
-    set_bit(TCCR1B, CS10);
-
 
     while (true)
     {
@@ -29,7 +25,9 @@ int main(void)
         text = uart_readline();
         if (text != NULL)
         {
-            reset_lcd();
+            lcd_clear();
+            lcd_set_page(7);
+            lcd_set_column(5);
             lcd_display_string(text);
         }
     }
@@ -55,6 +53,7 @@ char* uart_readline(void)
             {
                 cr = 0;
                 lf = 0;
+                size = 1;
                 return result;
             }
         }
@@ -65,17 +64,4 @@ char* uart_readline(void)
         }
     }
     return NULL;
-}
-
-void reset_lcd(void)
-{
-    // fire every 2 seconds
-    if (TCNT1 >= 21600)
-    {
-        lcd_clear();
-        lcd_set_page(7);
-        lcd_set_column(5);
-        // reset timer to prevent overflow
-        TCNT1 = 0;
-    }
 }
