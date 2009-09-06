@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <avr/io.h> 
 #include <avr/interrupt.h>
 #include "main.h"
@@ -10,6 +11,7 @@ int main(void)
 {
     int c;
     char* text;
+    bool connected = false;
     uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, 11059200UL));
     sei();
 
@@ -26,6 +28,14 @@ int main(void)
         if (text != NULL)
         {
             lcd_display_string(text);
+            if (!connected)
+            {
+                if ((strlen(text) >= 9) && (strncmp(text, "CONNECT  ", 9) == 0))
+                {
+                    connected = true;
+                    lcd_display_string("yay");
+                }
+            }
         }
     }
 }
