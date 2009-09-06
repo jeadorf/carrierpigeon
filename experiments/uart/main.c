@@ -25,9 +25,6 @@ int main(void)
         text = uart_readline();
         if (text != NULL)
         {
-            lcd_clear();
-            lcd_set_page(7);
-            lcd_set_column(5);
             lcd_display_string(text);
         }
     }
