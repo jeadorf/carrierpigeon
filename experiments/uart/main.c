@@ -27,15 +27,37 @@ int main(void)
         text = uart_readline();
         if (text != NULL)
         {
+            lcd_display_string("pre ");
             lcd_display_string(text);
-            if (!connected)
+            strncmp(text, "CONNECT  ", 9);
+            lcd_display_string("in ");
+            lcd_display_string(text);
+            strncmp(text, "DISCONNECT  ", 12);
+            lcd_display_string("post ");
+
+            /*
+            if (connected)
             {
-                if ((strlen(text) >= 9) && (strncmp(text, "CONNECT  ", 9) == 0))
+                lcd_display_string("c ");
+                lcd_display_string(text);
+                if (false)
+                //if (strncmp(text, "DISCONNECT  ", 12) == 0)
+                //if (text[0] = 'D')
+                {
+                    connected = false;
+                    lcd_display_string("noes");
+                }
+            }
+            else
+            {
+                if (false)
+                //if (strncmp(text, "CONNECT  ", 9) == 0)
                 {
                     connected = true;
                     lcd_display_string("yay");
                 }
             }
+            */
         }
     }
 }
