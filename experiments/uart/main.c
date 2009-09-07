@@ -65,8 +65,8 @@ bool startswith(const char* str, const char* prefix)
 char* uart_readline(void)
 {
     int c;
-    static char* result = NULL;
-    static size_t size = 1;
+    static char result[128];
+    static unsigned char position = 0;
     static unsigned char cr = 0, lf = 0;
 
     c = uart_getc();
@@ -87,16 +87,15 @@ char* uart_readline(void)
                 // reset all static variables back to their initial values
                 cr = 0;
                 lf = 0;
-                size = 1;
+                position = 0;
                 // return what we got now
                 return result;
             }
         }
         else {
             // not a \r or \n, add it to our string
-            result = realloc(result, (++size) * sizeof (char));
-            result[size-2] = c;
-            result[size-1] = '\0';
+            result[position++] = c;
+            result[position] = '\0';
         }
     }
     // if we aren't done, always return NULL
