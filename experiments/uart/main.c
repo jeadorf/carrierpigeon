@@ -27,22 +27,11 @@ int main(void)
         text = uart_readline();
         if (text != NULL)
         {
-            lcd_display_string("pre ");
             lcd_display_string(text);
-            strncmp(text, "CONNECT  ", 9);
-            lcd_display_string("in ");
-            lcd_display_string(text);
-            strncmp(text, "DISCONNECT  ", 12);
-            lcd_display_string("post ");
 
-            /*
             if (connected)
             {
-                lcd_display_string("c ");
-                lcd_display_string(text);
-                if (false)
-                //if (strncmp(text, "DISCONNECT  ", 12) == 0)
-                //if (text[0] = 'D')
+                if (strncmp(text, "DISCONNECT  ", 12) == 0)
                 {
                     connected = false;
                     lcd_display_string("noes");
@@ -50,16 +39,27 @@ int main(void)
             }
             else
             {
-                if (false)
-                //if (strncmp(text, "CONNECT  ", 9) == 0)
+                if (strncmp(text, "CONNECT  ", 9) == 0)
                 {
                     connected = true;
                     lcd_display_string("yay");
                 }
             }
-            */
         }
     }
+}
+
+bool startswith(const char* str, const char* prefix)
+{
+    int i;
+    for (i = 0; i < strlen(prefix); i++)
+    {
+        if (str[i] != prefix[i])
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 char* uart_readline(void)
@@ -94,7 +94,7 @@ char* uart_readline(void)
         }
         else {
             // not a \r or \n, add it to our string
-            result = realloc(result, ++size);
+            result = realloc(result, (++size) * sizeof (char));
             result[size-2] = c;
             result[size-1] = '\0';
         }
