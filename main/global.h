@@ -14,3 +14,5 @@
 /* set to whatever represents 8 bits */
 /* TODO: test this */
 typedef unsigned char byte;
+
+#define UART_BAUD_RATE 19200
