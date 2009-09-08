@@ -49,19 +49,6 @@ int main(void)
     }
 }
 
-bool startswith(const char* str, const char* prefix)
-{
-    int i;
-    for (i = 0; i < strlen(prefix); i++)
-    {
-        if (str[i] != prefix[i])
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 char* uart_readline(void)
 {
     int c;
