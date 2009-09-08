@@ -52,7 +52,8 @@ int main(void)
 char* uart_readline(void)
 {
     int c;
-    static char result[128];
+    // TODO: MAX_MESSAGE_LENGTH
+    static char result[112+1];
     static unsigned char position = 0;
     static unsigned char cr = 0, lf = 0;
 
