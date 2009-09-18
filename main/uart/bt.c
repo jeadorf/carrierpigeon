@@ -1,3 +1,4 @@
+#include <avr/io.h>
 #include <stdlib.h>
 #include "bt.h"
 #include "uart.h"
