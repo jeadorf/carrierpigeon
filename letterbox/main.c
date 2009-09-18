@@ -11,7 +11,7 @@ int main(void)
     int c;
     char* text;
     bool connected = false;
-    /*
+    
     uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, 11059200UL));
     sei();
 
@@ -24,7 +24,7 @@ int main(void)
     {
         //TODO: implement 'CONNECT' detection to only echo back relevant
         // stuff
-        text = uart_readline();
+        text = bt_readline();
         if (text != NULL)
         {
             lcd_display_string(text);
@@ -47,5 +47,5 @@ int main(void)
             }
         }
     }
-    */
+    
 }
