@@ -189,6 +189,7 @@ class Project:
             "avr-gcc",
             "-c",
             "-O2",
+            "-Wall",
             "-DF_CPU=16000000",
             "-mmcu=atmega8515"]
         self._append_compile_sources(compile_cmd)

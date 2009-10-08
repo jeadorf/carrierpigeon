@@ -1,5 +1,6 @@
-#include "main.h"
-#include "../../main/global.h"
+#include <avr/io.h> 
+#include "global.h"
+#include "eeprom.h"
 
 void eeprom_write(unsigned int address, unsigned char data)
 {
