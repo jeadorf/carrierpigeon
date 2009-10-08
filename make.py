@@ -212,6 +212,7 @@ class Project:
             "avr-gcc",
             "-O3",
             "--std=C99",
+            "-pedantic",
             "-mmcu=atmega8515",
             "-o", "main"]
         self._build_dependencies()
