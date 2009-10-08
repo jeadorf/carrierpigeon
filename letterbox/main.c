@@ -19,8 +19,6 @@ int main(void)
 
     lcd_init();
     lcd_clear();
-    lcd_set_page(7);
-    lcd_set_column(5);
 
     while (true)
     {
