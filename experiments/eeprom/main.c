@@ -1,3 +1,4 @@
+#include "eeprom.h"
 
 /* 
  * Fills the first 256 bytes of the EEPROM with numbers from 0 to 255 and

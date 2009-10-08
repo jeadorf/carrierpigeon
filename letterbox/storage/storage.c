@@ -80,7 +80,6 @@ bool storage_save_message(void)
     } else {
         // Find free memory block
         int block;
-        outer:
         // Check all blocks, do not do this by reading the
         // EEPROM message status bit, it should be faster this way.
         for (block = 1; block <= MAX_MESSAGES; block++) {

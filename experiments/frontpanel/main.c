@@ -16,7 +16,6 @@
 
 int main(void)
 {
-    int n;
     // the lightness that is desired
     DDRB = NONE_LIGHT;
 

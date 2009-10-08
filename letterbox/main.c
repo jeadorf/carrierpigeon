@@ -5,10 +5,12 @@
 #include <avr/interrupt.h>
 #include "global.h"
 #include "uart.h"
+#include "lcd.h"
+#include "text.h"
+#include "bt.h"
 
 int main(void)
 {
-    int c;
     char* text;
     bool connected = false;
     bool wait4connect = true;

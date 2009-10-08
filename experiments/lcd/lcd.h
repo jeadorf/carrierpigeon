@@ -43,7 +43,10 @@ void lcd_contrast(unsigned char level);
 /* Sets the current page of the display RAM. The address
  * has to be in the range 0 - 7
  */
-void lcd_set_page(unsigned char num);
+void lcd_set_page(unsigned char pagenum);
+
+/** Sets the current column of the display RAM. */
+void lcd_set_column(unsigned char colnum);
 
 #define LCD_BRIGHTNESS PE2
 

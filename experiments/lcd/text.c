@@ -160,10 +160,10 @@ void lcd_draw_char(unsigned char c)
 
 void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
 {
-    char i;
+    int i;
 
     // Map character
-    char j = lcd_char_to_index(c);
+    int j = lcd_char_to_index(c);
     for (i = 0; i < 5; i++)
     {
         lcd_write(characters[j][i] ^ xor_mask);
@@ -210,7 +210,7 @@ void lcd_display_string(const char* s)
 }
 
 /* maps a char to their index in the font definition array */
-char lcd_char_to_index(unsigned char c)
+int lcd_char_to_index(unsigned char c)
 {
     if (c >= 'A' && c <= 'Z')
     {

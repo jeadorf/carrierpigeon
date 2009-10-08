@@ -1,6 +1,8 @@
 #include <stdbool.h>
 #include "main.h"
 #include "global.h"
+#include "lcd.h"
+#include "text.h"
 
 int main(void)
 {
@@ -41,4 +43,6 @@ int main(void)
     lcd_display_string("This should get split.");
     // after much text, it even wraps over and replaces text
     // at the top, so all new text can be seen.
+
+    return 0;
 }
