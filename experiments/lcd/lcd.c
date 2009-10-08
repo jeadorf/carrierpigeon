@@ -1,5 +1,10 @@
 #include "global.h"
 #include "lcd.h"
+#include <avr/io.h>
+#include <util/delay.h>
+
+int current_page = LCD_INIT_PAGE;
+int current_column = LCD_INIT_COLUMN;
 
 void lcd_light(unsigned char level)
 {
@@ -67,6 +72,7 @@ void lcd_write(unsigned char data)
 void lcd_set_page(unsigned char pagenum)
 {
     lcd_control(0xB0 + pagenum);
+    current_page = pagenum;
 }
 
 void lcd_set_column(unsigned char colnum)
@@ -75,6 +81,7 @@ void lcd_set_column(unsigned char colnum)
     lcd_control(0x10 + (colnum >> 4));
     // 4 least significant bits
     lcd_control(0x00 + (colnum & 0x0F));
+    current_column = colnum;
 }
 
 void lcd_clear(void)
@@ -144,4 +151,8 @@ void lcd_init(void)
     lcd_control(0xB0);          // <- page address = 0
     lcd_control(0x10);          // <- column address high = 0
     lcd_control(0x00);          // <- column address low = 0
+
+    lcd_set_column(LCD_INIT_COLUMN);
+    lcd_set_page(LCD_INIT_PAGE);
+    
 }

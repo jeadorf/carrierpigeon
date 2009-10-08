@@ -6,8 +6,8 @@
  * stacked vertically on top of another.
  */
 
-#include <avr/io.h> 
-#include "main.h"
+#define LCD_INIT_COLUMN 0 
+#define LCD_INIT_PAGE 7
 
 /*
  * Writes a control byte to the display. See both lcd_init method and the 

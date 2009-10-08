@@ -1,5 +1,5 @@
 #include "assert.h"
-#include "eeprom.h"
+#include "text.h"
 #include "led.h"
 // TODO: test assertions
 // TODO: make assertion lib compile
@@ -22,15 +22,8 @@ void assert_false(char *error_msg, bool actual)
 
 void fail(char *error_msg)
 {
-    // Write message to EEPROM, truncate message if running
-    // out of memory
-    int i = 0;
-
-    while (error_msg[i] != '\0' && (i < EEPROM_SIZE / 2))
-    {
-        eeprom_write(i + EEPROM_SIZE / 2, error_msg[i]);
-        i++;
-    }
+    lcd_display_string("ERROR ");
+    lcd_display_string(error_msg);
 
     // Signal that something is wrong. Run forever.
     while (true)
@@ -38,3 +31,4 @@ void fail(char *error_msg)
         blink();
     }
 }
+

@@ -47,6 +47,7 @@
  *  1      
  */
 #define CHAR_TABLE_LENGTH 46
+#define LCD_CHAR_WIDTH 5
 
 // define representation for undefined characters 
 #define BOTTOM {0x04, 0x04, 0x7c, 0x04, 0x04}
@@ -55,7 +56,7 @@
 
 // be careful when changing character table, you will need to adjust both
 // CHAR_TABLE_LENGTH and the mapping function lcd_char_to_index
-char characters[CHAR_TABLE_LENGTH][5] = {
+char characters[CHAR_TABLE_LENGTH][LCD_CHAR_WIDTH] = {
     // A
     {0x3c, 0x50, 0x50, 0x3c, 0x00},
     // B
@@ -151,6 +152,9 @@ char characters[CHAR_TABLE_LENGTH][5] = {
     UNDEFINED_CHAR
 };
 
+extern int current_page;
+extern int current_column;
+
 // TODO: Think about storing bit matrix data externally and not within 8kb flash
 
 void lcd_draw_char(unsigned char c)
@@ -164,7 +168,7 @@ void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
 
     // Map character
     int j = lcd_char_to_index(c);
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < LCD_CHAR_WIDTH; i++)
     {
         lcd_write(characters[j][i] ^ xor_mask);
     }
@@ -174,29 +178,22 @@ void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
 
 void lcd_display_char(unsigned char c)
 {
-    // static: preserve their values across function calls
-    static int current_page = 7, current_column = 5;
-
-    // split after column 110 has been reached
-    if (current_column == 110)
+    
+    // split after last column has been reached
+    if (current_column == 115)
     {
-        // first place to put a character on is column 5
-        current_column = 5;
-        current_page--;
-        lcd_set_page(current_page);
-        lcd_set_column(current_column);
+        lcd_set_page(current_page - 1);
+        lcd_set_column(LCD_INIT_COLUMN);
     }
 
     if (current_page < 0)
     {
-        // the highest line is number 7, wraparound to that
-        current_page = 7;
-        lcd_set_page(current_page);
+        // wrap around to the initial page 
+        lcd_set_page(LCD_INIT_PAGE);
     }
 
-    // any character has width 5, so add it to the counter
-    current_column += 5;
     lcd_draw_char(c);
+    lcd_set_column(current_column + LCD_CHAR_WIDTH);
 }
 
 void lcd_display_string(const char* s)
