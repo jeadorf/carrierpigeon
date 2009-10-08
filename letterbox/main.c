@@ -36,6 +36,8 @@ int main(void)
                     connected = false;
                     lcd_display_string("noes ");
                     wait4connect = true;
+                } else {
+                    lcd_display_string(text);
                 }
             }
             else

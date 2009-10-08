@@ -35,7 +35,6 @@ int main(void)
         lcd_draw_char(i);
     }
 
-    // initialize with 7 and 5 since the function expects it like this
     lcd_set_page(7);
     lcd_set_column(5);
     lcd_display_string("Hello world!");
@@ -43,6 +42,8 @@ int main(void)
     lcd_display_string("This should get split.");
     // after much text, it even wraps over and replaces text
     // at the top, so all new text can be seen.
+
+    // lcd_display_string("A very long string that should wrap and overwrite the first characters within the display! This belongs to the long string, too! This, too! And this! And finally this!");
 
     return 0;
 }

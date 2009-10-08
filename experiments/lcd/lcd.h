@@ -6,7 +6,7 @@
  * stacked vertically on top of another.
  */
 
-#define LCD_INIT_COLUMN 0 
+#define LCD_INIT_COLUMN 5 
 #define LCD_INIT_PAGE 7
 
 /*

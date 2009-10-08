@@ -84,7 +84,7 @@ char characters[CHAR_TABLE_LENGTH][LCD_CHAR_WIDTH] = {
     // M
     {0x7c, 0x20, 0x10, 0x20, 0x7c},
     // N
-    {0x7c, 0x20, 0x10, 0x08, 0x7c},
+    {0x7c, 0x20, 0x10, 0x7c, 0x00},
     // O
     {0x38, 0x44, 0x44, 0x38, 0x00},
     // P
@@ -176,10 +176,10 @@ void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
 }
 
 void lcd_display_char(unsigned char c)
-{
-    
+{ 
     // split after last column has been reached
-    if (current_column == 115)
+    // TODO: resolve magic number
+    if (current_column == 110)
     {
         lcd_set_page(current_page - 1);
         lcd_set_column(LCD_INIT_COLUMN);
