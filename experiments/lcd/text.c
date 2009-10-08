@@ -156,7 +156,6 @@ extern int current_page;
 extern int current_column;
 
 // TODO: Think about storing bit matrix data externally and not within 8kb flash
-
 void lcd_draw_char(unsigned char c)
 {
     lcd_draw_char_masked(c, 0x00);
@@ -184,13 +183,19 @@ void lcd_display_char(unsigned char c)
     {
         lcd_set_page(current_page - 1);
         lcd_set_column(LCD_INIT_COLUMN);
+    } else {
+        // sync current_column and actual lcd column
+        lcd_set_column(current_column);
     }
 
     if (current_page < 0)
     {
         // wrap around to the initial page 
         lcd_set_page(LCD_INIT_PAGE);
-    }
+    } else {
+        // sync current_page and actual lcd page
+        lcd_set_page(current_page);
+    } 
 
     lcd_draw_char(c);
     lcd_set_column(current_column + LCD_CHAR_WIDTH);

@@ -1,8 +1,7 @@
 #include "assert.h"
 #include "text.h"
 #include "led.h"
-// TODO: test assertions
-// TODO: make assertion lib compile
+#include <util/delay.h>
 
 void assert_true(char *error_msg, bool actual)
 {
@@ -25,10 +24,12 @@ void fail(char *error_msg)
     lcd_display_string("ERROR ");
     lcd_display_string(error_msg);
 
-    // Signal that something is wrong. Run forever.
-    while (true)
-    {
+    while (true) {
         blink();
+        blink();
+        blink();
+        _delay_ms(1000);
     }
+
 }
 
