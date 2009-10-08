@@ -25,6 +25,13 @@
 #define STATE_NEW   'n'
 #define STATE_READ  'r'
 
+// avoid magic numbers
+#define MAX_MESSAGES 4
+#define MESSAGE_SIZE 120
+#define MESSAGE_TEXT_LENGTH 112
+#define MESSAGE_RESERVED_SIZE 7
+
+
 /*
  * Saves a message on the EEPROM. The message text is expected to be
  * in the buffer. Returns false if memory is full, true on success.

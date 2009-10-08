@@ -33,12 +33,6 @@
 #include "storage.h"
 #include "eeprom.h"
 
-// avoid magic numbers
-#define MAX_MESSAGES 4
-#define MESSAGE_SIZE 120
-#define MESSAGE_TEXT_LENGTH 112
-#define MESSAGE_RESERVED_SIZE 7
-
 // List of nodes that point to message blocks. Zero marks a free slot
 // in the list. The first zero denotes the end of the list. A value
 // n denotes that the message is actually stored in the n-th memory
