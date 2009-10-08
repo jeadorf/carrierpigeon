@@ -210,7 +210,8 @@ class Project:
         _info("Linking '%s' ..." % self.name)
         link_cmd = [
             "avr-gcc",
-            "-O2",
+            "-O3",
+            "--std=C99",
             "-mmcu=atmega8515",
             "-o", "main"]
         self._build_dependencies()
