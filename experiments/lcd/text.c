@@ -156,12 +156,12 @@ extern int current_page;
 extern int current_column;
 
 // TODO: Think about storing bit matrix data externally and not within 8kb flash
-void lcd_draw_char(unsigned char c)
+void lcd_draw_char(char c)
 {
     lcd_draw_char_masked(c, 0x00);
 }
 
-void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
+void lcd_draw_char_masked(char c, unsigned char xor_mask)
 {
     int i;
 
@@ -175,13 +175,13 @@ void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask)
     lcd_write(0x0 ^ xor_mask);
 }
 
-void lcd_display_char(unsigned char c)
+void lcd_display_char(char c)
 { 
     // split after last column has been reached
     // TODO: resolve magic number
-    if (current_column == 110)
+    if (current_column >= 130)
     {
-        lcd_set_page(current_page - 1);
+        current_page--;
         lcd_set_column(LCD_INIT_COLUMN);
     } else {
         // sync current_column and actual lcd column
@@ -198,7 +198,7 @@ void lcd_display_char(unsigned char c)
     } 
 
     lcd_draw_char(c);
-    lcd_set_column(current_column + LCD_CHAR_WIDTH);
+    lcd_set_column(current_column + LCD_CHAR_WIDTH + 1);
 }
 
 void lcd_display_string(const char* s)
@@ -212,7 +212,7 @@ void lcd_display_string(const char* s)
 }
 
 /* maps a char to their index in the font definition array */
-int lcd_char_to_index(unsigned char c)
+int lcd_char_to_index(char c)
 {
     if (c >= 'A' && c <= 'Z')
     {

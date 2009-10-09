@@ -188,7 +188,7 @@ class Project:
         compile_cmd = [
             "avr-gcc",
             "-c",
-            "-O2",
+            "-O3",
             "-Wall",
             "-DF_CPU=16000000",
             "-mmcu=atmega8515"]

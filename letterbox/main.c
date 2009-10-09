@@ -1,5 +1,5 @@
 /** Main routine of the letterbox server. The server works like
- * finite, deterministic automaton.
+ * a finite, deterministic automaton.
  */
 
 #include <stdlib.h>
@@ -14,11 +14,28 @@
 #include "text.h"
 #include "bt.h"
 #include "storage.h"
+#include "assert.h"
+
+/** Enumerates all possible GUI pages */
+enum uipage {
+    /* The letterbox has established a connection to a client
+       and is downloading a message. The user may not interact
+       with the letterbox during communication. */
+    connection,
+    /* The letterbox has received messages that have not yet
+       been read by the user. */
+    notice,
+    /* The letterbox shows a specific message and its state */
+    message
+};
+
+/* Stores which UI page is displayed on the LCD at the moment */
+static enum uipage current_uipage = message;
 
 /**
  * Initializes all components required by the letterbox.
  */
-void letterbox_init(void)
+void lb_init(void)
 {
     uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, 11059200UL));
     sei();
@@ -27,82 +44,95 @@ void letterbox_init(void)
     lcd_clear();
 }
 
-bool letterbox_is_connect(char* msg)
+bool lb_is_connect(char* msg)
 {
     return msg != NULL && strncmp(msg, "CONNECT  ", 9) == 0;
 }
 
-bool letterbox_is_disconnect(char* msg)
+bool lb_is_disconnect(char* msg)
 {
     return msg != NULL && strncmp(msg, "DISCONNECT  ", 12) == 0;
 }
 
-void letterbox_wait_for_connection(void)
-{
-    char* msg;
-    while (true) {
-        msg = bt_readline();
-        if (letterbox_is_connect(msg)) {
-            return;
-        } else {
-            // Yield and give the user a chance to trigger some
-            // action.
-            letterbox_handle_user_request();
-        }
-    }
+void lb_display_connection(void) {
+    
+    current_uipage = connection;
 }
 
-void letterbox_retrieve_message(void)
+void lb_display_notice(void) {
+    assert_true("uipage should be connection", current_uipage == connection);
+    current_uipage = notice;
+}
+
+void lb_display_message(void) {
+    char* text = storage_get_buffer();  
+    current_uipage = message;
+}
+
+bool lb_read_request_line(void) {
+
+}
+
+void lb_send_confirm(void) {
+
+}
+
+bool lb_save_message(void) {
+
+}
+
+void lb_send_server_ready(void) {
+
+}
+
+void lb_send_error(void) {
+
+}
+
+void lb_force_disconnect(void) {
+
+}
+
+void lb_check_connection(void)
 {
-    char* msg;
-    int i, pos;
-    char* storage = storage_get_buffer();
-    while (pos < MESSAGE_TEXT_LENGTH) {
-        msg = bt_readline();
-        if (letterbox_is_disconnect(msg)) {
-            storage[pos+1] = '\0';
-            break;
-        } else if (msg != NULL) {
-            for (i = 0; msg[i] != '\0' && pos < MESSAGE_TEXT_LENGTH; i++) { 
-                storage[pos++] = msg[i];
+    char* msg = bt_readline();
+    if (lb_is_connect(msg)) {
+        lb_display_connection();
+        if (lb_read_request_line()) {
+            lb_send_server_ready();
+            lb_read_message();
+            if (lb_save_message()) {
+                lb_send_confirm();
+                lb_set_new_as_current();
+                lb_display_notice();
+            } else {
+                lb_send_error();
             }
         }
+        lb_force_disconnect();
     }
-    lcd_display_string(storage);
-    led_on();
-    // FIXME:
-    while (true) {}
-    // storage_save_message();
 }
-
-void letterbox_handle_client(void)
+        
+void lb_check_user_request(void)
 {
-    char* msg;
-    letterbox_wait_for_connection();
-    letterbox_retrieve_message(); 
-}
-
-void letterbox_handle_user_request(void)
-{
-    // FIXME 
 }
 
 /**
  * Lifecycle of the letterbox.
  */
-void letterbox_serve(void)
+void lb_serve(void)
 {
     while (true) {
-        letterbox_handle_client();
-        letterbox_handle_user_request();
+        lb_check_connection();
+        lb_check_user_request();
     }
 }
 
 /** Letterbox life cycle. */
 int main(void)
 {
-    letterbox_init();
-    letterbox_serve();
+    lb_init();
+    lb_serve();
     return 0;
 }
 

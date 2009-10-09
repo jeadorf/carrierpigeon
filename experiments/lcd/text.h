@@ -14,19 +14,19 @@
  *               matrix that represents the character. 0x00 leaves the matrix
  *               untouched, while 0xff inverts the matrix.  
  */
-void lcd_draw_char_masked(unsigned char c, unsigned char xor_mask);
+void lcd_draw_char_masked(char c, unsigned char xor_mask);
 
 /* Equivalent to lcd_draw_char_masked with bitmask 0x00 */
-void lcd_draw_char(unsigned char c);
+void lcd_draw_char(char c);
 
 /* Draws a string. Does not care about line-wrapping. */
-void lcd_draw_string(unsigned char* s);
+void lcd_draw_string(char* s);
 
 /* Maps a character to an index in the character table */
-int lcd_char_to_index(unsigned char c);
+int lcd_char_to_index(char c);
 
 /* displays a char so that it can actually be seen on the display, handling
  * line feeds and wraparound
  */
-void lcd_display_char(unsigned char c);
+void lcd_display_char(char c);
 void lcd_display_string(const char* s);

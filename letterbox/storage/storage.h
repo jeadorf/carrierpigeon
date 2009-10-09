@@ -62,7 +62,7 @@ bool storage_delete_message(unsigned int message_number);
  * Gets a pointer to the current buffer. The buffer is 112 bytes wide,
  * writing beyond 112 bytes will result in segmentation fault.
  */
-unsigned char* storage_get_buffer(void);
+char* storage_get_buffer(void);
 
 /*
  * Get the number of stored messages.

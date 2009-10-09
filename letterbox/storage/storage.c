@@ -41,7 +41,7 @@ unsigned char storage_nodes[4] = { 0, 0, 0, 0 };
 // Points to the next free slot in storage_nodes 
 unsigned char storage_count = 0;
 // A buffer that is used for IO operations
-unsigned char storage_buffer[MESSAGE_TEXT_LENGTH];
+char storage_buffer[MESSAGE_TEXT_LENGTH];
 
 bool storage_is_empty(void)
 {
@@ -147,7 +147,7 @@ bool storage_delete_message(unsigned int message_num)
     }
 }
 
-unsigned char* storage_get_buffer(void)
+char* storage_get_buffer(void)
 {
     return storage_buffer;
 }
