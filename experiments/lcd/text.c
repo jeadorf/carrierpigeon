@@ -1,5 +1,6 @@
 #include "text.h"
 #include "lcd.h"
+#include <avr/pgmspace.h>
 
 /* 
  * Characters are represented as bit matrices. There are no lower-case
@@ -56,7 +57,9 @@
 
 // be careful when changing character table, you will need to adjust both
 // CHAR_TABLE_LENGTH and the mapping function lcd_char_to_index
-char characters[CHAR_TABLE_LENGTH][LCD_CHAR_WIDTH] = {
+// For info about PROGMEM, see: http://www.nongnu.org/avr-libc/user-manual/pgmspace.html
+// Character table should be stored in program memory.
+char characters[CHAR_TABLE_LENGTH][LCD_CHAR_WIDTH] PROGMEM = {
     // A
     {0x3c, 0x50, 0x50, 0x3c, 0x00},
     // B
@@ -169,7 +172,7 @@ void lcd_draw_char_masked(char c, unsigned char xor_mask)
     int j = lcd_char_to_index(c);
     for (i = 0; i < LCD_CHAR_WIDTH; i++)
     {
-        lcd_write(characters[j][i] ^ xor_mask);
+        lcd_write((unsigned char) pgm_read_byte(&(characters[j][i])) ^ xor_mask);
     }
     // Insert a little space
     lcd_write(0x0 ^ xor_mask);
