@@ -190,11 +190,13 @@ class Project:
         compile_cmd = [
             "avr-gcc",
             "-c",
-            "-O3",
+            "-O2",
             "-Wall",
             "-Werror",
             "-DF_CPU=16000000",
             "-mmcu=atmega8515"]
+        if options.debug:
+            compile_cmd.append("-g")
         self._append_compile_sources(compile_cmd)
         self._append_include_paths(compile_cmd)
         self._execute(compile_cmd)
@@ -375,6 +377,17 @@ def _add_statistics_option(option_parser):
         help="Print memory statistics for created binaries"
     )
 
+def _add_debug_option(option_parser):
+    option_parser.add_option(
+        "-d",
+        "--debug",
+        action="store_true",
+        dest="debug",
+        default=False,
+        help="Add debugging information"
+    )
+
+
 if __name__ == "__main__":
     option_parser = optparse.OptionParser("./make.py [OPTIONS] [PROJECT...]")
     _add_build_option(option_parser)
@@ -382,6 +395,7 @@ if __name__ == "__main__":
     _add_program_option(option_parser)
     _add_verbosity_option(option_parser)
     _add_statistics_option(option_parser)
+    _add_debug_option(option_parser)
     options, args = option_parser.parse_args()
 
     cfg = ConfigParser.ConfigParser()
