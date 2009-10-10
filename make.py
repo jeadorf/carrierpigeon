@@ -47,13 +47,15 @@ import sys
 import ConfigParser
 import optparse
 
-verbose = False 
+# must be initialized before calling any of
+# the functions in this script
+options = None
 
 def _info(message):
     print message
 
 def _fine(message):
-    if verbose:
+    if options.verbose:
         print message
 
 def _recursively_remove_dir(top):
@@ -219,6 +221,18 @@ class Project:
         self._append_compile_output_files(link_cmd)
         self._append_dependencies_output_files(link_cmd)
         self._execute(link_cmd)
+        # display memory statistics
+        if options.statistics:
+            self._print_memory_stats()
+    def _print_memory_stats(self):
+        """Prints memory statistics using avr-size"""
+        _info("Memory statistics for '%s':" % self.name)
+        stats_cmd = [
+            "avr-size",
+            "--format=avr",
+            "--mcu=atmega8515",
+            "main"]
+        self._execute(stats_cmd)
     def _append_compile_output_files(self, cmd):
         for f in self.files:
             cmd.append(f + ".o")
@@ -350,15 +364,24 @@ def _add_verbosity_option(option_parser):
         help="Be talkative."
     )
 
+def _add_statistics_option(option_parser):
+    option_parser.add_option(
+        "-s",
+        "--statistics",
+        action="store_true",
+        dest="statistics",
+        default=False,
+        help="Print memory statistics for created binaries"
+    )
+
 if __name__ == "__main__":
     option_parser = optparse.OptionParser("./make.py [OPTIONS] [PROJECT...]")
     _add_build_option(option_parser)
     _add_clean_option(option_parser)
     _add_program_option(option_parser)
     _add_verbosity_option(option_parser)
+    _add_statistics_option(option_parser)
     options, args = option_parser.parse_args()
-
-    verbose = options.verbose
 
     cfg = ConfigParser.ConfigParser()
     cfg.read("make.cfg")

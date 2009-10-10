@@ -4,7 +4,6 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include <string.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include "global.h"

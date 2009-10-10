@@ -25,9 +25,9 @@ void fail(char *error_msg)
     lcd_display_string(error_msg);
 
     while (true) {
-        blink();
-        blink();
-        blink();
+        led_blink();
+        led_blink();
+        led_blink();
         _delay_ms(1000);
     }
 

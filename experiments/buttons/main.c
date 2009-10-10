@@ -28,7 +28,7 @@ int main(void)
     while (true)
     {
         key = get_key();
-        blink_times(key);
+        led_blink_times(key);
     }
 
     return 0;
