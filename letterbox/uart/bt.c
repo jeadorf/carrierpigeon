@@ -1,13 +1,15 @@
 #include <avr/io.h>
 #include <stdlib.h>
+#include "global.h"
 #include "bt.h"
 #include "uart.h"
+
+/** use the global buffer in order to save memory. */
+extern char* global_buffer;
 
 char* bt_readline(void)
 {
     int c;
-    // TODO: MAX_MESSAGE_LENGTH
-    static char result[112+1];
     static unsigned char position = 0;
     static unsigned char cr = 0, lf = 0;
 
@@ -31,13 +33,13 @@ char* bt_readline(void)
                 lf = 0;
                 position = 0;
                 // return what we got now
-                return result;
+                return global_buffer;
             }
         }
         else {
             // not a \r or \n, add it to our string
-            result[position++] = c;
-            result[position] = '\0';
+            global_buffer[position++] = c;
+            global_buffer[position] = '\0';
         }
     }
     // if we aren't done, always return NULL

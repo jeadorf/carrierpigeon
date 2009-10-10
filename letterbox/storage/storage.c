@@ -40,8 +40,10 @@
 unsigned char storage_nodes[4] = { 0, 0, 0, 0 };
 // Points to the next free slot in storage_nodes 
 unsigned char storage_count = 0;
-// A buffer that is used for IO operations
-char storage_buffer[MESSAGE_TEXT_LENGTH];
+
+/** use the globally available buffer in order to
+ * reduce memory consumption */
+extern char* global_buffer;
 
 bool storage_is_empty(void)
 {
@@ -60,8 +62,8 @@ void _storage_save_message_to_eeprom(unsigned char block)
     int i;
     for (i = 0; i < MESSAGE_TEXT_LENGTH; i++)
     {
-        eeprom_write(text_addr + i, storage_buffer[i]);
-        if (storage_buffer[i] == '\0') {
+        eeprom_write(text_addr + i, global_buffer[i]);
+        if (global_buffer[i] == '\0') {
             break;
         }
     }
@@ -120,7 +122,7 @@ bool storage_load_message(unsigned int message_num)
         char c;
         for (i = 0; i < MESSAGE_TEXT_LENGTH; i++) {
             c = eeprom_read(text_addr + i);
-            storage_buffer[i] = c;
+            global_buffer[i] = c;
             if (c == '\0') {
                 break;
             }
@@ -149,7 +151,7 @@ bool storage_delete_message(unsigned int message_num)
 
 char* storage_get_buffer(void)
 {
-    return storage_buffer;
+    return global_buffer;
 }
 
 unsigned int storage_message_count(void)

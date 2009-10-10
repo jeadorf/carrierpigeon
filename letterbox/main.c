@@ -3,9 +3,12 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#include <avr/io.h>
+#include <stdio.h>
 #include "global.h"
 #include "uart.h"
 #include "lcd.h"
@@ -30,6 +33,22 @@ enum uipage {
 
 /* Stores which UI page is displayed on the LCD at the moment */
 static enum uipage current_uipage = message;
+
+void lb_init(void);
+bool lb_is_connect(char*);
+bool lb_is_disconnect(char*);
+void lb_display_connection(void);
+void lb_display_notice(void);
+void lb_display_message(void);
+bool lb_read_request_line(void);
+void lb_send_confirm(void);
+void lb_read_message(void);
+bool lb_save_message(void);
+void lb_send_server_ready(void);
+void lb_send_error(void);
+void lb_set_new_as_current(void);
+void lb_force_disconnect(void);
+void lb_check_connection(void);
 
 /**
  * Initializes all components required by the letterbox.
@@ -64,12 +83,11 @@ void lb_display_notice(void) {
 }
 
 void lb_display_message(void) {
-    char* text = storage_get_buffer();  
     current_uipage = message;
 }
 
 bool lb_read_request_line(void) {
-
+    return false;
 }
 
 void lb_send_confirm(void) {
@@ -77,7 +95,7 @@ void lb_send_confirm(void) {
 }
 
 bool lb_save_message(void) {
-
+    return false;
 }
 
 void lb_send_server_ready(void) {
@@ -126,11 +144,16 @@ void lb_serve(void)
         lb_check_user_request();
     }
 }
+extern unsigned char __heap_start;
 
 /** Letterbox life cycle. */
 int main(void)
 {
     lb_init();
+    char buf[4];
+    uint16_t free_memory = SP - (uint16_t) &__heap_start;
+    sprintf(buf, "%d", free_memory);
+    lcd_display_string(buf);
     lb_serve();
     return 0;
 }

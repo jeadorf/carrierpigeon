@@ -267,3 +267,4 @@ int lcd_char_to_index(char c)
         return CHAR_TABLE_LENGTH - 1;
     }
 }
+

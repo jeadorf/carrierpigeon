@@ -4,8 +4,6 @@
  * of the EEPROM address register EEAR (two registers EEARH and EEARL).
  */
 
-/* TODO: Check for AVR eeprom library (look at GNU AVR tools) */
-
 /*
  * Writes exactly one byte to the EEPROM at the specified memory address.
  */
@@ -15,3 +13,4 @@ void eeprom_write(unsigned int address, unsigned char data);
  * Reads exactly one byte from the EEPROM at the specified memory address.
  */
 unsigned char eeprom_read(unsigned int address);
+

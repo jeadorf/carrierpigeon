@@ -4,3 +4,4 @@
  * 0. After the button state is read all buttons will be reset.
  */
 char get_key(void);
+

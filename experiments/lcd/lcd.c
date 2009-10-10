@@ -156,5 +156,5 @@ void lcd_init(void)
 
     lcd_set_column(LCD_INIT_COLUMN);
     lcd_set_page(LCD_INIT_PAGE);
-    
 }
+
