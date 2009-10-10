@@ -25,7 +25,6 @@
 #define STATE_NEW   'n'
 #define STATE_READ  'r'
 
-// avoid magic numbers
 #define MAX_MESSAGES 4
 #define MESSAGE_SIZE 120
 #define MESSAGE_TEXT_LENGTH 112

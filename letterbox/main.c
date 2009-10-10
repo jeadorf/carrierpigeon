@@ -1,6 +1,4 @@
-/** Main routine of the letterbox server. The server works like
- * a finite, deterministic automaton.
- */
+/** Main routine of the letterbox server. */
 
 #include <stdlib.h>
 #include <string.h>
@@ -17,38 +15,22 @@
 #include "bt.h"
 #include "storage.h"
 #include "assert.h"
-
-/** Enumerates all possible GUI pages */
-enum uipage {
-    /* The letterbox has established a connection to a client
-       and is downloading a message. The user may not interact
-       with the letterbox during communication. */
-    connection,
-    /* The letterbox has received messages that have not yet
-       been read by the user. */
-    notice,
-    /* The letterbox shows a specific message and its state */
-    message
-};
-
-/* Stores which UI page is displayed on the LCD at the moment */
-static enum uipage current_uipage = message;
+#include "buttons.h"
 
 void lb_init(void);
-bool lb_is_connect(char*);
-bool lb_is_disconnect(char*);
+void lb_serve(void);
+void lb_check_user_request(void);
+void lb_check_connection(void);
+bool lb_is_connect(char* msg);
+bool lb_is_disconnect(char* msg);
 void lb_display_connection(void);
 void lb_display_notice(void);
 void lb_display_message(void);
-bool lb_read_request_line(void);
-void lb_send_confirm(void);
 void lb_read_message(void);
 bool lb_save_message(void);
-void lb_send_server_ready(void);
-void lb_send_error(void);
 void lb_set_new_as_current(void);
-void lb_force_disconnect(void);
-void lb_check_connection(void);
+
+unsigned int current_message = 0;
 
 /**
  * Initializes all components required by the letterbox.
@@ -60,6 +42,8 @@ void lb_init(void)
 
     lcd_init();
     lcd_clear();
+        
+    lb_display_message();
 }
 
 bool lb_is_connect(char* msg)
@@ -73,65 +57,81 @@ bool lb_is_disconnect(char* msg)
 }
 
 void lb_display_connection(void) {
-    
-    current_uipage = connection;
 }
 
 void lb_display_notice(void) {
-    assert_true("uipage should be connection", current_uipage == connection);
-    current_uipage = notice;
 }
 
 void lb_display_message(void) {
-    current_uipage = message;
-}
-
-bool lb_read_request_line(void) {
-    return false;
-}
-
-void lb_send_confirm(void) {
-
+    storage_load_message(current_message);
+    lcd_clear();
+    lcd_display_string(storage_get_buffer());
+    lcd_set_page(0);
+    lcd_set_column(LCD_INIT_COLUMN);
+    lcd_display_string_masked("Down", 0xff);
+    lcd_display_string(" ");
+    lcd_display_string_masked(" Up ", 0xff);
+    lcd_display_string("        ");
+    lcd_display_string_masked("Del.", 0xff);
 }
 
 bool lb_save_message(void) {
     return false;
 }
 
-void lb_send_server_ready(void) {
-
-}
-
-void lb_send_error(void) {
-
-}
-
-void lb_force_disconnect(void) {
-
-}
-
 void lb_check_connection(void)
 {
-    char* msg = bt_readline();
+    /* char* msg = bt_readline();
     if (lb_is_connect(msg)) {
         lb_display_connection();
-        if (lb_read_request_line()) {
-            lb_send_server_ready();
-            lb_read_message();
-            if (lb_save_message()) {
-                lb_send_confirm();
-                lb_set_new_as_current();
-                lb_display_notice();
-            } else {
-                lb_send_error();
-            }
-        }
-        lb_force_disconnect();
-    }
+        lb_read_message();
+        lb_save_message();
+        lb_set_new_as_current();
+        lb_display_notice();
+    } */
 }
         
 void lb_check_user_request(void)
 {
+    int key = get_key();
+    switch (key)
+    { // TODO: get rid of magic numbers
+        case 4:
+            led_on();
+            // Down
+            current_message = (current_message - 1) % storage_message_count();
+            break;
+        case 6:
+            led_on();
+            // Up 
+            current_message = (current_message + 1) % storage_message_count();
+            break;
+        case 9:
+            led_on();
+            // Delete 
+            storage_delete_message(current_message);
+            current_message = (current_message - 1) % storage_message_count();
+            break;
+    }
+
+    if (key) {
+        lb_display_message();
+    }
+
+    // wait until button is released
+    while (get_key() != 0) {
+      //  _delay_ms(10);
+    }
+
+    led_off();
+}
+
+void lb_read_message(void) {
+
+}
+
+void lb_set_new_as_current(void) {
+
 }
 
 /**
@@ -144,16 +144,24 @@ void lb_serve(void)
         lb_check_user_request();
     }
 }
-extern unsigned char __heap_start;
 
 /** Letterbox life cycle. */
 int main(void)
 {
+    char* buf = storage_get_buffer();
     lb_init();
-    char buf[4];
-    uint16_t free_memory = SP - (uint16_t) &__heap_start;
-    sprintf(buf, "%d", free_memory);
-    lcd_display_string(buf);
+
+    strcpy(buf, "Nachricht 1: Alpha42");
+    storage_save_message();
+ 
+    strcpy(buf, "Nachricht 2: Nemo15");
+    storage_save_message();
+ 
+    strcpy(buf, "Nachricht 3: Knuth33");
+    storage_save_message();
+    
+   
+    //lb_display_message();
     lb_serve();
     return 0;
 }

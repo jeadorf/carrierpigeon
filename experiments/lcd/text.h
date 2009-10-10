@@ -29,4 +29,6 @@ int lcd_char_to_index(char c);
  * line feeds and wraparound
  */
 void lcd_display_char(char c);
+void lcd_display_char_masked(char c, unsigned char xor_mask);
 void lcd_display_string(const char* s);
+void lcd_display_string_masked(const char* s, unsigned char xor_mask);

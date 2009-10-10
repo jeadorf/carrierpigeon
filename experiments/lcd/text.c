@@ -179,6 +179,11 @@ void lcd_draw_char_masked(char c, unsigned char xor_mask)
 }
 
 void lcd_display_char(char c)
+{
+    lcd_display_char_masked(c, 0x00);
+}
+
+void lcd_display_char_masked(char c, unsigned char xor_mask)
 { 
     // split after last column has been reached
     // TODO: resolve magic number
@@ -200,16 +205,21 @@ void lcd_display_char(char c)
         lcd_set_page(current_page);
     } 
 
-    lcd_draw_char(c);
+    lcd_draw_char_masked(c, xor_mask);
     lcd_set_column(current_column + LCD_CHAR_WIDTH + 1);
 }
 
 void lcd_display_string(const char* s)
 {
+    lcd_display_string_masked(s, 0x00);
+}
+
+void lcd_display_string_masked(const char* s, unsigned char xor_mask)
+{
     const char *p = s;
     while (*p != '\0')
     {
-        lcd_display_char(*p);
+        lcd_display_char_masked(*p, xor_mask);
         p++;
     }
 }

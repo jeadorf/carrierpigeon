@@ -43,7 +43,7 @@ unsigned char storage_count = 0;
 
 /** use the globally available buffer in order to
  * reduce memory consumption */
-extern char* global_buffer;
+extern char global_buffer[];
 
 bool storage_is_empty(void)
 {
@@ -57,12 +57,14 @@ bool storage_is_full(void)
 
 void _storage_save_message_to_eeprom(unsigned char block)
 {
+    char c;
     eeprom_write((block - 1) * MESSAGE_SIZE, STATE_NEW);
     unsigned int text_addr = (block - 1) * MESSAGE_SIZE + MESSAGE_RESERVED_SIZE + 1;
     int i;
     for (i = 0; i < MESSAGE_TEXT_LENGTH; i++)
     {
-        eeprom_write(text_addr + i, global_buffer[i]);
+        c = global_buffer[i];
+        eeprom_write(text_addr + i, c);
         if (global_buffer[i] == '\0') {
             break;
         }
@@ -71,6 +73,7 @@ void _storage_save_message_to_eeprom(unsigned char block)
 
 bool storage_save_message(void)
 {
+    bool found_free;
     if (storage_is_full()) {
         return false;
     } else {
@@ -80,15 +83,15 @@ bool storage_save_message(void)
         // EEPROM message status bit, it should be faster this way.
         for (block = 1; block <= MAX_MESSAGES; block++) {
             int i;
-            bool free = true;
+            found_free = true;
             // Look whether one node points to this block.
             for (i = 0; i < MAX_MESSAGES; i++) {
                 if (storage_nodes[i] == block) {
-                    free = false;
+                    found_free = false;
                     break;
                 }
             }
-            if (free) {
+            if (found_free) {
                 // Found a free memory block
                 storage_nodes[storage_count] = block;
                 // Write message to the eeprom memory

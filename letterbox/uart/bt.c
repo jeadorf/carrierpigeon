@@ -5,7 +5,7 @@
 #include "uart.h"
 
 /** use the global buffer in order to save memory. */
-extern char* global_buffer;
+extern char global_buffer[];
 
 char* bt_readline(void)
 {
