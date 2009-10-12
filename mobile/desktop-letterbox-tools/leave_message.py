@@ -3,9 +3,11 @@
 import sys
 from bluetooth import BluetoothSocket, discover_devices, RFCOMM
 
-def encap(data):
+MAX_MESSAGE_LENGTH = 113
+
+def encapsulate(data):
     tag = '\r\n'
-    return tag + data + " " + tag
+    return "%s%s%s" % (tag, data, tag)
 
 try:
     #host = [device[0] for device in discover_devices(lookup_names=True)
@@ -20,19 +22,21 @@ sock = BluetoothSocket(RFCOMM)
 sock.connect((host, 1))
 print "Connected to said letterbox"
 
+message = ''
 
-MAX_MESSAGE_LENGTH = 113
+print "Go and type away (empty line to quit)"
 while True:
-    print "Go and type away (empty line to quit)"
     data = raw_input()
     if not data:
         break
-    data = encap(data)
-    if len(data)<MAX_MESSAGE_LENGTH:
-        bytes = sock.send(data)
-        print "%i bytes sent" %bytes
-    else:
-        print "ERROR: maximum length %i !" %(MAX_MESSAGE_LENGTH)
+    message += data
+
+message = encapsulate(message)
+if len(message) < MAX_MESSAGE_LENGTH:
+    bytes = sock.send(message)
+    print "%d bytes sent" % bytes
+else:
+    print "ERROR: maximum length %d!" % MAX_MESSAGE_LENGTH
 
 print "Closing connection to said letterbox"
 sock.close()
