@@ -1,5 +1,6 @@
 #!/bin/sh
 #
 #
+echo "Reading EEPROM content, storing to eeprom_content_r in raw format"
 avrdude -P usb -c avrisp2 -p atmega8515 -U eeprom:r:eeprom_content_r:r
 hexdump -C eeprom_content_r

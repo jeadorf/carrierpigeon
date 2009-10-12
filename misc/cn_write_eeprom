@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+#
+if [ $# != 1 ]; then
+    echo "Usage: cn_write_eeprom <eeprom-raw-image-file>"
+    exit 1
+fi
+
+echo "Writing image '$1' to EEPROM"
+avrdude -P usb -c avrisp2 -p atmega8515 -U eeprom:r:$1:r
