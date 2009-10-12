@@ -133,7 +133,7 @@ bool lb_is_disconnect(char* msg)
 
 
 bool lb_save_message(void) {
-    return false;
+    return storage_save_message();
 }
 
 void lb_check_connection(void)
@@ -151,6 +151,7 @@ void lb_check_connection(void)
  
 void lb_read_message(void) {
     char* msg;
+    int r = 0, s = 0;
     while (true) {
        msg = bt_readline();
        if (msg != NULL) {
@@ -160,7 +161,12 @@ void lb_read_message(void) {
                 led_blink();
                 break;
             } else {
-                lcd_display_string(global_buffer);
+                lcd_display_string(msg);
+                // TODO: could use streaming here,
+                // but needs rewrite of storage module
+                r = strlen(msg);
+                memcpy(global_buffer + s, msg, r); 
+                s += r;
             }
        }
     }   
@@ -197,6 +203,7 @@ void lb_check_user_request(void)
 
     if (key) {
         lb_display_message();
+        new_message = false;
     }
 
     // wait until button is released
