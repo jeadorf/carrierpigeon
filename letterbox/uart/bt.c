@@ -5,9 +5,7 @@
 #include "uart.h"
 
 /** use the global buffer in order to save memory. */
-//extern char global_buffer[];
-//char global_buffer[112];
-char result[112];
+extern char global_buffer[];
 
 char* bt_readline(void)
 {
@@ -35,13 +33,13 @@ char* bt_readline(void)
                 lf = 0;
                 position = 0;
                 // return what we got now
-                return result; 
+                return global_buffer; 
             }
         }
         else {
             // not a \r or \n, add it to our string
-            result[position++] = c;
-            result[position] = '\0';
+            global_buffer[position++] = c;
+            global_buffer[position] = '\0';
         }
     }
     // if we aren't done, always return NULL

@@ -33,8 +33,10 @@ bool lb_is_disconnect(char* msg);
 void lb_display_connection(void);
 void lb_display_notice(void);
 void lb_display_message(void);
+void lb_display_dialog(const char* pgm_msg);
 void lb_read_message(void);
 bool lb_save_message(void);
+void lb_read_disconnect(void);
 void lb_set_new_as_current(void);
 
 /** refers to the currently selected message that is to be 
@@ -44,7 +46,7 @@ bool new_message = false;
 
 extern char global_buffer[];
 
-char CONNECTION[] PROGMEM =
+const char CONNECTION[] PROGMEM =
         "                     "
         "                     "
         "                     "
@@ -54,7 +56,7 @@ char CONNECTION[] PROGMEM =
         "                     "
         "                     ";
 
-char NOTICE[] PROGMEM  = 
+const char NOTICE[] PROGMEM  = 
         "                     "
         "                     "
         "                     "
@@ -78,24 +80,24 @@ void lb_init(void)
 
 /** A screen panel */
 void lb_display_connection(void) {
-    char* c_addr = CONNECTION;
-    char c;
-    lcd_clear();
-    while ((c = pgm_read_byte(c_addr)) != '\0') {
-        lcd_display_char_masked(c, 0xff);
-        c_addr++;
-    }
+    lb_display_dialog(CONNECTION);
 }
 
 /** A screen panel */
 void lb_display_notice(void) {
-    char* c_addr = NOTICE;
+    lb_display_dialog(NOTICE);
+}
+
+void lb_display_dialog(const char* pgm_msg)
+{
+    const char* c_addr = pgm_msg;
     char c;
     lcd_clear();
     while ((c = pgm_read_byte(c_addr)) != '\0') {
         lcd_display_char_masked(c, 0xff);
         c_addr++;
     }
+    
 }
 
 /** A screen panel. Only call this method if the currently selected
@@ -138,11 +140,11 @@ bool lb_save_message(void) {
 
 void lb_check_connection(void)
 {
-    char* msg = bt_readline();
-    if (lb_is_connect(msg)) {
+    if (bt_readline() && lb_is_connect(global_buffer)) {
         lb_display_connection();
         lb_read_message();
         lb_save_message();
+        lb_read_disconnect();
         lb_set_new_as_current();
         new_message = true;
         lb_display_notice();
@@ -150,26 +152,24 @@ void lb_check_connection(void)
 }
  
 void lb_read_message(void) {
-    char* msg;
-    int r = 0, s = 0;
-    while (true) {
-       msg = bt_readline();
-       if (msg != NULL) {
-            if (lb_is_disconnect(msg)) {
-                led_blink();
-                led_blink();
-                led_blink();
-                break;
-            } else {
-                lcd_display_string(msg);
-                // TODO: could use streaming here,
-                // but needs rewrite of storage module
-                r = strlen(msg);
-                memcpy(global_buffer + s, msg, r); 
-                s += r;
-            }
-       }
-    }   
+    while (bt_readline() == NULL) {
+        // wait until message arrives
+    }
+    
+}
+
+void lb_read_disconnect(void)
+{
+    while (bt_readline() == NULL) {
+        // wait until message arrives
+    }
+    if (lb_is_disconnect(global_buffer)) {
+        led_blink();
+        led_blink();
+        led_blink();
+    } else {
+        lcd_display_string("error in communication");
+    }
 }
 
 void lb_set_new_as_current(void) {
@@ -229,12 +229,6 @@ void lb_serve(void)
 int main(void)
 {
     lb_init();
-    // strcpy(storage_get_buffer(), "Message 1");
-    // storage_save_message();
-    // lb_display_message();
-    // lb_display_connection();
-    // _delay_ms(6000);
-    // lb_display_notice();
     lb_serve();
     return 0;
 }
