@@ -4,10 +4,7 @@
 #include "bt.h"
 #include "uart.h"
 
-/** use the global buffer in order to save memory. */
-extern char global_buffer[];
-
-char* bt_readline(void)
+bool bt_readline(char* buf, int max_size)
 {
     int c;
     static unsigned char position = 0;
@@ -33,13 +30,13 @@ char* bt_readline(void)
                 lf = 0;
                 position = 0;
                 // return what we got now
-                return global_buffer; 
+                return buf; 
             }
         }
         else {
             // not a \r or \n, add it to our string
-            global_buffer[position++] = c;
-            global_buffer[position] = '\0';
+            buf[position++] = c;
+            buf[position] = '\0';
         }
     }
     // if we aren't done, always return NULL

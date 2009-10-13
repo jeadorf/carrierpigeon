@@ -10,3 +10,7 @@ main
 build/
 target/
 *.py[cod]
+mobile/mobile-letterbox-client/nbproject/private
+mobile/mobile-letterbox-client/dist
+mobile/mobile-letterbox-client/build
+

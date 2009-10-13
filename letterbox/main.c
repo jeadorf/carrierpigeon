@@ -139,7 +139,8 @@ bool lb_is_disconnect(char* msg)
 
 void lb_check_connection(void)
 {
-    if (bt_readline() && lb_is_connect(global_buffer)) {
+    bool read = bt_readline(global_buffer, MESSAGE_TEXT_LENGTH);
+    if (read && lb_is_connect(global_buffer)) {
         lb_display_connection();
         lb_capture_message();
         lb_read_disconnect();
@@ -150,20 +151,19 @@ void lb_check_connection(void)
 }
  
 void lb_capture_message(void) {
-    char *msg;
-    do {
-        msg = bt_readline();
-    } while (msg == NULL);
+    while (!bt_readline(global_buffer, MESSAGE_TEXT_LENGTH)) {
+        // Wait for disconnect
+    }
 
     // write message
     message_new();
-    message_write(msg);
+    message_write(global_buffer);
     message_close();
 }
 
 void lb_read_disconnect(void)
 {
-    while (bt_readline() == NULL) {
+    while (!bt_readline(global_buffer, MESSAGE_TEXT_LENGTH)) {
         // wait until disconnect arrives
     }
     if (lb_is_disconnect(global_buffer)) {
