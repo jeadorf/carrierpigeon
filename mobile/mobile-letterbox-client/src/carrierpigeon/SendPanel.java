@@ -16,7 +16,6 @@ import javax.microedition.lcdui.List;
 
 /**
  *
- * @author julius
  */
 public class SendPanel extends List implements CommandListener, DeviceDetector.CompletionListener {
 

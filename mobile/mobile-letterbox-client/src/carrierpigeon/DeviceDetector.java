@@ -1,18 +1,10 @@
 package carrierpigeon;
 
-import java.io.IOException;
 import java.util.Vector;
 import javax.bluetooth.BluetoothStateException;
-import javax.bluetooth.DeviceClass;
-import javax.bluetooth.DiscoveryAgent;
-import javax.bluetooth.DiscoveryListener;
-import javax.bluetooth.LocalDevice;
-import javax.bluetooth.RemoteDevice;
-import javax.bluetooth.ServiceRecord;
 
 /**
  *
- * @author julius
  */
 public abstract class DeviceDetector {
 
@@ -20,9 +12,27 @@ public abstract class DeviceDetector {
 
     private final Vector listenerList = new Vector();
 
+    /**
+     * Starts bluetooth device detection within a separate thread. This method
+     * does not block. It returns immediately.
+     * 
+     * @throws BluetoothStateException
+     */
     public abstract void startDiscovery() throws BluetoothStateException;
+
+    /**
+     * Waits until the detection process finishs.
+     * 
+     * @throws InterruptedException
+     */
     public abstract void waitForCompletion() throws InterruptedException;
 
+    /**
+     * Gets all devices that have been discovered so far. Returned vector
+     * contains instances of RemoteDevice.
+     *
+     * @return
+     */
     public Vector getDevices() {
         return devices;
     }

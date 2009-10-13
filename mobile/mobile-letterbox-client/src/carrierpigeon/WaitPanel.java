@@ -10,7 +10,6 @@ import javax.microedition.lcdui.StringItem;
 
 /**
  *
- * @author julius
  */
 public class WaitPanel extends Form implements CommandListener {
 

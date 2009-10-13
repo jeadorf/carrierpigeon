@@ -11,7 +11,6 @@ import javax.bluetooth.ServiceRecord;
 
 /**
  *
- * @author julius
  */
 public class DefaultDeviceDetector extends DeviceDetector {
 

@@ -8,7 +8,6 @@ import javax.microedition.lcdui.StringItem;
 
 /**
  *
- * @author julius
  */
 public class ErrorPanel extends Form implements CommandListener {
 

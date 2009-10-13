@@ -5,7 +5,6 @@ import javax.bluetooth.RemoteDevice;
 
 /**
  *
- * @author julius
  */
 public class MockDeviceDetector extends DeviceDetector {
 
