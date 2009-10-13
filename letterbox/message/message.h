@@ -22,6 +22,7 @@
  */
 
 #include <stdbool.h>
+#include <stdint.h>
 
 // see MESSAGE status byte
 #define STATE_EMPTY 'e'
@@ -47,13 +48,13 @@ bool message_new(void);
  * calls to this function will have no effect. Returns the number of
  * bytes that have been written to the message entry.
  */
-int message_write(char *buf);
+uint8_t message_write(char *text);
 
 /*
  * Opens a message entry that is stored in the EEPROM. Returns true, if
  * there is an entry with such a msg_num, false otherwise.
  */
-bool message_open(int msg_num);
+bool message_open(uint8_t msg_num);
 
 /*
  * Reads a byte from the message entry that has been opened with
@@ -78,18 +79,18 @@ void message_close();
  * number of stored messages is less than the specified
  * message_number.
  */
-unsigned char message_state(unsigned int message_number);
+char message_state(uint8_t msg_num);
 
 /*
  * Removes the n-th oldest message. Returns true, if deleted successfully
  * (i.e. there was at such a message)
  */
-bool message_delete(unsigned int message_number);
+bool message_delete(uint8_t msg_num);
 
 /*
  * Get the number of stored messages.
  */
-unsigned int message_count(void);
+uint8_t message_count(void);
 
 /*
  * Returns true iff there is no message.

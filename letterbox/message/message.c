@@ -32,29 +32,30 @@
 
 #include "message.h"
 #include "eeprom.h"
+#include "stdint.h"
 
 // Memory state: List of nodes that point to message blocks. Zero marks a free slot
 // in the list. The first zero denotes the end of the list. A value
 // n denotes that the message is actually stored in the n-th memory
 // block (counting begins with 1)
-unsigned char storage_nodes[4] = { 0, 0, 0, 0 };
+uint8_t storage_nodes[4] = { 0, 0, 0, 0 };
 // Memory state: Points to the next free slot in storage_nodes 
-unsigned char storage_count = 0;
+uint8_t storage_count = 0;
 
 // Streaming state: Points to the currently opened message entry
-int block = -1;
+uint8_t block;
 // Streaming state: Points to the current read/write position
-int pos = -1;
+uint16_t pos;
 
 bool message_new(void)
 {
+    uint8_t i;
     bool found_free;
     if (!message_full()) {
         // Find free memory block
         // Check all blocks, do not do this by reading the
         // EEPROM message status bit, it should be faster this way.
         for (block = 1; block <= MAX_MESSAGES; block++) {
-            int i;
             found_free = true;
             // Look whether one node points to this block.
             for (i = 0; i < MAX_MESSAGES; i++) {
@@ -83,10 +84,10 @@ bool message_new(void)
     return false;    
 }
 
-int message_write(char* buf)
+uint8_t message_write(char* buf)
 {
-    int i = 0;
-    int old = pos;
+    uint8_t i = 0;
+    uint8_t old = pos;
     while (buf[i] != '\0') {
         eeprom_write(pos, buf[i]);
         i++;
@@ -95,7 +96,7 @@ int message_write(char* buf)
     return pos - old;
 }
 
-bool message_open(int msg_num)
+bool message_open(uint8_t msg_num)
 {
     if (msg_num < message_count()) {
         block = storage_nodes[msg_num]; 
@@ -132,24 +133,24 @@ bool message_full(void)
     return storage_count == MAX_MESSAGES;
 }
 
-unsigned char message_state(unsigned int message_num)
+char message_state(uint8_t msg_num)
 {
-    if (message_num < storage_count)
+    if (msg_num < storage_count)
     {
-        unsigned char block = storage_nodes[message_num];
-        unsigned char mem_addr = (block - 1) * MESSAGE_SIZE; 
+        uint8_t block = storage_nodes[msg_num];
+        uint16_t mem_addr = (block - 1) * MESSAGE_SIZE; 
         return eeprom_read(mem_addr);
     }
 
     return STATE_EMPTY;
 }
 
-bool message_delete(unsigned int message_num)
+bool message_delete(uint8_t msg_num)
 {
-    if (message_num < storage_count) {
+    if (msg_num < storage_count) {
         // Shift all message pointers left, thus removing one pointer.
-        int i;
-        for (i = message_num + 1; i < storage_count; i++) {
+        uint8_t i;
+        for (i = msg_num + 1; i < storage_count; i++) {
             storage_nodes[i - 1] = storage_nodes[i];
         }
         storage_nodes[storage_count - 1] = 0;
@@ -160,7 +161,7 @@ bool message_delete(unsigned int message_num)
     }
 }
 
-unsigned int message_count(void)
+uint8_t message_count(void)
 {
     return storage_count;
 }
@@ -168,7 +169,7 @@ unsigned int message_count(void)
 /* for testing purposes */
 void message_reset(void)
 {
-    int i;
+    uint8_t i;
     for (i = 0; i < MAX_MESSAGES; i++) {
         storage_nodes[i] = 0;
     }
