@@ -47,7 +47,7 @@
  *  1      
  *  1      
  */
-#define CHAR_TABLE_LENGTH 46
+#define CHAR_TABLE_LENGTH 47 
 #define LCD_CHAR_WIDTH 5
 
 // define representation for undefined characters 
@@ -150,6 +150,8 @@ char characters[CHAR_TABLE_LENGTH][LCD_CHAR_WIDTH] PROGMEM = {
     {0x00, 0x00, 0x60, 0x00, 0x00},
     // "
     {0x00, 0x60, 0x00, 0x60, 0x00},
+    // /
+    {0x04, 0x08, 0x10, 0x20, 0x40},
     // <undefined> at position CHAR_TABLE_LENGTH - 1
     // 
     UNDEFINED_CHAR
@@ -274,6 +276,9 @@ int lcd_char_to_index(char c)
     else if (c == '"')
     {
         return 44;
+    }
+    else if (c == '/') {
+        return 45;
     }
     else
     {

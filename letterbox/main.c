@@ -106,7 +106,9 @@ void lb_display_message(void) {
 
     lcd_clear();
    
-    if (message_count() > 0) {
+    if (message_empty()) {
+        lcd_display_string_masked("There are no messages", 0xff);
+    } else {
         // Load and display message
         message_open(current_message);
         while ((c = message_read())) {
@@ -121,9 +123,12 @@ void lb_display_message(void) {
     lcd_display_string_masked("Down", 0xff);
     lcd_display_string(" ");
     lcd_display_string_masked(" Up ", 0xff);
-    // snprintf(global_buffer, 8, "   %d/%d  ", current_message, storage_message_count());
-    // lcd_display_string(global_buffer);
-    lcd_display_string("      ");
+    if (message_empty()) {
+        lcd_display_string("  0/0 ");
+    } else {
+        snprintf(global_buffer, 7, "  %d/%d  ", current_message + 1, message_count());
+        lcd_display_string(global_buffer);
+    }
     lcd_display_string_masked(" Del. ", 0xff);
 }
 
@@ -168,8 +173,6 @@ void lb_read_disconnect(void)
     }
     if (lb_is_disconnect(global_buffer)) {
         led_blink();
-        led_blink();
-        led_blink();
     } else {
         lcd_display_string("error in communication");
     }
@@ -190,7 +193,11 @@ void lb_check_user_request(void)
             case 4:
                 led_on();
                 // Down
-                current_message = (current_message - 1) % message_count();
+                if (current_message == 0) {
+                    current_message = message_count() - 1;
+                } else {
+                    current_message = current_message - 1;
+                }
                 break;
             case 6:
                 led_on();
@@ -200,8 +207,10 @@ void lb_check_user_request(void)
             case 9:
                 led_on();
                 // Delete 
-                message_delete(current_message);
-                current_message = (current_message - 1) % message_count();
+                if (!message_empty()) {
+                    message_delete(current_message);
+                    current_message = (current_message - 1) % message_count();
+                }
                 break;
         }
     }
