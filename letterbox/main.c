@@ -14,7 +14,7 @@
 #include "led.h"
 #include "text.h"
 #include "bt.h"
-#include "storage.h"
+#include "message.h"
 #include "assert.h"
 #include "buttons.h"
 
@@ -106,13 +106,13 @@ void lb_display_message(void) {
 
     lcd_clear();
    
-    if (storage_message_count() > 0) {
+    if (message_count() > 0) {
         // Load and display message
-        storage_open(current_message);
-        while ((c = storage_read())) {
+        message_open(current_message);
+        while ((c = message_read())) {
             lcd_display_char(c);
         }
-        storage_close();
+        message_close();
     }
 
     // Draw menu
@@ -156,15 +156,15 @@ void lb_capture_message(void) {
     } while (msg == NULL);
 
     // write message
-    storage_new();
-    storage_write(msg);
-    storage_close();
+    message_new();
+    message_write(msg);
+    message_close();
 }
 
 void lb_read_disconnect(void)
 {
     while (bt_readline() == NULL) {
-        // wait until message arrives
+        // wait until disconnect arrives
     }
     if (lb_is_disconnect(global_buffer)) {
         led_blink();
@@ -176,7 +176,7 @@ void lb_read_disconnect(void)
 }
 
 void lb_set_new_as_current(void) {
-    current_message = storage_message_count() - 1;
+    current_message = message_count() - 1;
 }
 
 void lb_check_user_request(void)
@@ -184,22 +184,24 @@ void lb_check_user_request(void)
     int key = get_key();
     if (!new_message) {
         switch (key)
-        { // TODO: get rid of magic numbers
+        { 
+            // TODO: get rid of magic numbers
+            // FIXME: % modulo operator does nonsense when applied to negative numbers (but why?)
             case 4:
                 led_on();
                 // Down
-                current_message = (current_message - 1) % storage_message_count();
+                current_message = (current_message - 1) % message_count();
                 break;
             case 6:
                 led_on();
                 // Up 
-                current_message = (current_message + 1) % storage_message_count();
+                current_message = (current_message + 1) % message_count();
                 break;
             case 9:
                 led_on();
                 // Delete 
-                storage_delete_message(current_message);
-                current_message = (current_message - 1) % storage_message_count();
+                message_delete(current_message);
+                current_message = (current_message - 1) % message_count();
                 break;
         }
     }

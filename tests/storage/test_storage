@@ -1,3 +1,0 @@
-#!/bin/sh
-gcc -g ../../letterbox/storage/storage.c ../../global/global.c test_storage.c mock_eeprom.c assert.c -I . -I ../../global -I ../../letterbox/storage -I ../../experiments/eeprom && ./a.out
-
