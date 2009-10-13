@@ -6,6 +6,7 @@
 
 bool bt_readline(char* buf, int max_size)
 {
+    // TODO: stop when max_size is reached and return unfinished line
     int c;
     static unsigned char position = 0;
     static unsigned char cr = 0, lf = 0;

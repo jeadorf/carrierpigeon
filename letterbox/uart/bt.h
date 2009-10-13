@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 /*
  * Reads a line from the bluetooth module using the
  * serial interface. Calls to bt_readline are non-blocking.

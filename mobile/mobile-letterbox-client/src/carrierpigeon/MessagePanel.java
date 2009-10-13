@@ -21,14 +21,22 @@ public class MessagePanel extends Form implements CommandListener {
     public MessagePanel(CarrierpigeonMIDlet midlet) {
         super("Carrierpigeon client");
         this.midlet = midlet;
-        this.messageTextField = new TextField("Message text", "type message here", 112, TextField.ANY);
+        this.messageTextField = new TextField("Message text", 
+            "0123456789" + 
+            "0123456789" + 
+            "0123456789" +
+            "0123456789" +
+            "0123456789" +
+            "0123456789" +
+            "0123456789" +
+            "0123456789" +
+            "0123456789" +
+            "0123456789" +
+            "0123456789", 112, TextField.ANY);
         append(messageTextField);
         try {
-            // Set up this form to listen to command events
             setCommandListener(this);
-            // Add the Curreencies command
             addCommand(new Command("Send", Command.OK, 1));
-            // Add the Exit command
             addCommand(new Command("Exit", Command.EXIT, 1));
         } catch (Exception e) {
             e.printStackTrace();
@@ -39,7 +47,7 @@ public class MessagePanel extends Form implements CommandListener {
         if (command.getCommandType() == Command.EXIT) {
             midlet.destroyApp(true);
         } else if (command.getCommandType() == Command.OK) {
-
+// TODO: put in real worker thread queue
             new Thread(new Runnable() {
 
                 public void run() {
@@ -52,6 +60,7 @@ public class MessagePanel extends Form implements CommandListener {
         }
     }
 
+// TODO: deal with umlauts
     public void sendMessage() {
         try {
             String serviceUrl = "btspp://00126F037095:1"; // eumel
@@ -66,6 +75,7 @@ public class MessagePanel extends Form implements CommandListener {
             out.write(message);
             out.flush();
             conn.close();
+            Thread.sleep(500);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
