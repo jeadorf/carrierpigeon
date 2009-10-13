@@ -34,8 +34,7 @@ void lb_display_connection(void);
 void lb_display_notice(void);
 void lb_display_message(void);
 void lb_display_dialog(const char* pgm_msg);
-void lb_read_message(void);
-bool lb_save_message(void);
+void lb_capture_message(void);
 void lb_read_disconnect(void);
 void lb_set_new_as_current(void);
 
@@ -103,12 +102,17 @@ void lb_display_dialog(const char* pgm_msg)
 /** A screen panel. Only call this method if the currently selected
  * message changed or if the LCD must switch to the message screen panel */
 void lb_display_message(void) {
+    char c;
+
     lcd_clear();
    
     if (storage_message_count() > 0) {
         // Load and display message
-        storage_load_message(current_message);
-        lcd_display_string(storage_get_buffer());
+        storage_open(current_message);
+        while ((c = storage_read())) {
+            lcd_display_char(c);
+        }
+        storage_close();
     }
 
     // Draw menu
@@ -133,17 +137,11 @@ bool lb_is_disconnect(char* msg)
     return msg != NULL && strncmp(msg, "DISCONNECT  ", 12) == 0;
 }
 
-
-bool lb_save_message(void) {
-    return storage_save_message();
-}
-
 void lb_check_connection(void)
 {
     if (bt_readline() && lb_is_connect(global_buffer)) {
         lb_display_connection();
-        lb_read_message();
-        lb_save_message();
+        lb_capture_message();
         lb_read_disconnect();
         lb_set_new_as_current();
         new_message = true;
@@ -151,11 +149,16 @@ void lb_check_connection(void)
     }
 }
  
-void lb_read_message(void) {
-    while (bt_readline() == NULL) {
-        // wait until message arrives
-    }
-    
+void lb_capture_message(void) {
+    char *msg;
+    do {
+        msg = bt_readline();
+    } while (msg == NULL);
+
+    // write message
+    storage_new();
+    storage_write(msg);
+    storage_close();
 }
 
 void lb_read_disconnect(void)

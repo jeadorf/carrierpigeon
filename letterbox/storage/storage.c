@@ -40,10 +40,90 @@
 unsigned char storage_nodes[4] = { 0, 0, 0, 0 };
 // Points to the next free slot in storage_nodes 
 unsigned char storage_count = 0;
+// Points to the currently opened message entry
+int block = -1;
+// Points to the current read/write position
+int pos = -1;
 
 /** use the globally available buffer in order to
  * reduce memory consumption */
 extern char global_buffer[];
+
+bool storage_new(void)
+{
+    bool found_free;
+    if (!storage_is_full()) {
+        // Find free memory block
+        // Check all blocks, do not do this by reading the
+        // EEPROM message status bit, it should be faster this way.
+        for (block = 1; block <= MAX_MESSAGES; block++) {
+            int i;
+            found_free = true;
+            // Look whether one node points to this block.
+            for (i = 0; i < MAX_MESSAGES; i++) {
+                if (storage_nodes[i] == block) {
+                    found_free = false;
+                    break;
+                }
+            }
+            if (found_free) {
+                // Found a free memory block
+                storage_nodes[storage_count] = block;
+                storage_count++;
+                pos = (block - 1) * MESSAGE_SIZE;
+
+                // Write status byte and skip reserved
+                // message part
+                eeprom_write(pos, STATE_NEW);
+                pos += MESSAGE_RESERVED_SIZE + 1;
+                break;
+            }
+        }
+        return true;
+    }
+
+    block = -1;
+    return false;    
+}
+
+int storage_write(char* buf)
+{
+    int i = 0;
+    int old = pos;
+    while (buf[i] != '\0') {
+        eeprom_write(pos, buf[i]);
+        i++;
+        pos++;
+    }
+    return pos - old;
+}
+
+bool storage_open(int msg_num)
+{
+    if (msg_num < storage_message_count()) {
+        block = storage_nodes[msg_num]; 
+        pos = (block - 1) * MESSAGE_SIZE;
+        pos += MESSAGE_RESERVED_SIZE + 1;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+char storage_read(void)
+{
+    return eeprom_read(pos++);
+}
+
+void storage_close(void)
+{
+    if (pos - (block - 1) * MESSAGE_SIZE < MESSAGE_SIZE) {
+        eeprom_write(pos, '\0'); 
+    }
+
+    block = -1;
+    pos = -1;
+}
 
 bool storage_is_empty(void)
 {

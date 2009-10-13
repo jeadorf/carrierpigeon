@@ -8,10 +8,13 @@
  * number that temporarily identifies the message. Valid message
  * numbers are within the range [0, storage_message_count()[
  *
- * You do not write and read messages directly, instead, there is a
- * global buffer that is large enough to hold the text of one message.
- * There are methods to fill the buffer with a certain message read
- * from memory and to flush the buffer to the memory.
+ * This library uses a streaming pattern. A storage operation will
+ * include an initial call to storage_new, multiple calls to
+ * storage_write and a final call to storage_close. A load operation
+ * will include an initial call to storage_open, multiple calls to
+ * storage_read and a final call to storage_close. The streaming
+ * pattern helps to reduce the necessary buffer size and thus reduces
+ * SRAM consumption.
  * 
  * Each time a message is deleted, the message numbers of all newer
  * message are decremented. Thus, message numbers do not qualify as
@@ -30,12 +33,45 @@
 #define MESSAGE_TEXT_LENGTH 112
 #define MESSAGE_RESERVED_SIZE 7
 
+/* 
+* Creates a new message entry that is to be stored in the EEPROM. After
+* creating a new message you can write text via storage_write. Returns
+* false if and only if storage is full.
+*/
+bool storage_new(void);
 
 /*
- * Saves a message on the EEPROM. The message text is expected to be
- * in the buffer. Returns false if memory is full, true on success.
+ * Writes a sequence of characters to the message entry that has been 
+ * created with storage_new. You may call this function more than once.
+ * Beware: after MESSAGE_TEXT_LENGTH bytes have been written, subsequent
+ * calls to this function will have no effect. Returns the number of
+ * bytes that have been written to the message entry.
  */
-bool storage_save_message(void);
+int storage_write(char *buf);
+
+/*
+ * Opens a message entry that is stored in the EEPROM. Returns true, if
+ * there is an entry with such a msg_num, false otherwise.
+ */
+bool storage_open(int msg_num);
+
+/*
+ * Reads a byte from the message entry that has been opened with
+ * storage_open. The '\0' byte always marks the end of the message
+ * content. Thus, you can safely read until the '\0' byte occurs.
+ */
+char storage_read(void);
+
+/*
+ * (1) Storage operation: Closes the current message entry that has
+ * been created with storage_new and filled with text using storage_write.
+ * If storage_write wrote less than MESSAGE_TEXT_LENGTH bytes than this
+ * method will append the '\0' byte.
+ *
+ * (2) Load operation: Closes the current message entry that has been
+ * opened using storage_open. 
+ */
+void storage_close();
 
 /* 
  * Retrieves the state of the message. Returns STATE_EMPTY if the
@@ -43,13 +79,6 @@ bool storage_save_message(void);
  * message_number.
  */
 unsigned char storage_get_state(unsigned int message_number);
-
-/*
- * Reads the message into the buffer. Returns false, if the number of
- * stored messages is less than the specified message_number. Returns
- * true on success.
- */
-bool storage_load_message(unsigned int message_number);
 
 /*
  * Removes the n-th oldest message. Returns true, if deleted successfully

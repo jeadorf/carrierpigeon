@@ -17,6 +17,16 @@ void teardown_test_storage(char* test_name)
     // mock_eeprom_print();
 }
 
+/* helper */
+void helper_storage_read_buf(char buffer[])
+{
+    int i = 0;
+    do {
+        buffer[i] = storage_read();
+        i++;
+    } while (buffer[i-1] != '\0'); 
+}
+
 void test_mock_eeprom_reset(void)
 {
     printf("test_mock_eeprom_reset\n");
@@ -36,7 +46,12 @@ void test_mock_eeprom_read_write(void)
 void test_storage_reset(void)
 {
     setup_test_storage("test_storage_reset");
-    storage_save_message();
+    // save a message
+    bool ok = storage_new();
+    assert_true("could not create new message", ok);
+    storage_write("FooBar");
+    storage_close();
+    // reset and clear memory
     storage_reset();
     assert_equals_int("count should be zero", 0, storage_message_count());
     teardown_test_storage("test_storage_reset");
@@ -46,18 +61,21 @@ void test_message_save_read_text(void)
 {
     setup_test_storage("test_message_save_read_text");
 
+    // write message
     char *expected_text = "FooBar";
-    strcpy(storage_get_buffer(), expected_text);
-    
-    // flush buffer
-    storage_save_message();
-    // scramble buffer
-    strcpy(storage_get_buffer(), "someotherstuff");
+    char restored_text[6];
+    char c;
+    int i = 0;
+    storage_new();
+    storage_write(expected_text);
+    storage_close();
     // restore buffer
-    storage_load_message(0);
+    storage_open(0);
+    helper_storage_read_buf(restored_text);
+    storage_close();
 
     assert_equals_string("saved text should be restored correctly",
-        expected_text, storage_get_buffer()); 
+        expected_text, restored_text); 
 
     teardown_test_storage("test_message_save_read");
 }
@@ -66,7 +84,8 @@ void test_message_initial_state(void)
 {
     setup_test_storage("test_message_initial_state");
     
-    storage_save_message();
+    storage_new();
+    storage_close();
     assert_equals_int("state should be STATE_NEW", STATE_NEW, 
        storage_get_state(0));
 
@@ -77,7 +96,8 @@ void test_save_message_count(void)
 {
     setup_test_storage("test_save_message_count");
 
-    storage_save_message();
+    storage_new();
+    storage_close();
     assert_equals_int("count should be one", 1, storage_message_count());
 
     teardown_test_storage("test_message_initial_state");
@@ -87,7 +107,8 @@ void test_delete_message_count(void)
 {
     setup_test_storage("test_delete_message_count");
 
-    storage_save_message();
+    storage_new();
+    storage_close();
     storage_delete_message(0);
     assert_equals_int("count should be zero", 0, storage_message_count());
 
@@ -98,8 +119,10 @@ void test_save_two_messages_count(void)
 {
     setup_test_storage("test_save_two_messages_count");
 
-    storage_save_message();
-    storage_save_message();
+    storage_new();
+    storage_close();
+    storage_new();
+    storage_close();
     assert_equals_int("count should be two", 2, storage_message_count());
 
     teardown_test_storage("test_save_two_messages_count");
@@ -115,11 +138,18 @@ void test_save_max_full_message(void)
         "12345678901234567890123456"
         "qwertzuiopasdfghjklyxcvbnm"
         "QWERTZUI";
-    strcpy(storage_get_buffer(), expected);
-    storage_save_message();
-    storage_load_message(0);
+    char restored_text[112];
+
+    storage_new();
+    storage_write(expected);
+    storage_close();
+
+    storage_open(0);
+    helper_storage_read_buf(restored_text);
+    storage_close();
+
     assert_equals_string("full message should be recovered",
-                                expected, storage_get_buffer());
+                                expected, restored_text); 
 
     teardown_test_storage("test_save_max_full_message");
 }
@@ -155,30 +185,54 @@ void test_save_too_many_messages(void)
 {
     setup_test_storage("test_save_too_many_messages");
 
-    strcpy(storage_get_buffer(), "FooBar");
-    storage_save_message();
-    strcpy(storage_get_buffer(), "Grazie");
-    storage_save_message();
-    strcpy(storage_get_buffer(), "DonaldK");
-    storage_save_message();
-    strcpy(storage_get_buffer(), "EdgarD");
-    storage_save_message();
-    strcpy(storage_get_buffer(), "WayOff1");
-    bool wayoff1 = storage_save_message();
-    strcpy(storage_get_buffer(), "WayOff2");
-    bool wayoff2 = storage_save_message();
+    storage_new();
+    storage_write("FooBar");
+    storage_close();
+
+    storage_new();
+    storage_write("Grazie");
+    storage_close();
+
+    storage_new();
+    storage_write("DonaldK");
+    storage_close();
+
+    storage_new();
+    storage_write("EdgarD");
+    storage_close();
+
+    bool wayoff1 = storage_new();
+    storage_write("WayOff1");
+    storage_close();
+
+    bool wayoff2 = storage_new();
+    storage_write("WayOff2");
+    storage_close();
 
     assert_false("should indicate failure (1)", wayoff1);
     assert_false("should indicate failure (2)", wayoff2);
 
-    storage_load_message(0);
-    assert_equals_string("test1", "FooBar", storage_get_buffer());
-    storage_load_message(1);
-    assert_equals_string("test2", "Grazie", storage_get_buffer());
-    storage_load_message(2);
-    assert_equals_string("test3", "DonaldK", storage_get_buffer());
-    storage_load_message(3);
-    assert_equals_string("test4", "EdgarD", storage_get_buffer());
+    char restored_text[32];
+
+    storage_open(0);
+    helper_storage_read_buf(restored_text);
+    storage_close();
+    assert_equals_string("test1", "FooBar", restored_text); 
+
+    storage_open(1);
+    helper_storage_read_buf(restored_text);
+    storage_close(); 
+    assert_equals_string("test2", "Grazie", restored_text); 
+
+    storage_open(2);
+    helper_storage_read_buf(restored_text);
+    storage_close(); 
+    assert_equals_string("test3", "DonaldK", restored_text); 
+
+    storage_open(3);
+    helper_storage_read_buf(restored_text);
+    storage_close(); 
+    assert_equals_string("test4", "EdgarD", restored_text); 
 
     teardown_test_storage("test_save_too_many_messages");
 }
