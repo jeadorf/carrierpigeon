@@ -3,7 +3,7 @@
 import sys
 from bluetooth import BluetoothSocket, discover_devices, RFCOMM
 
-MAX_MESSAGE_LENGTH = 113
+MAX_MESSAGE_LENGTH = 112+4
 
 def encapsulate(data):
     tag = '\r\n'
@@ -32,7 +32,7 @@ while True:
     message += data
 
 message = encapsulate(message)
-if len(message) < MAX_MESSAGE_LENGTH:
+if len(message) <= MAX_MESSAGE_LENGTH:
     bytes = sock.send(message)
     print "%d bytes sent" % bytes
 else:
