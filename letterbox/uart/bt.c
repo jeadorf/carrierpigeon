@@ -36,11 +36,6 @@ bool bt_readline(char *buf, int max_size, bool use_buffer)
     c = uart_getc();
     if (!(c & UART_NO_DATA))
     {
-        // Check whether we have read max_size chars
-        if (position == max_size - 1) {
-            bt_finish_and_reset(buf, use_buffer); 
-        }
-
         // mask out all higher level bits that might be set
         c = c & 0xFF;
 
@@ -55,8 +50,9 @@ bool bt_readline(char *buf, int max_size, bool use_buffer)
                 // return what we got now
                 return true; 
             }
-        }
-        else {
+        } else if (position == max_size - 1) {
+            bt_finish_and_reset(buf, use_buffer); 
+        } else {
             if (use_buffer) {
                 // not a \r or \n, add it to our string
                 buf[position] = c;
@@ -66,7 +62,7 @@ bool bt_readline(char *buf, int max_size, bool use_buffer)
             position++;
         }
     }
-    // if we aren't done, always return NULL
+    // line has not been completely read yet
     return false;
 }
 
