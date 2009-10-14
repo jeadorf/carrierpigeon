@@ -63,12 +63,14 @@ void test_message_save_read_text(void)
 
     // write message
     char *expected_text = "FooBar";
-    char restored_text[6];
+    char restored_text[7];
     char c;
     int i = 0;
+
     message_new();
     message_write(expected_text);
     message_close();
+
     // restore buffer
     message_open(0);
     helper_message_read_buf(restored_text);
@@ -237,6 +239,39 @@ void test_save_too_many_messages(void)
     teardown_test_message("test_save_too_many_messages");
 }
 
+void test_read_message_until_null_byte_occurs(void)
+{
+    setup_test_message("test_read_message_until_null_byte_occurs");
+
+    char expected_text[] = "alpha";
+
+    message_new();
+    message_write(expected_text);
+    message_close();
+
+    message_open(0);
+    char restored_text[25];
+    char c;
+    int i = 0;
+    while ((c = message_read()) != '\0') {
+        restored_text[i] = c;
+        i++;
+    }
+    restored_text[i] = '\0';
+    assert_equals_string("problem", expected_text, restored_text);
+    
+    teardown_test_message("test_read_message_until_null_byte_occurs");
+}
+
+void test_return_null_byte_on_invalid_read(void)
+{
+    setup_test_message("test_return_null_byte_on_invalid_read");
+
+    assert_true("expected \\0 byte", '\0' == message_read());
+
+    teardown_test_message("test_return_null_byte_on_invalid_read");
+}
+
 /* run the tests */
 int main(void)
 {
@@ -251,6 +286,8 @@ int main(void)
     test_save_max_full_message();
     // test_save_too_long_message();
     test_save_too_many_messages();
+    test_read_message_until_null_byte_occurs();
+    test_return_null_byte_on_invalid_read();
     return 0;
 }
 

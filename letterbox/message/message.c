@@ -42,14 +42,15 @@ uint8_t storage_nodes[4] = { 0, 0, 0, 0 };
 // Memory state: Points to the next free slot in storage_nodes 
 uint8_t storage_count = 0;
 
-// Streaming state: Points to the currently opened message entry
-uint8_t block;
 // Streaming state: Points to the current read/write position
 uint16_t pos;
+uint16_t offset;
+bool open = false;
 
 bool message_new(void)
 {
     uint8_t i;
+    uint8_t block;
     bool found_free;
     if (!message_full()) {
         // Find free memory block
@@ -68,12 +69,14 @@ bool message_new(void)
                 // Found a free memory block
                 storage_nodes[storage_count] = block;
                 storage_count++;
-                pos = (block - 1) * MESSAGE_SIZE;
+                offset = (block - 1) * MESSAGE_SIZE;
 
                 // Write status byte and skip reserved
                 // message part
-                eeprom_write(pos, STATE_NEW);
-                pos += MESSAGE_RESERVED_SIZE + 1;
+                eeprom_write(offset, STATE_NEW);
+                offset += MESSAGE_RESERVED_SIZE + 1;
+                pos = 0;
+                open = true;
                 break;
             }
         }
@@ -86,9 +89,13 @@ bool message_new(void)
 
 uint8_t message_write_char(char c)
 {
-    eeprom_write(pos, c); 
-    pos++;
-    return 1;
+    if (open) {
+        eeprom_write(offset + pos, c); 
+        pos++;
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 uint8_t message_write(char* buf)
@@ -103,10 +110,12 @@ uint8_t message_write(char* buf)
 
 bool message_open(uint8_t msg_num)
 {
+    uint8_t block;
     if (msg_num < message_count()) {
         block = storage_nodes[msg_num]; 
-        pos = (block - 1) * MESSAGE_SIZE;
-        pos += MESSAGE_RESERVED_SIZE + 1;
+        offset = (block - 1) * MESSAGE_SIZE + MESSAGE_RESERVED_SIZE + 1;
+        pos = 0;
+        open = true;
         return true;
     } else {
         return false;
@@ -115,21 +124,19 @@ bool message_open(uint8_t msg_num)
 
 char message_read(void)
 {
-    if (pos - (block - 1) * MESSAGE_SIZE - MESSAGE_RESERVED_SIZE - 1 == 112 ) {
-    return '\0';
+    char c;
+    if (!open || pos == MESSAGE_TEXT_LENGTH) {
+        c = '\0';
     } else {
-    return eeprom_read(pos++);
+        c = eeprom_read(offset + pos);
+        pos++;
     }
+    return c;
 }
 
 void message_close(void)
 {
-    if (pos - (block - 1) * MESSAGE_SIZE < MESSAGE_SIZE) {
-        eeprom_write(pos-1, '\0'); 
-    }
-
-    block = -1;
-    pos = -1;
+    open = false;
 }
 
 bool message_empty(void)

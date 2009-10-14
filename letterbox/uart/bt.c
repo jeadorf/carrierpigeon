@@ -50,7 +50,7 @@ bool bt_readline(char *buf, int max_size, bool use_buffer)
                 // return what we got now
                 return true; 
             }
-        } else if (position == max_size - 1) {
+        } else if (position == max_size) {
             bt_finish_and_reset(buf, use_buffer); 
         } else {
             if (use_buffer) {
@@ -71,7 +71,7 @@ void bt_finish_and_reset(char* buf, bool use_buffer)
     if (use_buffer) {
         buf[position] = '\0';
     } else {
-        message_write('\0');
+        message_write_char('\0');
     }
     
     cr = 0;

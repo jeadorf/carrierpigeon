@@ -7,4 +7,4 @@ if [ $# != 1 ]; then
 fi
 
 echo "Writing image '$1' to EEPROM"
-avrdude -P usb -c avrisp2 -p atmega8515 -U eeprom:r:$1:r
+avrdude -P usb -c avrisp2 -p atmega8515 -U eeprom:w:$1:r
