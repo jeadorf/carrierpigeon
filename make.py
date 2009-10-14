@@ -229,7 +229,8 @@ class Project:
             self._print_memory_stats()
     def _print_memory_stats(self):
         """Prints memory statistics using avr-size"""
-        _info("Memory statistics for '%s':" % self.name)
+        _info("\nMemory statistics for '%s':" % self.name)
+        _info("(includes dependencies for this project)");
         stats_cmd = [
             "avr-size",
             "--format=avr",

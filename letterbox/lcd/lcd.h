@@ -64,19 +64,3 @@ void lcd_set_column(unsigned char colnum);
 // read
 #define LCD_RD  PB2
 
-// line switches
-// CS
-#define set_lcd_cs() set_bit(PORTE, LCD_CS)
-#define clear_lcd_cs() clear_bit(PORTE, LCD_CS)
-// RST
-#define set_lcd_rst() set_bit(PORTC, LCD_RST)
-#define clear_lcd_rst() clear_bit(PORTC, LCD_RST)
-// RS
-#define set_lcd_rs() set_bit(PORTB, LCD_RS)
-#define clear_lcd_rs() clear_bit(PORTB, LCD_RS)
-// WR
-#define set_lcd_wr() set_bit(PORTE, LCD_WR)
-#define clear_lcd_wr() clear_bit(PORTE, LCD_WR)
-// RD
-#define set_lcd_rd() set_bit(PORTB, LCD_RD)
-#define clear_lcd_rd() clear_bit(PORTB, LCD_RD)

@@ -46,13 +46,13 @@ void lcd_control(unsigned char control)
     // rs goes high (rs moves before and after
     // the other lines to meet timing constraints)
 
-    PORTB &= ~_BV(LCD_RS);
-    PORTE &= ~_BV(LCD_CS);
-    PORTE &= ~_BV(LCD_WR);
-    PORTB |= _BV(LCD_RD);
+    clear_bit(PORTB, LCD_RS);
+    clear_bit(PORTE, LCD_CS);
+    clear_bit(PORTE, LCD_WR);
+    set_bit(PORTB, LCD_RD);
     PORTA = control;
-    PORTE |= _BV(LCD_WR);
-    PORTE |= _BV(LCD_CS);
+    set_bit(PORTE, LCD_WR);
+    set_bit(PORTE, LCD_CS);
 }
 
 void lcd_write(unsigned char data)
@@ -60,13 +60,13 @@ void lcd_write(unsigned char data)
     // writes arg0 to the currently selected column of the display
     // rs high for data
 
-    PORTB |= _BV(LCD_RS);
-    PORTE &= ~_BV(LCD_CS);
-    PORTE &= ~_BV(LCD_WR);
-    PORTB |= _BV(LCD_RD);
+    set_bit(PORTB, LCD_RS);
+    clear_bit(PORTE, LCD_CS);
+    clear_bit(PORTE, LCD_WR);
+    set_bit(PORTB, LCD_RD);
     PORTA = data;
-    PORTE |= _BV(LCD_WR);
-    PORTE |= _BV(LCD_CS);
+    set_bit(PORTE, LCD_WR);
+    set_bit(PORTE, LCD_CS);
 }
 
 void lcd_set_page(unsigned char pagenum)
@@ -124,16 +124,17 @@ void lcd_init(void)
     set_bit(DDRE, DDE1);
 
     // with control lines all high except reset
-    set_lcd_cs();
-    clear_lcd_rst();
+    set_bit(PORTE, LCD_CS);
+    clear_bit(PORTC, LCD_RST);
 
-    set_lcd_rs();
-    set_lcd_wr();
-    set_lcd_rd();
+    set_bit(PORTB, LCD_RS);
+    set_bit(PORTE, LCD_WR);
+    set_bit(PORTB, LCD_RD);
+
     // startup delay of 100ms
     _delay_ms(100);
     // and rst high again
-    set_lcd_rst();
+    set_bit(PORTC, LCD_RST);
 
     lcd_control(0xA2);          // <- Bias 1/9
 
