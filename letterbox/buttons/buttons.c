@@ -1,5 +1,5 @@
 #include <avr/io.h>
-#include "main.h"
+#include "global.h"
 
 char get_key(void)
 {
@@ -15,10 +15,10 @@ char get_key(void)
         for (othercol = PC3; othercol >= PC0; othercol--)
         {
             if (othercol != col)
-                SET_BIT(PORTC, othercol);
+                set_bit(PORTC, othercol);
         }
         // set the current col to 0
-        CLEAR_BIT(PORTC, col);
+        clear_bit(PORTC, col);
         // set DDRD6-4 to READ (needs to be in a loop, since DDR is strange)
         DDRD &= 0x8F;           //0b10001111;
 
@@ -29,7 +29,7 @@ char get_key(void)
             if (bit_is_clear(PIND, row))
             {
                 // unpress it
-                SET_BIT(PORTD, row);
+                set_bit(PORTD, row);
 
                 // return the value of the key
                 // col * 3 because each col has 3 keys
