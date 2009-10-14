@@ -4,8 +4,6 @@
 #include "bt.h"
 #include "uart.h"
 #include "message.h"
-#include "buttons.h"
-#include "led.h"
 
 static unsigned char position = 0;
 static unsigned char cr = 0, lf = 0;
