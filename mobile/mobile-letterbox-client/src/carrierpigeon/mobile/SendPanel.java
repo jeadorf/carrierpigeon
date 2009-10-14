@@ -33,7 +33,7 @@ public class SendPanel extends List implements CommandListener, DeviceDetector.C
         this.midlet = midlet;
         this.btAddresses = new Hashtable();
 
-        addCommand(new Command("Send", Command.OK, 1));
+        addCommand(new Command("Exit", Command.EXIT, 1));
         setCommandListener(this);
 
         // Start device discovery early
@@ -67,7 +67,7 @@ public class SendPanel extends List implements CommandListener, DeviceDetector.C
     }
 
     public void commandAction(Command c, Displayable d) {
-        if (c.getCommandType() == Command.OK) {
+        if (c == List.SELECT_COMMAND) {
             // When the MIDlet tries to open a bluetooth connection, a dialog
             // will pop up where the user must confirm that it is allowed to do
             // so. This dialog might get blocked by the connection request,
@@ -79,6 +79,8 @@ public class SendPanel extends List implements CommandListener, DeviceDetector.C
                     sendMessage();
                 }
             }).start();
+        } else if (c.getCommandType() == Command.EXIT) {
+            midlet.destroyApp(true);
         }
 
     }

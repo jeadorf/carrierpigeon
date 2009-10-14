@@ -13,9 +13,3 @@
 
 #define UART_BAUD_RATE 19200
 
-/** This constant defines the size of the global buffer. Since
- * this buffer is used for several different purposes, you have
- * to be extremely careful and look at each purpose before changing
- * the size of this buffer. */
-#define GLOBAL_BUFFER_SIZE 32 
-

@@ -7,6 +7,7 @@ import javax.bluetooth.DiscoveryListener;
 import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
+import javax.microedition.lcdui.Alert;
 
 /**
  * A device discovery service that looks for bluetooth devices in the vicinity.
@@ -27,9 +28,9 @@ public class DefaultDeviceDetector extends DeviceDetector {
 
             public void inquiryCompleted(int discType) {
                 synchronized (DefaultDeviceDetector.this) {
-                    DefaultDeviceDetector.this.notifyAll();
                     fireDeviceDetectionComplete();
                     completed = true;
+                    DefaultDeviceDetector.this.notifyAll();
                 }
             }
 
@@ -45,7 +46,7 @@ public class DefaultDeviceDetector extends DeviceDetector {
     }
 
     public synchronized void waitForCompletion() throws InterruptedException {
-        if (started) {
+        if (started && !completed) {
             wait();
         }
     }

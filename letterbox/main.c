@@ -47,7 +47,8 @@ void lb_set_new_as_current(void);
 unsigned int current_message = 0;
 bool new_message = false;
 
-extern char global_buffer[];
+#define READ_BUFFER_SIZE 16
+char read_buffer[READ_BUFFER_SIZE];
 
 const char CONNECTION[] PROGMEM =
         "                     "
@@ -130,8 +131,8 @@ void lb_display_message(void) {
     if (message_empty()) {
         lcd_display_string("  0/0 ");
     } else {
-        snprintf(global_buffer, 7, "  %d/%d  ", current_message + 1, message_count());
-        lcd_display_string(global_buffer);
+        snprintf(read_buffer, 7, "  %d/%d  ", current_message + 1, message_count());
+        lcd_display_string(read_buffer);
     }
     lcd_display_string_masked(" Del. ", 0xff);
 }
@@ -148,8 +149,8 @@ bool lb_is_disconnect(char* msg)
 
 void lb_check_connection(void)
 {
-    bool read = bt_readline_buffer(global_buffer, GLOBAL_BUFFER_SIZE);
-    if (read && lb_is_connect(global_buffer)) {
+    bool read = bt_readline_buffer(read_buffer, GLOBAL_BUFFER_SIZE);
+    if (read && lb_is_connect(read_buffer)) {
         lb_display_connection();
         lb_capture_message();
         lb_read_disconnect();
@@ -171,10 +172,10 @@ void lb_capture_message(void) {
 
 void lb_read_disconnect(void)
 {
-    while (!bt_readline_buffer(global_buffer, GLOBAL_BUFFER_SIZE)) {
+    while (!bt_readline_buffer(read_buffer, GLOBAL_BUFFER_SIZE)) {
         // wait until disconnect arrives
     }
-    if (lb_is_disconnect(global_buffer)) {
+    if (lb_is_disconnect(read_buffer)) {
         led_blink();
     } else {
         lcd_display_string("error in communication");
