@@ -1,7 +1,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
-#include "main.h"
 #include "led.h"
+#include "global.h"
 
 void led_blink_times(int n)
 {
@@ -14,13 +14,13 @@ void led_blink_times(int n)
 
 void led_on(void)
 {
-    SET_BIT(DDRC, DDC4);
-    SET_BIT(PORTC, PC4);
+    set_bit(DDRC, DDC4);
+    set_bit(PORTC, PC4);
 }
 
 void led_off(void)
 {
-    CLEAR_BIT(PORTC, PC4);
+    clear_bit(PORTC, PC4);
 }
 
 
