@@ -24,6 +24,10 @@
  * and saving messages.
  */
 
+#define BUTTON_UP 6
+#define BUTTON_DOWN 4
+#define BUTTON_DELETE 9
+
 void lb_init(void);
 void lb_serve(void);
 void lb_check_user_request(void);
@@ -144,7 +148,7 @@ bool lb_is_disconnect(char* msg)
 
 void lb_check_connection(void)
 {
-    bool read = bt_readline_buffer(global_buffer, MESSAGE_TEXT_LENGTH);
+    bool read = bt_readline_buffer(global_buffer, GLOBAL_BUFFER_SIZE);
     if (read && lb_is_connect(global_buffer)) {
         lb_display_connection();
         lb_capture_message();
@@ -159,7 +163,7 @@ void lb_capture_message(void) {
     // open new record
     message_new();
     // pipe next line directly to EEPROM
-    while (!bt_readline_message(MESSAGE_TEXT_LENGTH)) {
+    while (!bt_readline_message(MESSAGE_TEXT_LENGTH - 1)) {
         // Wait for message 
     }
     message_close();
@@ -167,7 +171,7 @@ void lb_capture_message(void) {
 
 void lb_read_disconnect(void)
 {
-    while (!bt_readline_buffer(global_buffer, MESSAGE_TEXT_LENGTH)) {
+    while (!bt_readline_buffer(global_buffer, GLOBAL_BUFFER_SIZE)) {
         // wait until disconnect arrives
     }
     if (lb_is_disconnect(global_buffer)) {
@@ -187,9 +191,7 @@ void lb_check_user_request(void)
     if (!new_message) {
         switch (key)
         { 
-            // TODO: get rid of magic numbers
-            // FIXME: % modulo operator does nonsense when applied to negative numbers (but why?)
-            case 4:
+            case BUTTON_DOWN:
                 led_on();
                 // Down
                 if (current_message == 0) {
@@ -198,12 +200,12 @@ void lb_check_user_request(void)
                     current_message = current_message - 1;
                 }
                 break;
-            case 6:
+            case BUTTON_UP:
                 led_on();
                 // Up 
                 current_message = (current_message + 1) % message_count();
                 break;
-            case 9:
+            case BUTTON_DELETE:
                 led_on();
                 // Delete 
                 if (!message_empty()) {

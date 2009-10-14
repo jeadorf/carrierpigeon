@@ -160,7 +160,6 @@ char characters[CHAR_TABLE_LENGTH][LCD_CHAR_WIDTH] PROGMEM = {
 extern int current_page;
 extern int current_column;
 
-// TODO: Think about storing bit matrix data externally and not within 8kb flash
 void lcd_draw_char(char c)
 {
     lcd_draw_char_masked(c, 0x00);

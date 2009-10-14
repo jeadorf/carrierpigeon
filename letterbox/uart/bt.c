@@ -5,8 +5,13 @@
 #include "uart.h"
 #include "message.h"
 
+static unsigned char position = 0;
+static unsigned char cr = 0, lf = 0;
+
 // Implementation
 bool bt_readline(char *buf, int max_size, bool use_buffer);
+// Writes a null byte and resets static variables
+void bt_finish_and_reset(char *buf, bool use_buffer);
 
 bool bt_readline_buffer(char* buf, int max_size)
 {
@@ -23,12 +28,19 @@ bool bt_readline(char *buf, int max_size, bool use_buffer)
 {
     // TODO: stop when max_size is reached and return unfinished line
     int c;
-    static unsigned char position = 0;
-    static unsigned char cr = 0, lf = 0;
+
+    if (max_size == 0) {
+        return true;
+    }
 
     c = uart_getc();
     if (!(c & UART_NO_DATA))
     {
+        // Check whether we have read max_size chars
+        if (position == max_size - 1) {
+            bt_finish_and_reset(buf, use_buffer); 
+        }
+
         // mask out all higher level bits that might be set
         c = c & 0xFF;
 
@@ -39,16 +51,7 @@ bool bt_readline(char *buf, int max_size, bool use_buffer)
         else if (c == '\n') {
             lf++;
             if (lf == 2 && cr == 2) {
-                if (use_buffer) {
-                    buf[position] = '\0';
-                } else {
-                    message_write('\0');
-                }
-                // we found the terminal \n
-                // reset all static variables back to their initial values
-                cr = 0;
-                lf = 0;
-                position = 0;
+                bt_finish_and_reset(buf, use_buffer);
                 // return what we got now
                 return true; 
             }
@@ -65,5 +68,18 @@ bool bt_readline(char *buf, int max_size, bool use_buffer)
     }
     // if we aren't done, always return NULL
     return false;
+}
+
+void bt_finish_and_reset(char* buf, bool use_buffer)
+{
+    if (use_buffer) {
+        buf[position] = '\0';
+    } else {
+        message_write('\0');
+    }
+    
+    cr = 0;
+    lf = 0;
+    position = 0;
 }
 
