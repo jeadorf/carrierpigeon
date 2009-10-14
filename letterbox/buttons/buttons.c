@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include <util/delay.h>
 #include "global.h"
 
 char get_key(void)
@@ -8,6 +9,7 @@ char get_key(void)
 
     // set DDRC3-0 to WRITE
     DDRC |= 0x0F;                //0b00001111;
+
         // iterate over all 4 COLs
         for (col = PC3; col >= PC0; col--)
     {

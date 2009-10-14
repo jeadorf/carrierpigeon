@@ -219,11 +219,12 @@ void lb_check_user_request(void)
     if (key) {
         lb_display_message();
         new_message = false;
-    }
 
-    // wait until button is released
-    while (get_key() != 0) {
-        /* NOP */
+        // wait until button is released
+        while (get_key() != 0) {
+            /* NOP */
+        }
+
     }
 
     led_off();

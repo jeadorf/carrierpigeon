@@ -9,7 +9,7 @@
     <name>desktop-letterbox-client</name>
     <url>http://maven.apache.org</url>
     <properties>
-        <project.main.class>carrierpigeon.desktopclient.DesktopLetterboxClient</project.main.class>
+        <project.main.class>carrierpigeon.desktopclient.LeaveMessage</project.main.class>
     </properties>
 
     <build>
