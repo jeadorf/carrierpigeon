@@ -1,10 +1,18 @@
-package carrierpigeon;
+package carrierpigeon.mobile;
 
 import java.util.Vector;
 import javax.bluetooth.BluetoothStateException;
 
 /**
+ * Abstract base class for bluetooth device discovery services. Interested
+ * objects can listen to the detection state by registering a
+ * {@link CompletionListener} with a device detector. Usually, it is not
+ * possible to start two searches in parallel, since the detection blocks
+ * the (hardware) bluetooth device.
  *
+ * @see CompletionListener
+ * @see DefaultDeviceDetector
+ * @see MockDeviceDetector
  */
 public abstract class DeviceDetector {
 
@@ -26,6 +34,12 @@ public abstract class DeviceDetector {
      * @throws InterruptedException
      */
     public abstract void waitForCompletion() throws InterruptedException;
+
+    /**
+     * Returns true if a search for bluetooth devices has completed,
+     * false otherwise.
+     */
+    public abstract boolean hasCompleted();
 
     /**
      * Gets all devices that have been discovered so far. Returned vector

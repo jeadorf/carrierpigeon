@@ -1,6 +1,5 @@
-package carrierpigeon;
+package carrierpigeon.mobile;
 
-import java.io.IOException;
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DeviceClass;
 import javax.bluetooth.DiscoveryAgent;
@@ -10,30 +9,27 @@ import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 
 /**
- *
+ * A device discovery service that looks for bluetooth devices in the vicinity.
+ * It runs in the background in a separate thread. 
  */
 public class DefaultDeviceDetector extends DeviceDetector {
 
     private boolean started = false;
 
+    private boolean completed = false;
+
     public synchronized void startDiscovery() throws BluetoothStateException {
         DiscoveryListener listener = new DiscoveryListener() {
 
             public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
-                System.out.println("Device " + btDevice.getBluetoothAddress() + " found");
                 devices.addElement(btDevice);
-                try {
-                    System.out.println("     name " + btDevice.getFriendlyName(false));
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
             }
 
             public void inquiryCompleted(int discType) {
-                System.out.println("Device Inquiry completed!");
                 synchronized (DefaultDeviceDetector.this) {
                     DefaultDeviceDetector.this.notifyAll();
                     fireDeviceDetectionComplete();
+                    completed = true;
                 }
             }
 
@@ -52,5 +48,9 @@ public class DefaultDeviceDetector extends DeviceDetector {
         if (started) {
             wait();
         }
+    }
+
+    public synchronized boolean hasCompleted() {
+        return completed;
     }
 }

@@ -1,12 +1,19 @@
-package carrierpigeon;
+package carrierpigeon.mobile;
 
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.RemoteDevice;
 
 /**
- *
+ * A fake device detector that simulates a real device discovery mechanism. It
+ * needs some time (in fact it sleeps) and adds some fake devices to its list
+ * of detected devices. These devices have a name and a bluetooth address, but
+ * attempts to connect with these devices will usually fail, unless there is
+ * a bluetooth device with one of the fake addresses in the vicinity (very
+ * unlikely).
  */
 public class MockDeviceDetector extends DeviceDetector {
+
+    private boolean completed = false;
 
     public void startDiscovery() throws BluetoothStateException {
         new Thread() {
@@ -41,6 +48,7 @@ public class MockDeviceDetector extends DeviceDetector {
                     synchronized (MockDeviceDetector.this) {
                         MockDeviceDetector.this.notifyAll();
                         fireDeviceDetectionComplete();
+                        completed = true;
                     }
                 }
             }
@@ -51,5 +59,9 @@ public class MockDeviceDetector extends DeviceDetector {
         synchronized (this) {
             wait();
         }
+    }
+    
+    public synchronized boolean hasCompleted() {
+        return completed;
     }
 }

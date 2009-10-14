@@ -1,4 +1,4 @@
-package carrierpigeon;
+package carrierpigeon.mobile;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,7 +15,8 @@ import javax.microedition.lcdui.Displayable;
 import javax.microedition.lcdui.List;
 
 /**
- *
+ * Renders a list of bluetooth devices, preferrably by name. The user can send
+ * the composed message to the device s/he selected.
  */
 public class SendPanel extends List implements CommandListener, DeviceDetector.CompletionListener {
 

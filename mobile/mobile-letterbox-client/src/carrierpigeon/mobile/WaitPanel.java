@@ -1,4 +1,4 @@
-package carrierpigeon;
+package carrierpigeon.mobile;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -9,7 +9,7 @@ import javax.microedition.lcdui.Item;
 import javax.microedition.lcdui.StringItem;
 
 /**
- *
+ * Shown until the bluetooth discovery service completes.
  */
 public class WaitPanel extends Form implements CommandListener {
 

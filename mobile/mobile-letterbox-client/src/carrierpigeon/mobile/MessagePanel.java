@@ -1,4 +1,4 @@
-package carrierpigeon;
+package carrierpigeon.mobile;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;

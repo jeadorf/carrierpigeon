@@ -1,4 +1,4 @@
-package carrierpigeon;
+package carrierpigeon.mobile;
 
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
@@ -8,6 +8,11 @@ import javax.microedition.midlet.MIDlet;
  * other portable devices send messages to a letterbox server. It features
  * auto-discovery of bluetooth devices in the vicinity, T9 with most devices,
  * and basic feedback on failure.
+ *
+ * @see MessagePanel
+ * @see WaitPanel
+ * @see SendPanel
+ * @see ErrorPanel
  */
 public class CarrierpigeonMIDlet extends MIDlet {
 

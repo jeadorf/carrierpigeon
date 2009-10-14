@@ -1,4 +1,4 @@
-package carrierpigeon;
+package carrierpigeon.mobile;
 
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
@@ -7,7 +7,8 @@ import javax.microedition.lcdui.Form;
 import javax.microedition.lcdui.StringItem;
 
 /**
- *
+ * Panel that shows an exception message and a button that lets the user
+ * close the application.
  */
 public class ErrorPanel extends Form implements CommandListener {
 
