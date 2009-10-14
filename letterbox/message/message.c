@@ -115,7 +115,11 @@ bool message_open(uint8_t msg_num)
 
 char message_read(void)
 {
+    if (pos - (block - 1) * MESSAGE_SIZE - MESSAGE_RESERVED_SIZE - 1 == 112 ) {
+    return '\0';
+    } else {
     return eeprom_read(pos++);
+    }
 }
 
 void message_close(void)

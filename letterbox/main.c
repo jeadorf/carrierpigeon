@@ -115,7 +115,7 @@ void lb_display_message(void) {
     } else {
         // Load and display message
         message_open(current_message);
-        while ((c = message_read())) {
+        while ((c = message_read()) != '\0') {
             lcd_display_char(c);
         }
         message_close();
@@ -163,7 +163,7 @@ void lb_capture_message(void) {
     // open new record
     message_new();
     // pipe next line directly to EEPROM
-    while (!bt_readline_message(MESSAGE_TEXT_LENGTH - 1)) {
+    while (!bt_readline_message(MESSAGE_TEXT_LENGTH)) {
         // Wait for message 
     }
     message_close();
