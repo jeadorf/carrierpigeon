@@ -31,6 +31,7 @@ public class MessagePanel extends Form implements CommandListener {
                 "0123456789" +
                 "0123456789" +
                 "0123456789", 112, TextField.ANY);
+        messageTextField.setInitialInputMode("UCB_BASIC_LATIN");
         append(messageTextField);
 
         setCommandListener(this);

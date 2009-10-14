@@ -46,9 +46,9 @@ public class MockDeviceDetector extends DeviceDetector {
                     ex.printStackTrace();
                 } finally {
                     synchronized (MockDeviceDetector.this) {
-                        MockDeviceDetector.this.notifyAll();
                         fireDeviceDetectionComplete();
                         completed = true;
+                        MockDeviceDetector.this.notifyAll();
                     }
                 }
             }
@@ -56,11 +56,13 @@ public class MockDeviceDetector extends DeviceDetector {
     }
 
     public void waitForCompletion() throws InterruptedException {
-        synchronized (this) {
-            wait();
+        if (!completed) {
+            synchronized (this) {
+                wait();
+            }
         }
     }
-    
+
     public synchronized boolean hasCompleted() {
         return completed;
     }

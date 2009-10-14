@@ -20,10 +20,10 @@ public class WaitPanel extends Form implements CommandListener {
         this.midlet = midlet;
 
         Gauge gauge = new Gauge("Scanning for bluetooth devices", false,
-                Gauge.INDEFINITE, Gauge.INCREMENTAL_UPDATING);
+                Gauge.INDEFINITE, Gauge.CONTINUOUS_RUNNING);
         append(gauge);
         StringItem about = new StringItem("Carrierpigeon",
-                "http://www.bitbucket.org/jeadorf/carrierpigeon",
+                "Trying to discover receivers! This may take some time...",
                 Item.HYPERLINK);
         append(about);
 
