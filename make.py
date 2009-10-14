@@ -194,7 +194,9 @@ class Project:
             "-Wall",
             "-Werror",
             "-DF_CPU=16000000",
-            "-mmcu=atmega8515"]
+            "-mmcu=atmega8515",
+            "-DUART_RX_BUFFER_SIZE=128",
+            "-DUART_RX_BUFFER_SIZE=128"]
         if options.debug:
             compile_cmd.append("-g")
         self._append_compile_sources(compile_cmd)

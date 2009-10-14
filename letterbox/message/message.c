@@ -84,16 +84,21 @@ bool message_new(void)
     return false;    
 }
 
+uint8_t message_write_char(char c)
+{
+    eeprom_write(pos, c); 
+    pos++;
+    return 1;
+}
+
 uint8_t message_write(char* buf)
 {
     uint8_t i = 0;
-    uint8_t old = pos;
     while (buf[i] != '\0') {
-        eeprom_write(pos, buf[i]);
+        message_write_char(buf[i]);
         i++;
-        pos++;
     }
-    return pos - old;
+    return i;
 }
 
 bool message_open(uint8_t msg_num)
@@ -116,7 +121,7 @@ char message_read(void)
 void message_close(void)
 {
     if (pos - (block - 1) * MESSAGE_SIZE < MESSAGE_SIZE) {
-        eeprom_write(pos, '\0'); 
+        eeprom_write(pos-1, '\0'); 
     }
 
     block = -1;

@@ -144,7 +144,7 @@ bool lb_is_disconnect(char* msg)
 
 void lb_check_connection(void)
 {
-    bool read = bt_readline(global_buffer, MESSAGE_TEXT_LENGTH);
+    bool read = bt_readline_buffer(global_buffer, MESSAGE_TEXT_LENGTH);
     if (read && lb_is_connect(global_buffer)) {
         lb_display_connection();
         lb_capture_message();
@@ -156,19 +156,18 @@ void lb_check_connection(void)
 }
  
 void lb_capture_message(void) {
-    while (!bt_readline(global_buffer, MESSAGE_TEXT_LENGTH)) {
-        // Wait for disconnect
-    }
-
-    // write message
+    // open new record
     message_new();
-    message_write(global_buffer);
+    // pipe next line directly to EEPROM
+    while (!bt_readline_message(MESSAGE_TEXT_LENGTH)) {
+        // Wait for message 
+    }
     message_close();
 }
 
 void lb_read_disconnect(void)
 {
-    while (!bt_readline(global_buffer, MESSAGE_TEXT_LENGTH)) {
+    while (!bt_readline_buffer(global_buffer, MESSAGE_TEXT_LENGTH)) {
         // wait until disconnect arrives
     }
     if (lb_is_disconnect(global_buffer)) {

@@ -46,9 +46,15 @@ bool message_new(void);
  * created with message_new. You may call this function more than once.
  * Beware: after MESSAGE_TEXT_LENGTH bytes have been written, subsequent
  * calls to this function will have no effect. Returns the number of
- * bytes that have been written to the message entry.
+ * bytes that have been written to the message entry. Does not write
+ * a '\0' byte!
  */
 uint8_t message_write(char *text);
+
+/*
+ * Just like message_write, but writes only a single character.
+ */
+uint8_t message_write_char(char c);
 
 /*
  * Opens a message entry that is stored in the EEPROM. Returns true, if

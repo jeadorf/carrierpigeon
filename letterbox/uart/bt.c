@@ -3,8 +3,23 @@
 #include "global.h"
 #include "bt.h"
 #include "uart.h"
+#include "message.h"
 
-bool bt_readline(char* buf, int max_size)
+// Implementation
+bool bt_readline(char *buf, int max_size, bool use_buffer);
+
+bool bt_readline_buffer(char* buf, int max_size)
+{
+    return bt_readline(buf, max_size, true);
+}
+
+bool bt_readline_message(int max_size) 
+{
+
+    return bt_readline(0, max_size, false);
+}
+
+bool bt_readline(char *buf, int max_size, bool use_buffer)
 {
     // TODO: stop when max_size is reached and return unfinished line
     int c;
@@ -23,23 +38,32 @@ bool bt_readline(char* buf, int max_size)
         }
         else if (c == '\n') {
             lf++;
-            if (lf == 2 && cr == 2)
-            {
+            if (lf == 2 && cr == 2) {
+                if (use_buffer) {
+                    buf[position] = '\0';
+                } else {
+                    message_write('\0');
+                }
                 // we found the terminal \n
                 // reset all static variables back to their initial values
                 cr = 0;
                 lf = 0;
                 position = 0;
                 // return what we got now
-                return buf; 
+                return true; 
             }
         }
         else {
-            // not a \r or \n, add it to our string
-            buf[position++] = c;
-            buf[position] = '\0';
+            if (use_buffer) {
+                // not a \r or \n, add it to our string
+                buf[position] = c;
+            } else {
+                message_write_char(c); 
+            }
+            position++;
         }
     }
     // if we aren't done, always return NULL
-    return NULL;
+    return false;
 }
+
