@@ -3,11 +3,15 @@ package carrierpigeon.mobile;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.RemoteDevice;
 import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
+import javax.microedition.lcdui.Alert;
+import javax.microedition.lcdui.AlertType;
 import javax.microedition.lcdui.Command;
 import javax.microedition.lcdui.CommandListener;
 import javax.microedition.lcdui.Display;
@@ -88,8 +92,13 @@ public class SendPanel extends List implements CommandListener, DeviceDetector.C
     // TODO: deal with umlauts
     private void sendMessage() {
         try {
-            // String serviceUrl = "btspp://00126F037095:1"; // eumel
             String selectedDeviceName = getString(getSelectedIndex());
+            Alert feedbackAlert = new Alert("Sending message", 
+                    "Sending message to " + selectedDeviceName + " ...", null, AlertType.INFO);
+            feedbackAlert.setTimeout(Alert.FOREVER);
+            Display display = Display.getDisplay(midlet);
+            display.setCurrent(feedbackAlert);
+
             String serviceUrl = "btspp://" + btAddresses.get(selectedDeviceName) + ":1";
 
             StreamConnection conn = (StreamConnection) Connector.open(serviceUrl, Connector.WRITE);
@@ -109,7 +118,15 @@ public class SendPanel extends List implements CommandListener, DeviceDetector.C
             // TODO: the connection does not seem to be closed by the call to
             //       conn.close() - but as soon as the program quits, the
             //       mobile disconnects.
-            midlet.destroyApp(true);
+            feedbackAlert.setTitle("Message sent!");
+            feedbackAlert.setString("Your message has been sent.");
+            // Schedule terminator task
+            new Timer().schedule(new TimerTask() {
+
+                public void run() {
+                    midlet.destroyApp(true);
+                }
+            }, 1500);
         } catch (Exception e) {
             e.printStackTrace();
             ErrorPanel errorPanel = midlet.getErrorPanel();

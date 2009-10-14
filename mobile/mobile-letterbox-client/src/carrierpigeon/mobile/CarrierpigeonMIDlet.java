@@ -94,4 +94,5 @@ public class CarrierpigeonMIDlet extends MIDlet {
     public WaitPanel getWaitPanel() {
         return waitPanel;
     }
+
 }
