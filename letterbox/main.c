@@ -34,12 +34,9 @@ void lb_check_user_request(void);
 void lb_check_connection(void);
 bool lb_is_connect(char* msg);
 bool lb_is_disconnect(char* msg);
-void lb_display_connection(void);
-void lb_display_notice(void);
 void lb_display_message(void);
 void lb_display_dialog(const char* pgm_msg);
 void lb_capture_message(void);
-void lb_read_disconnect(void);
 void lb_set_new_as_current(void);
 
 /** refers to the currently selected message that is to be 
@@ -70,6 +67,17 @@ const char NOTICE[] PROGMEM  =
         "                     "
         "                     ";
 
+const char MESSAGE_FULL[] PROGMEM  = 
+        "                     "
+        "                     "
+        "                     "
+        "  There is no space  "
+        "  left for any new   "
+        "  messages!          "
+        "                     "
+        "                     "
+        "                     ";
+
 /** Initializes all components required by the letterbox. */
 void lb_init(void)
 {
@@ -80,16 +88,6 @@ void lb_init(void)
     lcd_clear();
         
     lb_display_message();
-}
-
-/** A screen panel */
-void lb_display_connection(void) {
-    lb_display_dialog(CONNECTION);
-}
-
-/** A screen panel */
-void lb_display_notice(void) {
-    lb_display_dialog(NOTICE);
 }
 
 void lb_display_dialog(const char* pgm_msg)
@@ -151,12 +149,15 @@ void lb_check_connection(void)
 {
     bool read = bt_readline_buffer(read_buffer, READ_BUFFER_SIZE);
     if (read && lb_is_connect(read_buffer)) {
-        lb_display_connection();
-        lb_capture_message();
-        lb_read_disconnect();
-        lb_set_new_as_current();
-        new_message = true;
-        lb_display_notice();
+        if (message_full()) {
+            lb_display_dialog(MESSAGE_FULL);
+        } else {
+            lb_display_dialog(CONNECTION);
+            lb_capture_message();
+            lb_set_new_as_current();
+            new_message = true;
+            lb_display_dialog(NOTICE);
+        }
     }
 }
  
@@ -168,18 +169,6 @@ void lb_capture_message(void) {
         // Wait for message 
     }
     message_close();
-}
-
-void lb_read_disconnect(void)
-{
-    while (!bt_readline_buffer(read_buffer, READ_BUFFER_SIZE)) {
-        // wait until disconnect arrives
-    }
-    if (lb_is_disconnect(read_buffer)) {
-        led_blink();
-    } else {
-        lcd_display_string("error in communication");
-    }
 }
 
 void lb_set_new_as_current(void) {

@@ -42,8 +42,7 @@ bool bt_readline(char *buf, int max_size, bool use_buffer)
         if (c == '\r') {
             // found a \r, add it to the count
             cr++;
-        }
-        else if (c == '\n') {
+        } else if (c == '\n') {
             lf++;
             if (lf == 2 && cr == 2) {
                 bt_finish_and_reset(buf, use_buffer);
@@ -52,6 +51,7 @@ bool bt_readline(char *buf, int max_size, bool use_buffer)
             }
         } else if (position == max_size) {
             bt_finish_and_reset(buf, use_buffer); 
+            return true;
         } else {
             if (use_buffer) {
                 // not a \r or \n, add it to our string

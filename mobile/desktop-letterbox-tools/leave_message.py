@@ -33,10 +33,8 @@ while True:
 
 message = encapsulate(message)
 if len(message) <= MAX_MESSAGE_LENGTH:
-    bytes = sock.send(message)
-    print "%d bytes sent" % bytes
-else:
-    print "ERROR: maximum length %d!" % MAX_MESSAGE_LENGTH
-
+    print "WARNING: maximum length %d!" % MAX_MESSAGE_LENGTH
+bytes = sock.send(message)
+print "%d bytes sent" % bytes
 print "Closing connection to said letterbox"
 sock.close()
