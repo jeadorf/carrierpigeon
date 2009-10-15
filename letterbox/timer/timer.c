@@ -28,7 +28,7 @@ bool timer_poll(void)
     } else {
        if (TCNT1 >= 10800) {
           ticks++;
-          led_blink();
+          led_blink(LED_BLUE);
           TCNT1 = 0;
        }
        return false;

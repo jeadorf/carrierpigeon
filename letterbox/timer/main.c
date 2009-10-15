@@ -4,6 +4,7 @@
 
 int main(void)
 {
+    led_init();
     timer_init();
     timer_start(5);
     while (!timer_poll()) {
