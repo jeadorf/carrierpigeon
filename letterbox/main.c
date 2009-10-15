@@ -34,6 +34,7 @@ void lb_check_user_request(void);
 void lb_check_connection(void);
 bool lb_is_connect(char* msg);
 bool lb_is_disconnect(char* msg);
+void lb_force_disconnect(void);
 void lb_display_message(void);
 void lb_display_dialog(const char* pgm_msg);
 void lb_capture_message(void);
@@ -43,7 +44,7 @@ void lb_set_new_as_current(void);
  * displayed on the LCD */
 unsigned int current_message = 0;
 bool new_message = false;
-
+bool connected = false;
 #define READ_BUFFER_SIZE 32 
 char read_buffer[READ_BUFFER_SIZE];
 
@@ -65,7 +66,7 @@ const char NOTICE[] PROGMEM  =
         "    You got mail!    "
         "                     "
         "                     "
-        "                     ";
+        "    press any key    ";
 
 const char MESSAGE_FULL[] PROGMEM  = 
         "                     "
@@ -76,7 +77,7 @@ const char MESSAGE_FULL[] PROGMEM  =
         "  messages!          "
         "                     "
         "                     "
-        "                     ";
+        "    press any key    ";
 
 /** Initializes all components required by the letterbox. */
 void lb_init(void)
@@ -145,10 +146,20 @@ bool lb_is_disconnect(char* msg)
     return msg != NULL && strncmp(msg, "DISCONNECT  ", 12) == 0;
 }
 
+void lb_force_disconnect(void)
+{
+    uart_puts("+++\r\n");
+    _delay_ms(1000);
+    uart_puts("ATH0\r\n");
+    uart_puts("ATH1\r\n");
+}
+
 void lb_check_connection(void)
 {
     bool read = bt_readline_buffer(read_buffer, READ_BUFFER_SIZE);
     if (read && lb_is_connect(read_buffer)) {
+        connected = true;
+
         if (message_full()) {
             lb_display_dialog(MESSAGE_FULL);
         } else {
@@ -208,13 +219,12 @@ void lb_check_user_request(void)
 
     if (key) {
         lb_display_message();
-        new_message = false;
+        new_message = false; 
 
         // wait until button is released
         while (get_key() != 0) {
             /* NOP */
         }
-
     }
 
     led_off();

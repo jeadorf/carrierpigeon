@@ -32,7 +32,7 @@ while True:
     message += data
 
 message = encapsulate(message)
-if len(message) <= MAX_MESSAGE_LENGTH:
+if len(message) > MAX_MESSAGE_LENGTH:
     print "WARNING: maximum length %d!" % MAX_MESSAGE_LENGTH
 bytes = sock.send(message)
 print "%d bytes sent" % bytes
