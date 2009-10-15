@@ -10,7 +10,7 @@ int main(void)
     while (!timer_poll()) {
     }
     while (true) {
-        led_blink();
+        led_blink(LED_GREEN);
     }
 }
 

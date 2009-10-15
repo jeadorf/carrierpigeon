@@ -12,9 +12,9 @@ int main_hold(void)
     {
         key = get_key();
         if (key != 0)
-            led_on();
+            led_on(LED_GREEN);
         else
-            led_off();
+            led_off(LED_GREEN);
     }
 
     return 0;
@@ -28,7 +28,7 @@ int main(void)
     while (true)
     {
         key = get_key();
-        led_blink_times(key);
+        led_blink_times(LED_GREEN, key);
     }
 
     return 0;
