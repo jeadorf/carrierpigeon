@@ -37,22 +37,36 @@ bool lb_is_connect(char* msg);
 bool lb_is_disconnect(char* msg);
 void lb_force_disconnect(void);
 void lb_display_message(void);
-void lb_display_dialog(const char* pgm_msg);
+void lb_display_dialog(const char* pgm_msg, bool _closable);
 void lb_capture_message(void);
 void lb_set_new_as_current(void);
 
 /** refers to the currently selected message that is to be 
  * displayed on the LCD */
 unsigned int current_message = 0;
-bool new_message = false;
+
+// Controls modal state
+bool dialog = false;
+bool closable = false;
+
 #define READ_BUFFER_SIZE 32 
 char read_buffer[READ_BUFFER_SIZE];
+
+const char NO_MESSAGE[] PROGMEM = 
+        "                     "
+        "    Carrierpigeon    "
+        " Bluetooth Letterbox "
+        "                     "
+        "                     "
+        "   Send a message!   "
+        "                     "
+        "                     ";
 
 const char CONNECTION[] PROGMEM =
         "                     "
         "                     "
         "                     "
-        " Message incoming... "
+        "  Message incoming   "
         "                     "
         "                     "
         "                     "
@@ -72,7 +86,7 @@ const char CANCEL[] PROGMEM  =
         "                     "
         "                     "
         "                     "
-        "     FAIL!           "
+        "        FAIL!        "
         "                     "
         "                     "
         "                     "
@@ -80,7 +94,6 @@ const char CANCEL[] PROGMEM  =
 
 
 const char MESSAGE_FULL[] PROGMEM  = 
-        "                     "
         "                     "
         "                     "
         "  There is no space  "
@@ -107,7 +120,12 @@ void lb_init(void)
     lb_display_message();
 }
 
-void lb_display_dialog(const char* pgm_msg)
+/*
+ * Displays a dialog. If and only if it is closable, the user
+ * may display the standard messages window by pressing any button.
+ * Otherwise, buttons will have no effect while the dialog is shown.
+ */
+void lb_display_dialog(const char* pgm_msg, bool _closable)
 {
     const char* c_addr = pgm_msg;
     char c;
@@ -116,7 +134,8 @@ void lb_display_dialog(const char* pgm_msg)
         lcd_display_char_masked(c, 0xff);
         c_addr++;
     }
-    
+    dialog = true;   
+    closable = _closable;
 }
 
 /** A screen panel. Only call this method if the currently selected
@@ -127,7 +146,7 @@ void lb_display_message(void) {
     lcd_clear();
    
     if (message_empty()) {
-        lcd_display_string_masked("There are no messages", 0xff);
+        lb_display_dialog(NO_MESSAGE, false);
     } else {
         // Load and display message
         message_open(current_message);
@@ -135,21 +154,23 @@ void lb_display_message(void) {
             lcd_display_char(c);
         }
         message_close();
-    }
 
-    // Draw menu
-    lcd_set_page(0);
-    lcd_set_column(LCD_INIT_COLUMN);
-    lcd_display_string_masked("Down", 0xff);
-    lcd_display_string(" ");
-    lcd_display_string_masked(" Up ", 0xff);
-    if (message_empty()) {
-        lcd_display_string("  0/0 ");
-    } else {
-        snprintf(read_buffer, 7, "  %d/%d  ", current_message + 1, message_count());
-        lcd_display_string(read_buffer);
+        // Draw menu
+        lcd_set_page(0);
+        lcd_set_column(LCD_INIT_COLUMN);
+        lcd_display_string_masked("Down", 0xff);
+        lcd_display_string(" ");
+        lcd_display_string_masked(" Up ", 0xff);
+        if (message_empty()) {
+            lcd_display_string("  0/0 ");
+        } else {
+            snprintf(read_buffer, 7, "  %d/%d  ", current_message + 1, message_count());
+            lcd_display_string(read_buffer);
+        }
+        lcd_display_string_masked(" Del. ", 0xff);
+
+        dialog = false;
     }
-    lcd_display_string_masked(" Del. ", 0xff);
 }
 
 bool lb_is_connect(char* msg)
@@ -175,9 +196,9 @@ void lb_check_connection(void)
     bool read = bt_readline_buffer(read_buffer, READ_BUFFER_SIZE);
     if (read && lb_is_connect(read_buffer)) {
         if (message_full()) {
-            lb_display_dialog(MESSAGE_FULL);
+            lb_display_dialog(MESSAGE_FULL, true);
         } else {
-            lb_display_dialog(CONNECTION);
+            lb_display_dialog(CONNECTION, false);
             lb_capture_message();
             // Do not wait for the client to disconnect such that the
             // letterbox cannot neither be blocked by a client nor
@@ -203,13 +224,12 @@ void lb_capture_message(void) {
         // Delete the message which may have partly
         // written to the EEPROM
         message_delete(message_count() - 1);
-        lb_display_dialog(CANCEL);
+        lb_display_dialog(CANCEL, true);
         _delay_ms(1500);
         lb_display_message();
     } else {
         lb_set_new_as_current();
-        new_message = true;
-        lb_display_dialog(NOTICE);
+        lb_display_dialog(NOTICE, true);
         message_serialize();
     }
 }
@@ -221,7 +241,7 @@ void lb_set_new_as_current(void) {
 void lb_check_user_request(void)
 {
     int key = get_key();
-    if (!new_message) {
+    if (!dialog) {
         switch (key)
         { 
             case BUTTON_DOWN:
@@ -250,9 +270,9 @@ void lb_check_user_request(void)
         }
     }
 
-    if (key) {
+    if (key && (!dialog || closable)) {
         lb_display_message();
-        new_message = false; 
+        dialog = false;
 
         // wait until button is released
         while (get_key() != 0) {
