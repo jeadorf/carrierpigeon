@@ -1,27 +1,37 @@
+#include "timer.h"
 #include "global.h"
 #include "led.h"
 #include <avr/io.h>
+#include <stdbool.h>
 
 int ticks = 0;
+int timeout = 15;
 
-void timer_init(void) {
+void timer_init(void)
+{
     // set prescale of timer to 1024
     set_bit(TCCR1B, CS12);
     set_bit(TCCR1B, CS10);
 }
 
-bool timer_poll(void) {
+void timer_start(int new_timeout)
 {
-    if (TCNT1 >= 10800) {
-        ticks++;
-        TCNT1 = 0;
-    }
+    timeout = new_timeout;
+    ticks = 0;
+    TCNT1 = 0;
+}
 
-    if (ticks >= TIMER_THRESHOLD) {
-        ticks = 0;
+bool timer_poll(void) 
+{
+    if (ticks >= timeout) {
         return true;
     } else {
-        return false;
+       if (TCNT1 >= 10800) {
+          ticks++;
+          led_blink();
+          TCNT1 = 0;
+       }
+       return false;
     }
 }
 
