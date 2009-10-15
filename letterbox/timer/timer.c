@@ -1,6 +1,5 @@
 #include "timer.h"
 #include "global.h"
-#include "led.h"
 #include <avr/io.h>
 #include <stdbool.h>
 
@@ -28,7 +27,6 @@ bool timer_poll(void)
     } else {
        if (TCNT1 >= 10800) {
           ticks++;
-          led_blink(LED_BLUE);
           TCNT1 = 0;
        }
        return false;

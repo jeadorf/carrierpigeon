@@ -108,3 +108,28 @@ bool message_empty(void);
  */
 bool message_full(void);
 
+/*
+ * Writes all metadata to EEPROM. If you switch off the letterbox
+ * after a call to this function you can restore state with
+ * message_restore after switching the power on again. Messages
+ * are persistent anyway but the pointers in SRAM must be
+ * made persistent too.
+ */
+void message_serialize(void);
+
+/*
+ * Restores all metadata from EEPROM. See message_serizalize.
+ */
+void message_restore(void);
+
+/*
+ * Ensures that all metadata is valid. This check becomes necessary
+ * when data is restored from the EEPROM. The EEPROM is a I/O source
+ * and therefore possibly unreliable and it is not safe to make 
+ * assumptions on what data is to expect at whatsoever address.
+ * Random EEPROM content could break the application and if it restores
+ * state when power is switched on, it might well become necessary to
+ * flash a valid image to the EEPROM to make the letterbox usable again.
+ */
+void message_validate(void);
+

@@ -271,6 +271,74 @@ void test_return_null_byte_on_invalid_read(void)
 
     teardown_test_message("test_return_null_byte_on_invalid_read");
 }
+void test_message_restore(void)
+{
+    setup_test_message("test_message_serialize");
+
+    message_new();
+    message_write("alpha"); 
+    message_close();
+
+    message_new();
+    message_write("beta");
+    message_close();
+
+    message_serialize();
+    
+    message_new();
+    message_write("gamma");
+    message_close();
+
+    message_restore();
+
+    assert_true("storage_count not correctly serialized/restored!", 2 == message_count());
+
+    char restored_text[16];
+    message_open(0);
+    helper_message_read_buf(restored_text);
+    assert_equals_string("problem", "alpha", restored_text);
+
+    message_open(1);
+    helper_message_read_buf(restored_text);
+    assert_equals_string("problem", "beta", restored_text);
+
+    teardown_test_message("test_message_serialize");
+}
+
+void test_message_validate(void)
+{
+    setup_test_message("test_message_validate");
+    
+    // Fill EEPROM with corrupt data
+    int i;
+    for (i = 0; i < 512; i++) {
+        eeprom_write(66);
+    }
+
+    message_restore();
+
+    assert_true("message validation corrupt", message_count() == 0);
+
+    // Create storage_nodes with duplicates
+    eeprom_write(480, 4);
+    eeprom_write(481, 1);
+    eeprom_write(482, 3);
+    eeprom_write(483, 4);
+    eeprom_write(484, 3);
+
+    assert_true("duplicates not detected", message_count() == 0);
+
+    // Check for invalid block values
+    eeprom_write(480, 4);
+    eeprom_write(481, 1);
+    eeprom_write(482, 3);
+    eeprom_write(483, MAX_MESSAGES + 1);
+    eeprom_write(484, 3);
+
+    assert_true("invalid block values not detected", message_count() == 0);
+
+    teardown_test_message("test_message_validate");
+}
 
 /* run the tests */
 int main(void)
@@ -288,6 +356,8 @@ int main(void)
     test_save_too_many_messages();
     test_read_message_until_null_byte_occurs();
     test_return_null_byte_on_invalid_read();
+    test_message_restore();
+    test_message_validate();
     return 0;
 }
 

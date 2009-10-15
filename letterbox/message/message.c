@@ -38,7 +38,7 @@
 // in the list. The first zero denotes the end of the list. A value
 // n denotes that the message is actually stored in the n-th memory
 // block (counting begins with 1)
-uint8_t storage_nodes[4] = { 0, 0, 0, 0 };
+uint8_t storage_nodes[MAX_MESSAGES] = { 0, 0, 0, 0 };
 // Memory state: Points to the next free slot in storage_nodes 
 uint8_t storage_count = 0;
 
@@ -46,6 +46,8 @@ uint8_t storage_count = 0;
 uint16_t pos;
 uint16_t offset;
 bool open = false;
+
+void message_validate(void);
 
 bool message_new(void)
 {
@@ -180,6 +182,56 @@ bool message_delete(uint8_t msg_num)
 uint8_t message_count(void)
 {
     return storage_count;
+}
+
+void message_serialize(void)
+{
+    uint8_t i;
+    eeprom_write(480, storage_count);
+    for (i = 0; i < MAX_MESSAGES; i++) {
+        eeprom_write(481 + i, storage_nodes[i]);
+    }
+}
+
+void message_restore(void)
+{
+    uint8_t i;
+    storage_count = eeprom_read(480);
+    for (i = 0; i < MAX_MESSAGES; i++) {
+        storage_nodes[i] = eeprom_read(481 + i);
+        if (storage_nodes[i] > MAX_MESSAGES) {
+            storage_nodes[i] = 0;
+        }
+    }
+
+    // Ensure that the letterbox starts up with a valid state
+    message_validate();
+}
+
+void message_validate(void)
+{
+    uint8_t i, j;
+    // Check storage count
+    if (storage_count > MAX_MESSAGES) {
+        storage_count = 0;
+        return;
+    }
+    // Check for obviously invalid values
+    for (i = 0; i < MAX_MESSAGES; i++) {
+        if (storage_nodes[i] > MAX_MESSAGES) {
+            storage_count = 0;
+            return;
+        }
+    }
+    // Check for duplicates
+    for (i = 0; i < storage_count; i++) {
+        for (j = 0; j < storage_count; j++) {
+            if (i != j && storage_nodes[i] == storage_nodes[j]) {
+                storage_count = 0;
+                return;
+            }
+        }
+    }
 }
 
 /* for testing purposes */
