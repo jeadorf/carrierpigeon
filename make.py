@@ -246,7 +246,7 @@ class Project:
         # change script here if you want to automatically include transitive dependencies
         for d in self.dependencies:
             dp = project_manager.get_project(d.project_name)
-            of = "%s.o" % os.path.join(self.path_to_root, "target", dp.path, d.file)
+            of = "%s.o" % os.path.join(self.path_to_root, ".build", dp.path, d.file)
             if of not in cmd:
                 cmd.append(of)
     def _build_dependencies(self):
@@ -299,9 +299,9 @@ class Project:
         self._execute(program_cmd)
     def clean(self):
         # Check for marker
-        if os.path.exists("target"):
-            if os.path.exists("target/build_marker"):
-                top = os.path.join("target", self.path)
+        if os.path.exists(".build"):
+            if os.path.exists(".build/stamp"):
+                top = os.path.join(".build", self.path)
                 _recursively_remove_dir(top)
             else:
                 raise BuildException("Cleaning aborted as a safety restriction against "
@@ -312,16 +312,17 @@ class Project:
         # mark the target directory. This is a safety mechanism used by the
         # clean function which checks for the marker before deleting any
         # files or directories on the file system.
-        if not os.path.isdir("target"): os.mkdir("target")
-        open("target/build_marker", "a").close()
+        if not os.path.isdir(".build"):
+            os.mkdir(".build")
+        open(".build/stamp", "a").close()
         # construct working directory in order to make all commands put their output
         # into the designated target subfolder.
-        wd = os.path.join("target", self.path)
+        wd = os.path.join(".build", self.path)
         if not os.path.exists(wd):
             _fine("Creating directory '%s'" % wd)
             os.makedirs(wd)
         _fine("Working directory is '%s'" % wd)
-        proc = subprocess.Popen(cmd, cwd = wd)
+        proc = subprocess.Popen(cmd, cwd=wd)
         proc.communicate()
         # fail-fast
         if proc.returncode != 0:
