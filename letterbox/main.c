@@ -68,7 +68,7 @@ const char NOTICE[] PROGMEM  =
         "                     "
         "    press any key    ";
 
-const char CANCEL[] PROGMEM  = 
+const char FAIL[] PROGMEM  = 
         "                     "
         "                     "
         "                     "
@@ -93,6 +93,10 @@ const char MESSAGE_FULL[] PROGMEM  =
 /** Initializes all components required by the letterbox. */
 void lb_init(void)
 {
+    led_init();
+    led_blink(LED_LINE_BLUE);
+    led_blink(LED_LINE_RED);
+
     uart_init(UART_BAUD_SELECT(UART_BAUD_RATE, 11059200UL));
     sei();
 
@@ -100,7 +104,6 @@ void lb_init(void)
     lcd_clear();
         
     timer_init();
-    led_init();
 
     lb_display_message();
 }
@@ -201,12 +204,13 @@ void lb_capture_message(void) {
         // Delete the message which may have partly
         // written to the EEPROM
         message_delete(message_count() - 1);
-        lb_display_dialog(CANCEL);
-        _delay_ms(1500);
+        lb_display_dialog(FAIL);
+        led_blink_times(LED_LINE_RED, 10);
         lb_display_message();
     } else {
         lb_set_new_as_current();
         new_message = true;
+        led_on(LED_BLUE);
         lb_display_dialog(NOTICE);
     }
 }
@@ -222,7 +226,7 @@ void lb_check_user_request(void)
         switch (key)
         { 
             case BUTTON_DOWN:
-                led_on(LED_BLUE);
+                led_on(LED_GREEN);
                 // Down
                 if (current_message == 0) {
                     current_message = message_count() - 1;
@@ -231,12 +235,12 @@ void lb_check_user_request(void)
                 }
                 break;
             case BUTTON_UP:
-                led_on(LED_BLUE);
+                led_on(LED_GREEN);
                 // Up 
                 current_message = (current_message + 1) % message_count();
                 break;
             case BUTTON_DELETE:
-                led_on(LED_BLUE);
+                led_on(LED_GREEN);
                 // Delete 
                 if (!message_empty()) {
                     message_delete(current_message);
@@ -249,6 +253,7 @@ void lb_check_user_request(void)
     if (key) {
         lb_display_message();
         new_message = false; 
+        led_off(LED_BLUE);
 
         // wait until button is released
         while (get_key() != 0) {
@@ -256,7 +261,7 @@ void lb_check_user_request(void)
         }
     }
 
-    led_off(LED_BLUE);
+    led_off(LED_GREEN);
 }
 
 /**
