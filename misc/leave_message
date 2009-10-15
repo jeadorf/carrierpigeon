@@ -3,7 +3,7 @@
 import sys
 from bluetooth import BluetoothSocket, discover_devices, RFCOMM
 
-MAX_MESSAGE_LENGTH = 112+4
+MAX_MESSAGE_LENGTH = 112 + 4
 
 def encapsulate(data):
     tag = '\r\n'
