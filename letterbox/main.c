@@ -8,7 +8,8 @@
 #include <avr/io.h>
 #include <stdio.h>
 #include <avr/pgmspace.h>
-#include "global.h"
+
+#include "commons.h"
 #include "uart.h"
 #include "lcd.h"
 #include "led.h"

@@ -12,3 +12,4 @@ main
 mobile/mobile-letterbox-client/nbproject/private
 mobile/mobile-letterbox-client/dist
 mobile/mobile-letterbox-client/build
+tests/message/a.out

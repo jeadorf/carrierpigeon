@@ -2,7 +2,7 @@
 #include <util/delay.h>
 #include <stdint.h>
 #include "led.h"
-#include "global.h"
+#include "commons.h"
 
 void led_blink_times(uint8_t led, int n)
 {

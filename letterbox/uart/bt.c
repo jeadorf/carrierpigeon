@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <stdlib.h>
-#include "global.h"
+#include "commons.h"
 #include "bt.h"
 #include "uart.h"
 #include "message.h"

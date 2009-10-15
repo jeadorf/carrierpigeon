@@ -1,6 +1,6 @@
 #include <avr/io.h>
 #include <util/delay.h>
-#include "global.h"
+#include "commons.h"
 
 char get_key(void)
 {

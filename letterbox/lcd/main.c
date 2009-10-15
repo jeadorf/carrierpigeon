@@ -1,6 +1,6 @@
 #include <stdbool.h>
 #include "main.h"
-#include "global.h"
+#include "commons.h"
 #include "lcd.h"
 #include "text.h"
 

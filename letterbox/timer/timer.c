@@ -1,7 +1,8 @@
-#include "timer.h"
-#include "global.h"
 #include <avr/io.h>
 #include <stdbool.h>
+
+#include "timer.h"
+#include "commons.h"
 
 int ticks = 0;
 int timeout = 15;
