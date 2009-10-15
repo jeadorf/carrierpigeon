@@ -7,10 +7,8 @@ main
 *.swp
 *.orig
 *~
-build/
-target/
+.build/
 *.py[cod]
 mobile/mobile-letterbox-client/nbproject/private
 mobile/mobile-letterbox-client/dist
 mobile/mobile-letterbox-client/build
-
