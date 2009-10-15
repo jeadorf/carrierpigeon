@@ -17,9 +17,9 @@ void led_init(void)
 {
     // initialize green led
     set_bit(DDRC, DDC4);
-    // initialize TODO led
+    // initialize blue led
     set_bit(DDRC, DDC5);
-    // initialize TODO led
+    // initialize red led
     set_bit(DDRC, DDC6);
 
     // initialize
@@ -29,12 +29,34 @@ void led_init(void)
 
 void led_on(uint8_t led)
 {
-    set_bit(PORTC, led);
+    switch (led)
+    {
+        case LED_GREEN:
+        case LED_BLUE:
+        case LED_RED:
+            set_bit(PORTC, led);
+            break;
+        case LED_LINE_RED:
+        case LED_LINE_BLUE:
+            set_bit(PORTB, led);
+            break;
+    }
 }
 
 void led_off(uint8_t led)
 {
-    clear_bit(PORTC, led);
+    switch (led)
+    {
+        case LED_GREEN:
+        case LED_BLUE:
+        case LED_RED:
+            clear_bit(PORTC, led);
+            break;
+        case LED_LINE_RED:
+        case LED_LINE_BLUE:
+            clear_bit(PORTB, led);
+            break;
+    }
 }
 
 void led_blink(uint8_t led)

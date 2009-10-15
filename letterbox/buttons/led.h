@@ -2,8 +2,11 @@
 #include <avr/io.h>
 
 #define LED_GREEN PC4
-#define LED_RED PC5
-#define LED_BLUE PC6
+#define LED_BLUE PC5
+#define LED_RED PC6
+
+#define LED_LINE_RED PB0
+#define LED_LINE_BLUE PB1
 
 #define WAIT_TIME 150.0
 
