@@ -41,22 +41,14 @@ public class CarrierpigeonMIDlet extends MIDlet {
     public void startApp() {
         Display display = Display.getDisplay(this);
 
-        // must go first
-        errorPanel = new ErrorPanel(this);
-
         try {
-            // Detect whether the MIDlet runs in the emulator on a workstation
-            // or on a real phone. Reading system properties might be an action
-            // that is guarded by some security manager implementation. This
-            // switch may not break the application when running on a mobile.
-            try {
-                if (System.getProperty("carrierpigeon.emulator") != null) {
-                    deviceDetector = new MockDeviceDetector();
-                }
-            } finally {
-                if (deviceDetector == null) {
-                    deviceDetector = new DefaultDeviceDetector();
-                }
+            // must go first
+            errorPanel = new ErrorPanel(this);
+
+            if (isRunningInSimulator()) {
+                deviceDetector = new MockDeviceDetector();
+            } else {
+                deviceDetector = new DefaultDeviceDetector();
             }
 
             deviceDetector.startDiscovery();
@@ -79,26 +71,60 @@ public class CarrierpigeonMIDlet extends MIDlet {
         notifyDestroyed();
     }
 
-    public void sendMessage(String message, String btAddress) throws IOException {
-        StreamConnection conn = null;
+    /**
+     * Detects whether the MIDlet runs in the emulator on a workstation
+     * or on a real phone.
+     */
+    public boolean isRunningInSimulator() {
+        // Reading system properties might be an action
+        // that is guarded by some security manager implementation. This
+        // switch may not break the application when running on a mobile.
         try {
-            String serviceUrl = "btspp://" + btAddress + ":1";
-            conn = (StreamConnection) Connector.open(serviceUrl, Connector.WRITE);
-            // TODO: find out why the calls to sleep are necessary
-            Thread.sleep(500);
-            OutputStream out = conn.openOutputStream();
-            out.write('\r');
-            out.write('\n');
-            out.write(encode(message));
-            out.write('\r');
-            out.write('\n');
-            out.flush();
-            Thread.sleep(1500);
-        } catch (InterruptedException ex) {
-            throw new IOException("Got interrupted.");
-        } finally {
-            if (conn != null) {
-                conn.close();
+            return System.getProperty("carrierpigeon.emulator") != null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Establishs a connection to the bluetooth device with the specified
+     * address, encodes the message, and sends it.
+     *
+     * @param message
+     * @param btAddress
+     * @throws IOException
+     */
+    public void sendMessage(String message, String btAddress) throws IOException {
+        if (isRunningInSimulator()) {
+            System.out.println("Send message to " + btAddress + " (fake): '" + message + "'");
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException ex) {
+                throw new IOException("Got interrupted.");
+            }
+        } else {
+            StreamConnection conn = null;
+            try {
+                String serviceUrl = "btspp://" + btAddress + ":1";
+                conn =
+                        (StreamConnection) Connector.open(serviceUrl, Connector.WRITE);
+                // TODO: find out why the calls to sleep are necessary
+                Thread.sleep(500);
+                OutputStream out = conn.openOutputStream();
+                out.write('\r');
+                out.write('\n');
+                out.write(encode(message));
+                out.write('\r');
+                out.write('\n');
+                out.flush();
+                Thread.sleep(1500);
+            } catch (InterruptedException ex) {
+                throw new IOException("Got interrupted.");
+            } finally {
+                if (conn != null) {
+                    conn.close();
+                }
             }
         }
     }
@@ -135,5 +161,4 @@ public class CarrierpigeonMIDlet extends MIDlet {
     public WaitPanel getWaitPanel() {
         return waitPanel;
     }
-
 }

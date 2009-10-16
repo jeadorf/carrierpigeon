@@ -102,9 +102,9 @@ public class SendPanel extends List implements CommandListener, DeviceDetector.C
             String btAddress = (String) btAddresses.get(selectedDeviceName);
             midlet.sendMessage(message, btAddress);
 
-            // TODO: the connection does not seem to be closed by the call to
-            //       conn.close() - but as soon as the program quits, the
-            //       mobile disconnects.
+            // The connection does not seem to be closed by the call to
+            // conn.close() - the letterbox disconnects after receiving the
+            // message
             feedbackAlert.setTitle("Message sent!");
             feedbackAlert.setString("Your message has been sent.");
             // Schedule terminator task
@@ -113,7 +113,7 @@ public class SendPanel extends List implements CommandListener, DeviceDetector.C
                 public void run() {
                     midlet.destroyApp(true);
                 }
-            }, 1500);
+            }, 3000);
         } catch (Exception e) {
             e.printStackTrace();
             ErrorPanel errorPanel = midlet.getErrorPanel();
