@@ -52,21 +52,28 @@ import StringIO
 # must be initialized before calling any of
 # the functions in this script
 options = None
+basedir = None
 
-def _info(message):
-    print message
+def _info(project, message):
+    _out(project, message)
 
-def _fine(message):
+def _fine(project, message):
     if options.verbose:
-        print message
+        _out(project, message)
+
+def _out(project, message):
+    who = ""
+    if project != None:
+        who = project.name
+    print "%12s: %s" % (who, message)
 
 def _recursively_remove_dir(top):
     for root, dirs, files in os.walk(top, topdown=False):
         for name in files:
-            _fine("Removing '%s'" % os.path.join(root, name))
+            _fine(None, "Removing '%s'" % os.path.join(root, name))
             os.remove(os.path.join(root, name))
         for name in dirs:
-            _fine("Removing '%s'" % os.path.join(root, name))
+            _fine(None, "Removing '%s'" % os.path.join(root, name))
             os.rmdir(os.path.join(root, name))
 
 class BuildException(Exception):
@@ -113,7 +120,7 @@ class ConfigProjectManager(ProjectManager):
         else:
             executable = True
 
-        _fine("Loaded project '%s'" % name) 
+        _fine(None, "Loaded project '%s'" % name) 
         # TODO: check conflicts
         self.projects[name] = Project(name, path, files, dependencies, executable, self) 
     def list_project_names(self):
@@ -128,7 +135,7 @@ class ConfigProjectManager(ProjectManager):
             project.build()
             self._set_build_completed(name)
         else:
-            _fine("Nothing to do. Project '%s' has already been built." % name)
+            _fine(None, "Nothing to do. Project '%s' has already been built." % name)
     def _set_build_completed(self, name):
         self.builds.add(name)
     def _needs_build(self, name):
@@ -173,38 +180,45 @@ class Project:
         """Triggers all necessary actions to create a 'flashable' binary for
         this project. Do not call this function directly, use an instance of
         ProjectManager instead."""
-        _info("Building '%s' ..." % self.name)
-        self.compile()
-        if self._is_executable():
-            self.link()
-            self.strip()
-            # TODO: find out was avr dump does (in makefile)
-            self.objcopy()
+        _info(self, "Building '%s' ..." % self.name)
+        if len(self.files) > 0:
+            self.compile()
+            if self._is_executable():
+                self.link()
+                self.strip()
+                # TODO: find out was avr dump does (in makefile)
+                self.objcopy()
+            else:
+                _fine(self, "Skipping link, strip and objcopy. Project '%s' does not have a main file." % self.name)
         else:
-            _fine("Skipping link, strip and objcopy. Project '%s' does not have a main file." % self.name)
+            _fine(self, "Skipping build. Project '%s' does not have any source files." % self.name)
     def _is_executable(self):
         return self.executable 
     def compile(self):
         """Compiles all sources. This step needs access to the header files
         but does not require other projects to be built"""
-        _info("Compiling '%s' ..." % self.name)
+        _info(self, "Compiling '%s' ..." % self.name)
         # TODO: f_cpu and other compiler options are hard-coded
         compile_cmd = [
             "avr-gcc",
             "-c",
             "-O2",
+            "-std=c99",
+            "-pedantic",
             "-Wall",
             "-Werror",
             "-DF_CPU=16000000",
             "-mmcu=atmega8515"]
         if options.debug:
             compile_cmd.append("-g")
-        self._append_compile_sources(compile_cmd)
+        self._append_sources(compile_cmd)
         self._append_include_paths(compile_cmd)
         self._execute(compile_cmd)
-    def _append_compile_sources(self, cmd):
+    def _append_sources(self, cmd):
         for f in self.files:
-            cmd.append(os.path.join(self.path_to_root, self.path, f + ".c"))
+            abspath = os.path.join(basedir, self.path, f + ".c")
+            if os.path.exists(abspath):
+                cmd.append(abspath)
     def _append_include_paths(self, cmd):
         # change script here if you want to automatically include transitive dependencies
         for d in self.dependencies:
@@ -214,19 +228,30 @@ class Project:
                 cmd.append(ipath)
     def link(self):
         """Builds all projects this project depends on and then links the binaries."""
-        _info("Linking '%s' ..." % self.name)
+        _info(self, "Linking '%s' ..." % self.name)
         link_cmd = [
             "avr-gcc",
-            "-O3",
-            "--std=C99",
-            "-pedantic",
+            "-O2",
             "-mmcu=atmega8515",
+            "-DF_CPU=16000000",
             "-o", "main"]
         self._build_dependencies()
-        self._append_compile_output_files(link_cmd)
-        self._append_dependencies_output_files(link_cmd)
-        self._execute(link_cmd)
-        self._check_memory_consumption()
+
+        files = []
+        self._append_object_files(files)
+        self._append_dependencies_output_files(files)
+         
+        if len(files) > 0:
+            link_cmd.extend(files)
+            self._execute(link_cmd)
+            self._check_memory_consumption()
+        else:
+            _fine(self, "Skipping linking process, no object files")
+    def _append_object_files(self, cmd):
+        for f in self.files:
+            abspath = os.path.join(basedir, ".build", self.path, f + ".o")
+            if os.path.exists(abspath):
+                cmd.append(abspath)
     def _check_memory_consumption(self):
         """Prints memory statistics using avr-size"""
         stats_cmd = [
@@ -235,31 +260,28 @@ class Project:
             "--mcu=atmega8515",
             "main"]
         avrsizeout = self._execute(stats_cmd)[1]
-        if options.statistics or options.verbose:
-            _info("\nMemory statistics for '%s':" % self.name)
-            _info("(includes dependencies for this project)")
-            _info(avrsizeout)
+        if options.statistics:
+            _info(self, "\nMemory statistics for '%s':" % self.name)
+            _info(self, "(includes dependencies for this project)")
+            _info(self, avrsizeout)
         # check whether program/data fit into memory
         for match in re.finditer("([0-9\.]*)%", avrsizeout):
             if float(match.group(1)) > 100:
-                raise BuildException("Project code and data do not seem to fit into memory! " + avrsizeout)
-    def _append_compile_output_files(self, cmd):
-        for f in self.files:
-            cmd.append(f + ".o")
+                raise BuildException("%10s: Project code and data do not seem to fit into memory! %s" % (self.name, avrsizeout))
     def _append_dependencies_output_files(self, cmd):
         # change script here if you want to automatically include transitive dependencies
         for d in self.dependencies:
             dp = project_manager.get_project(d.project_name)
-            of = "%s.o" % os.path.join(self.path_to_root, ".build", dp.path, d.file)
-            if of not in cmd:
+            of = "%s.o" % os.path.join(basedir, ".build", dp.path, d.file)
+            if of not in cmd and os.path.exists(of):
                 cmd.append(of)
     def _build_dependencies(self):
         for d in self.dependencies:
             project_manager.build(d.project_name)
     def strip(self):
         if not self._is_executable():
-            raise BuildException("Project is not executable")
-        _info("Stripping '%s' ..." % self.name)
+            raise BuildException("%10s: Project is not executable" % self.name)
+        _info(self, "Stripping '%s' ..." % self.name)
         strip_cmd = [
             "avr-strip",
             "main",
@@ -267,9 +289,9 @@ class Project:
         self._execute(strip_cmd)
     def objcopy(self):
         if not self._is_executable():
-            raise BuildException("Project is not executable")
+            raise BuildException("%10s: Project is not executable", self.name)
         # TODO: find better name for this function
-        _info("Objcopy '%s' ..." % self.name)
+        _info(self, "Objcopy '%s' ..." % self.name)
         srec_cmd = [
             "avr-objcopy",
             "-O", "srec",
@@ -290,7 +312,7 @@ class Project:
         self._execute(binary_cmd)
     def program(self):
         if not self._is_executable():
-            raise BuildException("Project is not executable")
+            raise BuildException("%10s: Project is not executable", self.name)
         program_cmd = [
             "avrdude",
             "-c", "avrisp2",
@@ -308,11 +330,11 @@ class Project:
                 top = os.path.join(".build", self.path)
                 _recursively_remove_dir(top)
             else:
-                raise BuildException("Cleaning aborted as a safety restriction against "
+                raise BuildException("%10s: Cleaning aborted as a safety restriction against "
                                      "accidental removal. Target directory does not seem "
-                                     "to contain a build marker file.")
+                                     "to contain a build marker file.", self.name)
     def _execute(self, cmd):
-        _fine("Running '%s'" % " ".join(cmd))
+        _fine(self, "Running '%s'" % " ".join(cmd))
         # mark the target directory. This is a safety mechanism used by the
         # clean function which checks for the marker before deleting any
         # files or directories on the file system.
@@ -323,15 +345,15 @@ class Project:
         # into the designated target subfolder.
         wd = os.path.join(".build", self.path)
         if not os.path.exists(wd):
-            _fine("Creating directory '%s'" % wd)
+            _fine(self, "Creating directory '%s'" % wd)
             os.makedirs(wd)
-        _fine("Working directory is '%s'" % wd)
+        _fine(self, "Working directory is '%s'" % wd)
         proc = subprocess.Popen(cmd, cwd=wd, stdout=subprocess.PIPE)
         stdoutdata, stderrdata = proc.communicate()
         # fail-fast
         if proc.returncode != 0:
-            raise BuildException("Build failed. Received bad status code "
-                                 "'%d' from command '%s'" % (proc.returncode, cmd))
+            raise BuildException("%10s: Build failed. Received bad status code "
+                                 "'%d' from command '%s'" % (self.name, proc.returncode, cmd))
         return (proc, stdoutdata, stderrdata)
 
 
@@ -406,17 +428,19 @@ if __name__ == "__main__":
     _add_debug_option(option_parser)
     options, args = option_parser.parse_args()
 
+    basedir = os.getcwd() 
+
     cfg = ConfigParser.ConfigParser()
     cfg.read("make.cfg")
     project_manager = ConfigProjectManager(cfg)
     
     if len(args) == 0:
         if options.program:
-            _info("Cannot use --program and without specifying a project")
+            _info(None, "Cannot use --program and without specifying a project")
             exit(1)
         else:
             # get ALL projects
-            _fine("No projects explicitly specified - operating on all projects!")
+            _fine(None, "No projects explicitly specified - operating on all projects!")
             args = project_manager.list_project_names()
 
     if not options.clean and not options.program:
@@ -424,33 +448,33 @@ if __name__ == "__main__":
 
     try:
         if options.clean:
-            _info("-------------------------------------------------------------------")
-            _info("Cleaning")
-            _info("-------------------------------------------------------------------")
+            _info(None, "-------------------------------------------------------------------")
+            _info(None, "Cleaning")
+            _info(None, "-------------------------------------------------------------------")
             for project_name in args: 
                 proj = project_manager.get_project(project_name)
                 proj.clean()
        
         if options.program or options.build:
-            _info("-------------------------------------------------------------------")
-            _info("Building")
-            _info("-------------------------------------------------------------------")
+            _info(None, "-------------------------------------------------------------------")
+            _info(None, "Building")
+            _info(None, "-------------------------------------------------------------------")
             
             for project_name in args: 
                 project_manager.build(project_name)
 
         if options.program:
-            _info("-------------------------------------------------------------------")
-            _info("Programming")
-            _info("-------------------------------------------------------------------")
+            _info(None, "-------------------------------------------------------------------")
+            _info(None, "Programming")
+            _info(None, "-------------------------------------------------------------------")
             
             proj = project_manager.get_project(args[-1])
             proj.program()
                 
-        _info("-------------------------------------------------------------------")
-        _info("Done.")
-        _info("-------------------------------------------------------------------")
+        _info(None, "-------------------------------------------------------------------")
+        _info(None, "Done.")
+        _info(None, "-------------------------------------------------------------------")
     except BuildException, be:
-        _info(be)
-        _info("BUILD FAILED!") # speak up on failure
+        _info(None, be)
+        _info(None, "BUILD FAILED!") # speak up on failure
         exit(1)
