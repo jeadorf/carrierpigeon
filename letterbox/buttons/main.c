@@ -8,8 +8,7 @@ int main_hold(void)
 {
     char key;
 
-    while (true)
-    {
+    while (true) {
         key = get_key();
         if (key != 0)
             led_on(LED_GREEN);
@@ -25,8 +24,7 @@ int main(void)
 {
     char key;
 
-    while (true)
-    {
+    while (true) {
         key = get_key();
         led_blink_times(LED_GREEN, key);
     }

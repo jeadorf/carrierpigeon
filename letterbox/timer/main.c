@@ -13,4 +13,3 @@ int main(void)
         led_blink(LED_LINE_RED);
     }
 }
-

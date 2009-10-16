@@ -7,8 +7,7 @@
 void led_blink_times(uint8_t led, int n)
 {
     int i;
-    for (i = 0; i < n; i++)
-    {
+    for (i = 0; i < n; i++) {
         led_blink(led);
     }
 }
@@ -29,8 +28,7 @@ void led_init(void)
 
 void led_on(uint8_t led)
 {
-    switch (led)
-    {
+    switch (led) {
         case LED_GREEN:
         case LED_BLUE:
         case LED_RED:
@@ -45,8 +43,7 @@ void led_on(uint8_t led)
 
 void led_off(uint8_t led)
 {
-    switch (led)
-    {
+    switch (led) {
         case LED_GREEN:
         case LED_BLUE:
         case LED_RED:

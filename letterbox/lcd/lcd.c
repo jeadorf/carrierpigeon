@@ -8,21 +8,15 @@ int current_column = LCD_INIT_COLUMN;
 
 void lcd_light(unsigned char level)
 {
-    if (level >= 2)
-    {
+    if (level >= 2) {
         set_bit(DDRE, LCD_BRIGHTNESS);
-    }
-    else
-    {
+    } else {
         clear_bit(DDRE, LCD_BRIGHTNESS);
     }
 
-    if (level > 0)
-    {
+    if (level > 0) {
         set_bit(PORTE, LCD_BRIGHTNESS);
-    }
-    else
-    {
+    } else {
         clear_bit(PORTE, LCD_BRIGHTNESS);
     }
 }
@@ -87,13 +81,11 @@ void lcd_set_column(unsigned char colnum)
 void lcd_clear(void)
 {
     int i;
-    for (i = 0; i < 8; i++)
-    {
+    for (i = 0; i < 8; i++) {
         lcd_set_page(i);
         lcd_set_column(0);
         int j;
-        for (j = 0; j < 132; j++)
-        {
+        for (j = 0; j < 132; j++) {
             lcd_write(0x00);
         }
     }
@@ -158,4 +150,3 @@ void lcd_init(void)
     lcd_set_column(LCD_INIT_COLUMN);
     lcd_set_page(LCD_INIT_PAGE);
 }
-

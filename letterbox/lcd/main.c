@@ -30,8 +30,7 @@ int main(void)
     lcd_set_page(1);
     lcd_set_column(5);
     char i;
-    for (i = 'A'; i <= 'Z'; i++)
-    {
+    for (i = 'A'; i <= 'Z'; i++) {
         lcd_draw_char(i);
     }
 

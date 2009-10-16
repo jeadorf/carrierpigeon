@@ -21,16 +21,15 @@ void timer_start(int new_timeout)
     TCNT1 = 0;
 }
 
-bool timer_poll(void) 
+bool timer_poll(void)
 {
     if (ticks >= timeout) {
         return true;
     } else {
-       if (TCNT1 >= 10800) {
-          ticks++;
-          TCNT1 = 0;
-       }
-       return false;
+        if (TCNT1 >= 10800) {
+            ticks++;
+            TCNT1 = 0;
+        }
+        return false;
     }
 }
-

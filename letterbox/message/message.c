@@ -39,6 +39,7 @@
 // n denotes that the message is actually stored in the n-th memory
 // block (counting begins with 1)
 uint8_t storage_nodes[MAX_MESSAGES] = { 0, 0, 0, 0 };
+
 // Memory state: Points to the next free slot in storage_nodes 
 uint8_t storage_count = 0;
 
@@ -86,13 +87,13 @@ bool message_new(void)
     }
 
     block = -1;
-    return false;    
+    return false;
 }
 
 uint8_t message_write_char(char c)
 {
     if (open) {
-        eeprom_write(offset + pos, c); 
+        eeprom_write(offset + pos, c);
         pos++;
         return 1;
     } else {
@@ -100,7 +101,7 @@ uint8_t message_write_char(char c)
     }
 }
 
-uint8_t message_write(char* buf)
+uint8_t message_write(char *buf)
 {
     uint8_t i = 0;
     while (buf[i] != '\0') {
@@ -114,7 +115,7 @@ bool message_open(uint8_t msg_num)
 {
     uint8_t block;
     if (msg_num < message_count()) {
-        block = storage_nodes[msg_num]; 
+        block = storage_nodes[msg_num];
         offset = (block - 1) * MESSAGE_SIZE + MESSAGE_RESERVED_SIZE + 1;
         pos = 0;
         open = true;
@@ -153,10 +154,9 @@ bool message_full(void)
 
 char message_state(uint8_t msg_num)
 {
-    if (msg_num < storage_count)
-    {
+    if (msg_num < storage_count) {
         uint8_t block = storage_nodes[msg_num];
-        uint16_t mem_addr = (block - 1) * MESSAGE_SIZE; 
+        uint16_t mem_addr = (block - 1) * MESSAGE_SIZE;
         return eeprom_read(mem_addr);
     }
 
@@ -243,4 +243,3 @@ void message_reset(void)
     }
     storage_count = 0;
 }
-

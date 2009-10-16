@@ -34,11 +34,11 @@ void lb_init(void);
 void lb_serve(void);
 void lb_check_user_request(void);
 void lb_check_connection(void);
-bool lb_is_connect(char* msg);
-bool lb_is_disconnect(char* msg);
+bool lb_is_connect(char *msg);
+bool lb_is_disconnect(char *msg);
 void lb_force_disconnect(void);
 void lb_display_message(void);
-void lb_display_dialog(const char* pgm_msg, bool _closable);
+void lb_display_dialog(const char *pgm_msg, bool _closable);
 void lb_capture_message(void);
 void lb_set_new_as_current(void);
 
@@ -50,60 +50,54 @@ unsigned int current_message = 0;
 bool dialog = false;
 bool closable = false;
 
-#define READ_BUFFER_SIZE 32 
+#define READ_BUFFER_SIZE 32
 
 char read_buffer[READ_BUFFER_SIZE];
 
-const char NO_MESSAGE[] PROGMEM = 
-        "                     "
-        "    Carrierpigeon    "
-        " Bluetooth Letterbox "
-        "                     "
-        "                     "
-        "   Send a message!   "
-        "                     "
-        "                     ";
+const char NO_MESSAGE[] PROGMEM =
+    "                     "
+    "    Carrierpigeon    "
+    " Bluetooth Letterbox "
+    "                     "
+    "                     "
+    "   Send a message!   "
+    "                     "
+    "                     ";
 
 const char CONNECTION[] PROGMEM =
-        "                     "
-        "                     "
-        "                     "
-        "  Message incoming   "
-        "                     "
-        "                     "
-        "                     "
-        "                     ";
+    "                     "
+    "                     "
+    "                     "
+    "  Message incoming   "
+    "                     "
+    "                     "
+    "                     "
+    "                     ";
 
-const char NOTICE[] PROGMEM  = 
-        "                     "
-        "                     "
-        "                     "
-        "    Hey, look.       "
-        "    You got mail!    "
-        "                     "
-        "                     "
-        "    press any key    ";
+const char NOTICE[] PROGMEM =
+    "                     "
+    "                     "
+    "                     "
+    "    Hey, look.       "
+    "    You got mail!    "
+    "                     " "                     " "    press any key    ";
 
-const char CANCEL[] PROGMEM  = 
-        "                     "
-        "                     "
-        "                     "
-        "        FAIL!        "
-        "                     "
-        "                     "
-        "                     "
-        "                     ";
+const char CANCEL[] PROGMEM =
+    "                     "
+    "                     "
+    "                     "
+    "        FAIL!        "
+    "                     "
+    "                     " "                     " "                     ";
 
 
-const char MESSAGE_FULL[] PROGMEM  = 
-        "                     "
-        "                     "
-        "  There is no space  "
-        "  left for any new   "
-        "  messages!          "
-        "                     "
-        "                     "
-        "    press any key    ";
+const char MESSAGE_FULL[] PROGMEM =
+    "                     "
+    "                     "
+    "  There is no space  "
+    "  left for any new   "
+    "  messages!          "
+    "                     " "                     " "    press any key    ";
 
 /** Initializes all components required by the letterbox. */
 void lb_init(void)
@@ -113,7 +107,7 @@ void lb_init(void)
 
     lcd_init();
     lcd_clear();
-        
+
     timer_init();
     led_init();
 
@@ -127,26 +121,27 @@ void lb_init(void)
  * may display the standard messages window by pressing any button.
  * Otherwise, buttons will have no effect while the dialog is shown.
  */
-void lb_display_dialog(const char* pgm_msg, bool _closable)
+void lb_display_dialog(const char *pgm_msg, bool _closable)
 {
-    const char* c_addr = pgm_msg;
+    const char *c_addr = pgm_msg;
     char c;
     lcd_clear();
     while ((c = pgm_read_byte(c_addr)) != '\0') {
         lcd_display_char_masked(c, 0xff);
         c_addr++;
     }
-    dialog = true;   
+    dialog = true;
     closable = _closable;
 }
 
 /** A screen panel. Only call this method if the currently selected
  * message changed or if the LCD must switch to the message screen panel */
-void lb_display_message(void) {
+void lb_display_message(void)
+{
     char c;
 
     lcd_clear();
-   
+
     if (message_empty()) {
         lb_display_dialog(NO_MESSAGE, false);
     } else {
@@ -169,7 +164,8 @@ void lb_display_message(void) {
         if (message_empty()) {
             lcd_display_string("  0/0 ");
         } else {
-            snprintf(read_buffer, 7, "  %d/%d  ", current_message + 1, message_count());
+            snprintf(read_buffer, 7, "  %d/%d  ", current_message + 1,
+                     message_count());
             lcd_display_string(read_buffer);
         }
         lcd_display_string_masked(" Del. ", 0xff);
@@ -178,12 +174,12 @@ void lb_display_message(void) {
     }
 }
 
-bool lb_is_connect(char* msg)
+bool lb_is_connect(char *msg)
 {
     return msg != NULL && strncmp(msg, "CONNECT  ", 9) == 0;
 }
 
-bool lb_is_disconnect(char* msg)
+bool lb_is_disconnect(char *msg)
 {
     return msg != NULL && strncmp(msg, "DISCONNECT  ", 12) == 0;
 }
@@ -212,11 +208,12 @@ void lb_check_connection(void)
         }
     }
 }
- 
-void lb_capture_message(void) {
+
+void lb_capture_message(void)
+{
     bool timeout = false;
     timer_start(15);
-    
+
     // Open new record
     message_new();
     // Pipe next line directly to EEPROM. Either the message arrives
@@ -226,7 +223,7 @@ void lb_capture_message(void) {
         timeout = timer_poll();
     }
     message_close();
-    
+
     if (timeout) {
         // Delete the message which may have partly
         // written to the EEPROM
@@ -241,7 +238,8 @@ void lb_capture_message(void) {
     }
 }
 
-void lb_set_new_as_current(void) {
+void lb_set_new_as_current(void)
+{
     current_message = message_count() - 1;
 }
 
@@ -249,8 +247,7 @@ void lb_check_user_request(void)
 {
     int key = get_key();
     if (!dialog) {
-        switch (key)
-        { 
+        switch (key) {
             case BUTTON_DOWN:
                 led_on(LED_GREEN);
                 // Down

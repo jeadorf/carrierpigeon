@@ -1,12 +1,11 @@
-#include <avr/io.h> 
+#include <avr/io.h>
 #include "commons.h"
 #include "eeprom.h"
 
 void eeprom_write(unsigned int address, unsigned char data)
 {
     // Wait for completion of previous write
-    while (EECR & (1 << EEWE))
-        ;
+    while (EECR & (1 << EEWE));
 
     // Set up address register
     EEAR = address;
@@ -23,8 +22,7 @@ void eeprom_write(unsigned int address, unsigned char data)
 unsigned char eeprom_read(unsigned int address)
 {
     // Wait for completion of previous write
-    while (EECR & (1 << EEWE))
-        ;
+    while (EECR & (1 << EEWE));
 
     // Set up address register
     EEAR = address;
@@ -34,4 +32,3 @@ unsigned char eeprom_read(unsigned int address)
 
     return EEDR;
 }
-

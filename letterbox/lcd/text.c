@@ -47,7 +47,7 @@
  *  1      
  *  1      
  */
-#define CHAR_TABLE_LENGTH 47 
+#define CHAR_TABLE_LENGTH 47
 #define LCD_CHAR_WIDTH 5
 
 // define representation for undefined characters 
@@ -171,9 +171,9 @@ void lcd_draw_char_masked(char c, unsigned char xor_mask)
 
     // Map character
     int j = lcd_char_to_index(c);
-    for (i = 0; i < LCD_CHAR_WIDTH; i++)
-    {
-        lcd_write((unsigned char) pgm_read_byte(&(characters[j][i])) ^ xor_mask);
+    for (i = 0; i < LCD_CHAR_WIDTH; i++) {
+        lcd_write((unsigned char) pgm_read_byte(&(characters[j][i])) ^
+                  xor_mask);
     }
     // Insert a little space
     lcd_write(0x0 ^ xor_mask);
@@ -185,11 +185,10 @@ void lcd_display_char(char c)
 }
 
 void lcd_display_char_masked(char c, unsigned char xor_mask)
-{ 
+{
     // split after last column has been reached
     // TODO: resolve magic number
-    if (current_column >= 130)
-    {
+    if (current_column >= 130) {
         current_page--;
         lcd_set_column(LCD_INIT_COLUMN);
     } else {
@@ -197,29 +196,27 @@ void lcd_display_char_masked(char c, unsigned char xor_mask)
         lcd_set_column(current_column);
     }
 
-    if (current_page < 0)
-    {
+    if (current_page < 0) {
         // wrap around to the initial page 
         lcd_set_page(LCD_INIT_PAGE);
     } else {
         // sync current_page and actual lcd page
         lcd_set_page(current_page);
-    } 
+    }
 
     lcd_draw_char_masked(c, xor_mask);
     lcd_set_column(current_column + LCD_CHAR_WIDTH + 1);
 }
 
-void lcd_display_string(const char* s)
+void lcd_display_string(const char *s)
 {
     lcd_display_string_masked(s, 0x00);
 }
 
-void lcd_display_string_masked(const char* s, unsigned char xor_mask)
+void lcd_display_string_masked(const char *s, unsigned char xor_mask)
 {
     const char *p = s;
-    while (*p != '\0')
-    {
+    while (*p != '\0') {
         lcd_display_char_masked(*p, xor_mask);
         p++;
     }
@@ -228,60 +225,33 @@ void lcd_display_string_masked(const char* s, unsigned char xor_mask)
 /* maps a char to their index in the font definition array */
 int lcd_char_to_index(char c)
 {
-    if (c >= 'A' && c <= 'Z')
-    {
+    if (c >= 'A' && c <= 'Z') {
         return c - 'A';
-    }
-    else if (c >= 'a' && c <= 'z')
-    {
+    } else if (c >= 'a' && c <= 'z') {
         return c - 'a';
-    }
-    else if (c >= '0' && c <= '9')
-    {
+    } else if (c >= '0' && c <= '9') {
         return c - '0' + 26;
-    }
-    else if (c == '?')
-    {
+    } else if (c == '?') {
         return 36;
-    }
-    else if (c == '!')
-    {
+    } else if (c == '!') {
         return 37;
-    }
-    else if (c == '.')
-    {
+    } else if (c == '.') {
         return 38;
-    }
-    else if (c == ',')
-    {
+    } else if (c == ',') {
         return 39;
-    }
-    else if (c == '-')
-    {
+    } else if (c == '-') {
         return 40;
-    }
-    else if (c == '+')
-    {
+    } else if (c == '+') {
         return 41;
-    }
-    else if (c == ' ')
-    {
+    } else if (c == ' ') {
         return 42;
-    }
-    else if (c == '\'')
-    {
+    } else if (c == '\'') {
         return 43;
-    }
-    else if (c == '"')
-    {
+    } else if (c == '"') {
         return 44;
-    }
-    else if (c == '/') {
+    } else if (c == '/') {
         return 45;
-    }
-    else
-    {
+    } else {
         return CHAR_TABLE_LENGTH - 1;
     }
 }
-

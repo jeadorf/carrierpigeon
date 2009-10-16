@@ -8,14 +8,12 @@ char get_key(void)
     char col, othercol, row, keyvalue = 0;
 
     // set DDRC3-0 to WRITE
-    DDRC |= 0x0F;                //0b00001111;
+    DDRC |= 0x0F;               //0b00001111;
 
-        // iterate over all 4 COLs
-        for (col = PC3; col >= PC0; col--)
-    {
+    // iterate over all 4 COLs
+    for (col = PC3; col >= PC0; col--) {
         // set all cols to 1 except for the current col
-        for (othercol = PC3; othercol >= PC0; othercol--)
-        {
+        for (othercol = PC3; othercol >= PC0; othercol--) {
             if (othercol != col)
                 set_bit(PORTC, othercol);
         }
@@ -25,11 +23,9 @@ char get_key(void)
         DDRD &= 0x8F;           //0b10001111;
 
         // loop over all rows (from PD6 - PD4)
-        for (row = PD6; row >= PD4; row--)
-        {
+        for (row = PD6; row >= PD4; row--) {
             // if the bit is clear, the button is pressed
-            if (bit_is_clear(PIND, row))
-            {
+            if (bit_is_clear(PIND, row)) {
                 // unpress it
                 set_bit(PORTD, row);
 
@@ -43,4 +39,3 @@ char get_key(void)
 
     return keyvalue;
 }
-

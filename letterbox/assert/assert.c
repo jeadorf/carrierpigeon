@@ -5,16 +5,14 @@
 
 void assert_true(char *error_msg, bool actual)
 {
-    if (actual == false)
-    {
+    if (actual == false) {
         fail(error_msg);
     }
 }
 
 void assert_false(char *error_msg, bool actual)
 {
-    if (actual)
-    {
+    if (actual) {
         fail(error_msg);
     }
 }
@@ -32,4 +30,3 @@ void fail(char *error_msg)
     }
 
 }
-

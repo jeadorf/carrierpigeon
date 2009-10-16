@@ -10,14 +10,12 @@
 int main(void)
 {
     int i;
-    for (i = 0; i < 256; i++)
-    {
+    for (i = 0; i < 256; i++) {
         eeprom_write(i, (unsigned char) i);
     }
 
     unsigned char c;
-    for (i = 256; i < 512; i++)
-    {
+    for (i = 256; i < 512; i++) {
         c = eeprom_read(i - 256);
         eeprom_write(i, c);
     }
