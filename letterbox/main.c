@@ -247,7 +247,7 @@ void lb_check_user_request(void)
         switch (key)
         { 
             case BUTTON_DOWN:
-                led_on(LED_BLUE);
+                led_on(LED_GREEN);
                 // Down
                 if (current_message == 0) {
                     current_message = message_count() - 1;
@@ -256,12 +256,12 @@ void lb_check_user_request(void)
                 }
                 break;
             case BUTTON_UP:
-                led_on(LED_BLUE);
+                led_on(LED_GREEN);
                 // Up 
                 current_message = (current_message + 1) % message_count();
                 break;
             case BUTTON_DELETE:
-                led_on(LED_BLUE);
+                led_on(LED_GREEN);
                 // Delete 
                 if (!message_empty()) {
                     message_delete(current_message);
@@ -282,7 +282,7 @@ void lb_check_user_request(void)
         }
     }
 
-    led_off(LED_BLUE);
+    led_off(LED_GREEN);
 }
 
 /**
