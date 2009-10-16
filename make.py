@@ -46,6 +46,8 @@ import os
 import sys
 import ConfigParser
 import optparse
+import re
+import StringIO
 
 # must be initialized before calling any of
 # the functions in this script
@@ -194,8 +196,7 @@ class Project:
             "-Wall",
             "-Werror",
             "-DF_CPU=16000000",
-            "-mmcu=atmega8515",
-            "-DUART_RX_BUFFER_SIZE=128"]
+            "-mmcu=atmega8515"]
         if options.debug:
             compile_cmd.append("-g")
         self._append_compile_sources(compile_cmd)
@@ -225,19 +226,23 @@ class Project:
         self._append_compile_output_files(link_cmd)
         self._append_dependencies_output_files(link_cmd)
         self._execute(link_cmd)
-        # display memory statistics
-        if options.statistics:
-            self._print_memory_stats()
-    def _print_memory_stats(self):
+        self._check_memory_consumption()
+    def _check_memory_consumption(self):
         """Prints memory statistics using avr-size"""
-        _info("\nMemory statistics for '%s':" % self.name)
-        _info("(includes dependencies for this project)");
         stats_cmd = [
             "avr-size",
             "--format=avr",
             "--mcu=atmega8515",
             "main"]
-        self._execute(stats_cmd)
+        avrsizeout = self._execute(stats_cmd)[1]
+        if options.statistics or options.verbose:
+            _info("\nMemory statistics for '%s':" % self.name)
+            _info("(includes dependencies for this project)")
+            _info(avrsizeout)
+        # check whether program/data fit into memory
+        for match in re.finditer("([0-9\.]*)%", avrsizeout):
+            if float(match.group(1)) > 100:
+                raise BuildException("Project code and data do not seem to fit into memory! " + avrsizeout)
     def _append_compile_output_files(self, cmd):
         for f in self.files:
             cmd.append(f + ".o")
@@ -321,13 +326,13 @@ class Project:
             _fine("Creating directory '%s'" % wd)
             os.makedirs(wd)
         _fine("Working directory is '%s'" % wd)
-        proc = subprocess.Popen(cmd, cwd=wd)
-        proc.communicate()
+        proc = subprocess.Popen(cmd, cwd=wd, stdout=subprocess.PIPE)
+        stdoutdata, stderrdata = proc.communicate()
         # fail-fast
         if proc.returncode != 0:
             raise BuildException("Build failed. Received bad status code "
                                  "'%d' from command '%s'" % (proc.returncode, cmd))
-        return proc
+        return (proc, stdoutdata, stderrdata)
 
 
 

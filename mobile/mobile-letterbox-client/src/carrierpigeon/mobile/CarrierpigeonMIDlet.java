@@ -1,5 +1,9 @@
 package carrierpigeon.mobile;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import javax.microedition.io.Connector;
+import javax.microedition.io.StreamConnection;
 import javax.microedition.lcdui.Display;
 import javax.microedition.midlet.MIDlet;
 
@@ -73,6 +77,43 @@ public class CarrierpigeonMIDlet extends MIDlet {
 
     public void destroyApp(boolean unconditional) {
         notifyDestroyed();
+    }
+
+    public void sendMessage(String message, String btAddress) throws IOException {
+        StreamConnection conn = null;
+        try {
+            String serviceUrl = "btspp://" + btAddress + ":1";
+            conn = (StreamConnection) Connector.open(serviceUrl, Connector.WRITE);
+            // TODO: find out why the calls to sleep are necessary
+            Thread.sleep(500);
+            OutputStream out = conn.openOutputStream();
+            out.write('\r');
+            out.write('\n');
+            out.write(encode(message));
+            out.write('\r');
+            out.write('\n');
+            out.flush();
+            Thread.sleep(1500);
+        } catch (InterruptedException ex) {
+            throw new IOException("Got interrupted.");
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    /**
+     * Cares about encoding a message into bytes. The letterbox does not
+     * understand umlauts or any special characters, it only supports parts of
+     * the ASCII alphabet. Characters that cannot be displayed on the letterbox
+     * are sent anyway, but never two bytes for one character.
+     *
+     * @param message
+     * @return
+     */
+    byte[] encode(String message) {
+        return message.getBytes();
     }
 
     public DeviceDetector getDeviceDetector() {

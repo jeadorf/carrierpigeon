@@ -89,31 +89,18 @@ public class SendPanel extends List implements CommandListener, DeviceDetector.C
 
     }
 
-    // TODO: deal with umlauts
     private void sendMessage() {
         try {
             String selectedDeviceName = getString(getSelectedIndex());
-            Alert feedbackAlert = new Alert("Sending message", 
+            Alert feedbackAlert = new Alert("Sending message",
                     "Sending message to " + selectedDeviceName + " ...", null, AlertType.INFO);
             feedbackAlert.setTimeout(Alert.FOREVER);
             Display display = Display.getDisplay(midlet);
             display.setCurrent(feedbackAlert);
 
-            String serviceUrl = "btspp://" + btAddresses.get(selectedDeviceName) + ":1";
-
-            StreamConnection conn = (StreamConnection) Connector.open(serviceUrl, Connector.WRITE);
-
-            // TODO: find out why the calls to sleep are necessary
-            Thread.sleep(500);
-            OutputStream out = conn.openOutputStream();
-
             String message = midlet.getMessagePanel().getMessage();
-            byte[] messageBuffer = ("\r\n" + message + "\r\n").getBytes();
-            out.write(messageBuffer);
-            out.flush();
-            conn.close();
-
-            Thread.sleep(1500);
+            String btAddress = (String) btAddresses.get(selectedDeviceName);
+            midlet.sendMessage(message, btAddress);
 
             // TODO: the connection does not seem to be closed by the call to
             //       conn.close() - but as soon as the program quits, the

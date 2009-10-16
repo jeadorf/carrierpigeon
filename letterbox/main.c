@@ -51,6 +51,7 @@ bool dialog = false;
 bool closable = false;
 
 #define READ_BUFFER_SIZE 32 
+
 char read_buffer[READ_BUFFER_SIZE];
 
 const char NO_MESSAGE[] PROGMEM = 
