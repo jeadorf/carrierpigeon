@@ -152,6 +152,9 @@ void lb_display_message(void) {
     } else {
         // Load and display message
         message_open(current_message);
+        // message_read returns the null byte either if it occurs within the
+        // message block or if the maximum number of characters is read. This
+        // while-loop will terminate.
         while ((c = message_read()) != '\0') {
             lcd_display_char(c);
         }
@@ -216,7 +219,9 @@ void lb_capture_message(void) {
     
     // Open new record
     message_new();
-    // Pipe next line directly to EEPROM
+    // Pipe next line directly to EEPROM. Either the message arrives
+    // or there is a timeout. In either case, this while-loop will
+    // terminate.
     while (!bt_readline_message(MESSAGE_TEXT_LENGTH) && !timeout) {
         timeout = timer_poll();
     }
@@ -276,7 +281,9 @@ void lb_check_user_request(void)
         lb_display_message();
         dialog = false;
 
-        // wait until button is released
+        // Wait until button is released
+        // This while-loop only blocks as long as the user holds a button
+        // pressed, thus it will terminate.
         while (get_key() != 0) {
             /* NOP */
         }
