@@ -59,7 +59,7 @@
 // CHAR_TABLE_LENGTH and the mapping function lcd_char_to_index
 // For info about PROGMEM, see: http://www.nongnu.org/avr-libc/user-manual/pgmspace.html
 // Character table should be stored in program memory.
-char characters[CHAR_TABLE_LENGTH][LCD_CHAR_WIDTH] PROGMEM = {
+static char characters[CHAR_TABLE_LENGTH][LCD_CHAR_WIDTH] PROGMEM = {
     // A
     {0x3c, 0x50, 0x50, 0x3c, 0x00},
     // B

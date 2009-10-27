@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <avr/io.h>
@@ -30,31 +31,30 @@
 #define BUTTON_DOWN 4
 #define BUTTON_DELETE 9
 
-void lb_init(void);
-void lb_serve(void);
-void lb_check_user_request(void);
-void lb_check_connection(void);
-bool lb_is_connect(char *msg);
-bool lb_is_disconnect(char *msg);
-void lb_force_disconnect(void);
-void lb_display_message(void);
-void lb_display_dialog(const char *pgm_msg, bool _closable);
-void lb_capture_message(void);
-void lb_set_new_as_current(void);
+static void lb_init(void);
+static void lb_serve(void);
+static void lb_check_user_request(void);
+static void lb_check_connection(void);
+static bool lb_is_connect(char *msg);
+static void lb_force_disconnect(void);
+static void lb_display_message(void);
+static void lb_display_dialog(const char *pgm_msg, bool _closable);
+static void lb_capture_message(void);
+static void lb_set_new_as_current(void);
 
 /** refers to the currently selected message that is to be 
  * displayed on the LCD */
-unsigned int current_message = 0;
+static uint8_t current_message = 0;
 
 // Controls modal state
-bool dialog = false;
-bool closable = false;
+static bool dialog = false;
+static bool closable = false;
 
 #define READ_BUFFER_SIZE 32
 
-char read_buffer[READ_BUFFER_SIZE];
+static char read_buffer[READ_BUFFER_SIZE];
 
-const char NO_MESSAGE[] PROGMEM =
+static const char NO_MESSAGE[] PROGMEM =
     "                     "
     "    Carrierpigeon    "
     " Bluetooth Letterbox "
@@ -64,7 +64,7 @@ const char NO_MESSAGE[] PROGMEM =
     "                     "
     "                     ";
 
-const char CONNECTION[] PROGMEM =
+static const char CONNECTION[] PROGMEM =
     "                     "
     "                     "
     "                     "
@@ -74,7 +74,7 @@ const char CONNECTION[] PROGMEM =
     "                     "
     "                     ";
 
-const char NOTICE[] PROGMEM =
+static const char NOTICE[] PROGMEM =
     "                     "
     "                     "
     "                     "
@@ -82,7 +82,7 @@ const char NOTICE[] PROGMEM =
     "    You got mail!    "
     "                     " "                     " "    press any key    ";
 
-const char CANCEL[] PROGMEM =
+static const char CANCEL[] PROGMEM =
     "                     "
     "                     "
     "                     "
@@ -91,7 +91,7 @@ const char CANCEL[] PROGMEM =
     "                     " "                     " "                     ";
 
 
-const char MESSAGE_FULL[] PROGMEM =
+static const char MESSAGE_FULL[] PROGMEM =
     "                     "
     "                     "
     "  There is no space  "
@@ -179,11 +179,6 @@ bool lb_is_connect(char *msg)
     return msg != NULL && strncmp(msg, "CONNECT  ", 9) == 0;
 }
 
-bool lb_is_disconnect(char *msg)
-{
-    return msg != NULL && strncmp(msg, "DISCONNECT  ", 12) == 0;
-}
-
 void lb_force_disconnect(void)
 {
     uart_puts("+++\r\n");
@@ -245,7 +240,7 @@ void lb_set_new_as_current(void)
 
 void lb_check_user_request(void)
 {
-    int key = get_key();
+    uint8_t key = get_key();
     if (!dialog) {
         switch (key) {
             case BUTTON_DOWN:

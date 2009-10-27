@@ -1,11 +1,13 @@
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdint.h>
 #include "commons.h"
 
-char get_key(void)
+uint8_t get_key(void)
 {
     // result: default 0 (no key pressed)
-    char col, othercol, row, keyvalue = 0;
+    uint8_t col, othercol, row;
+    uint8_t keyvalue = 0;
 
     // set DDRC3-0 to WRITE
     DDRC |= 0x0F;               //0b00001111;

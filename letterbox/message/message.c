@@ -38,15 +38,15 @@
 // in the list. The first zero denotes the end of the list. A value
 // n denotes that the message is actually stored in the n-th memory
 // block (counting begins with 1)
-uint8_t storage_nodes[MAX_MESSAGES] = { 0, 0, 0, 0 };
+static uint8_t storage_nodes[MAX_MESSAGES] = { 0, 0, 0, 0 };
 
 // Memory state: Points to the next free slot in storage_nodes 
-uint8_t storage_count = 0;
+static uint8_t storage_count = 0;
 
 // Streaming state: Points to the current read/write position
-uint16_t pos;
-uint16_t offset;
-bool open = false;
+static uint16_t pos;
+static uint16_t offset;
+static bool open = false;
 
 void message_validate(void);
 

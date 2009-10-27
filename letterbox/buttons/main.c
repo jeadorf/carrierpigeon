@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdint.h>
 #include "main.h"
 #include "buttons.h"
 #include "led.h"
@@ -6,7 +7,7 @@
 // rename to main to get this version
 int main_hold(void)
 {
-    char key;
+    uint8_t key;
 
     while (true) {
         key = get_key();
