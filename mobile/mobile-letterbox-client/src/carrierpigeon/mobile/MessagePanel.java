@@ -19,18 +19,7 @@ public class MessagePanel extends Form implements CommandListener {
     public MessagePanel(CarrierpigeonMIDlet midlet) {
         super("Carrierpigeon client");
         this.midlet = midlet;
-        this.messageTextField = new TextField("Message text",
-                "0123456789" +
-                "0123456789" +
-                "0123456789" +
-                "0123456789" +
-                "0123456789" +
-                "0123456789" +
-                "0123456789" +
-                "0123456789" +
-                "0123456789" +
-                "0123456789" +
-                "0123456789", 112, TextField.ANY);
+        this.messageTextField = new TextField("Message text", "", 112, TextField.ANY);
         messageTextField.setInitialInputMode("UCB_BASIC_LATIN");
         append(messageTextField);
 

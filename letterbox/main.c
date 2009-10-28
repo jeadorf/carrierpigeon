@@ -240,7 +240,7 @@ void lb_set_new_as_current(void)
 
 void lb_check_user_request(void)
 {
-    uint8_t key = get_key();
+    char key = get_key();
     if (!dialog) {
         switch (key) {
             case BUTTON_DOWN:
