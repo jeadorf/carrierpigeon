@@ -220,7 +220,7 @@ void lb_capture_message(void)
     message_close();
 
     if (timeout) {
-        // Delete the message which may have partly
+        // Delete the message which might have been partly
         // written to the EEPROM
         message_delete(message_count() - 1);
         lb_display_dialog(CANCEL, true);

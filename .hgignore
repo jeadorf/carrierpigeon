@@ -9,6 +9,13 @@ main
 *~
 .build/
 *.py[cod]
+doc/*.pdf
+doc/*.aux
+doc/*.out
+doc/*.snm
+doc/*.nav
+doc/*.log
+doc/*.toc
 mobile/mobile-letterbox-client/nbproject/private
 mobile/mobile-letterbox-client/dist
 mobile/mobile-letterbox-client/build
