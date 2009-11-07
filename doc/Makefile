@@ -7,11 +7,5 @@ article.pdf: article.tex
 	pdflatex article.tex
 
 clean:
-	rm *.aux
-	rm *.pdf
-	rm *.log
-	rm *.toc
-	rm *.nav
-	rm *.out
-	rm *.sm,
+	rm -f *.aux *.pdf *.log *.toc *.nav *.out *.snm
 
