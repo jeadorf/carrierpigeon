@@ -130,17 +130,60 @@
 
 }
 
+\frame{
 
+    \frametitle{Ausbaumöglichkeiten}
+
+\begin{figure}
+    \includegraphics[scale=0.2]{media/idea}
+\end{figure}
+
+   \begin{itemize}
+        \item Protokollerweiterung 
+        \item Mehr Speicher einbauen 
+        \item Korrekte Zeilenumbrüche
+        \item Automatische Tests mit GNU Debugger und AVR-Simulator 
+    \end{itemize}
+
+}
 
 \frame{
 
     \frametitle{Fazit}
+
+    \begin{figure}
+        \includegraphics[scale=0.6]{media/font}
+    \end{figure}
+
+   \begin{itemize}
+        \item Anforderungen erfüllt!
+        \item Einsatz verschiedener Techniken ...
+        \item ... was am Ende auch funktioniert hat!
+    \end{itemize}
+
+}
+
+\frame{
+
+    \frametitle{Ausprobieren}
+
+    \includegraphics[angle=90, scale=0.24]{media/story/6.JPG}
+
+    Wer es ausprobieren mag:
+
+   \begin{itemize}
+        \item http://bitbucket.org/jeadorf/carrierpigeon/downloads
+        \item Mobile-Client (JAR und evtl. JAD) herunterladen und auf das Handy spielen
+    \end{itemize}
 
 }
 
 \frame{
 
     % empty
+    \begin{center}
+    ( . )
+    \end{center}
 }
 
 
@@ -151,12 +194,25 @@
 
     \frametitle{Toolchain}
 
-}
 
-\frame{
+    \begin{tabular}{|r||l|}
+        \hline
+        Hardware & ATmega 8515, BTM-222, ST7565 LCD, AVRISP2 \\
+        \hline
+        Languages & C, Java, Python\\
+        \hline
+        Framework & Java Micro Edition, Peter Fleury's UART library\\
+        \hline
+        Compilation & {\tt avr-gcc, avr-objcopy, avr-strip, avrdude,} \\
+                    & {\tt avr-nm, avr-size, splint, python, ant} \\
+        \hline
+        Helpers & {\tt
+       hcitool, rfcomm, gtkterm, jpnevulator
+    } \\
+        \hline
+    \end{tabular}
 
-    \frametitle{Literatur}
-
+    
 }
 
 \end{document}
