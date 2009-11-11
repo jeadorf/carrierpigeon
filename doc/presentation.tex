@@ -1,7 +1,7 @@
 % Variante ohne Aufdeck-Effekte \documentclass[handout]{beamer}
 % http://groups.google.de/group/comp.text.tex/browse_thread/thread/6ac8485c7a17252a
-%\documentclass{beamer}
-\documentclass[draft]{beamer}
+\documentclass{beamer}
+%\documentclass[draft]{beamer}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[ngerman]{babel}
@@ -82,39 +82,51 @@
 
 \frame{
 
-    \frametitle{Sicherheit und Stabilität}
-
-    \includegraphics[scale=0.4]{media/bluescr}
-
-}
-
-\frame{
-
-    \frametitle{Herausforderung: Stabilität}
-
-}
-
-\frame{
-    \frametitle{Herausforderung: Stabilität}
+    \frametitle{Ziele - Sicherheit und Stabilität}
 
     \begin{itemize}
-        \item Server behält Kontrolle 
-        \item Timeouts
-        \item Vermeidung globaler Variablen
-        \item While-Schleifen sorgfältig überprüfen
+        \item Bluetooth-Clients dürfen keinen Schaden anrichten 
+        \item Programm darf nicht abstürzen 
+        \item Neustart soll immer möglich sein
+    \end{itemize}
+
+
+    % \includegraphics[scale=0.4]{media/bluescr}
+
+}
+
+\frame{
+    \frametitle{Mittel - Stabilität}
+
+    \begin{itemize}
+        \item der Server hat immer Recht 
+        \item Timeouts sorgfältig programmiert
+        \item Globale Variablen vermieden
+        \item While-Schleifen vermieden
+        \item While-Schleifen überprüft
     \end{itemize}
 
 }
 
 \frame{
 
-    \frametitle{Herausforderung: sicheres Einschalten}
+    \frametitle{Herausforderung: Speicherverwaltung}
+
+    \includegraphics[scale=0.4]{media/eeprom}
 
 }
 
 \frame{
     
     \frametitle{Herausforderung: sicheres Einschalten}
+
+   \begin{itemize}
+        \item Nachrichtenzähler überprüfen
+        \item Blockzeiger überprüfen
+        \item Blockzeiger auf Duplikate überprüfen
+    \end{itemize}
+
+    Damit der Techniker nicht zum Hausbesuch kommen muss.
 
 }
 
