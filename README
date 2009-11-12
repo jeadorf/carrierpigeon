@@ -1,0 +1,30 @@
+README
+---------------------------------------------------------------------
+
+This project consists of two parts, the letterbox module and the
+mobile client.
+
+
+    LETTERBOX
+
+Build requirements:
+    python, gcc-avr, binutils-avr, avr-libc, avrdude
+
+Build using:
+    ./make.py
+
+
+    MOBILE CLIENT
+
+Build requirements:
+   Java JDK, Java Wireless Toolkit, ant, ant-optional
+
+Build using:
+    cd mobile/mobile-letterbox-client
+    ant
+ 
+Note: You might have to specify the property 'platform.home' in 
+mobile/mobile-letterbox-client/nbproject/private/private.properties
+If this file does not exist, create it. The property 'platform.home'
+should point to the installation directory of the Wireless Toolkit.
+    
