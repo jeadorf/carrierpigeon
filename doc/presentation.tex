@@ -1,7 +1,7 @@
 % Variante ohne Aufdeck-Effekte \documentclass[handout]{beamer}
 % http://groups.google.de/group/comp.text.tex/browse_thread/thread/6ac8485c7a17252a
-\documentclass{beamer}
-%\documentclass[draft]{beamer}
+%\documentclass{beamer}
+\documentclass[draft]{beamer}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[ngerman]{babel}
@@ -140,6 +140,67 @@
 }
 
 \frame{
+    \frametitle{Herausforderung: Speichermangel}
+
+    \begin{block}{Die Hardware}
+
+      \begin{tabular}{|l|l|}
+        \hline
+        Flash & 8 KB \\
+        EEPROM & 512 Byte \\
+        SRAM & 512 Byte \\
+        \hline
+      \end{tabular}
+
+      \begin{itemize}
+        \item ATmega8515, 8-Bit AVR-MCU
+	\item 512 Byte RAM = 512 Zeichen
+	\item Harvard-Architektur
+      \end{itemize}
+    \end{block}
+}
+
+\frame{
+   \frametitle{Herausforderung: Komisches Verhalten}
+
+   \begin{block}{Bugs}
+     \begin{itemize}
+       \item Stack und Heap kollidieren
+       \item Unerklärliches Verhalten
+       \item Heisenbugs
+     \end{itemize}
+   \end{block}
+
+   \begin{block}{Diagnose}
+     avr-size
+   \end{block}
+}
+
+\frame{
+    \frametitle{Herausforderung: Speicher sparen}
+
+    \begin{block}{Dynamische Speicherverwaltung}
+      \begin{itemize}
+        \item Nur Strings allokieren die wir brauchen
+	\item Funktioniert nicht, Heisenbugparade
+      \end{itemize}
+    \end{block}
+
+    \begin{block}{Buffer sharing}
+      \begin{itemize}
+        \item Vorher: jeder Programmteil eigene Buffer
+	\item Nachher: alles über globalen Buffer
+      \end{itemize}
+    \end{block}
+
+    \begin{block}{Harvard ausnutzen}
+      \begin{itemize}
+        \item pgmspace
+      \end{itemize}
+    \end{block}
+}
+
+\frame{
     \frametitle{Herausforderung: LCD-Display und Textausgabe}
     
     \begin{itemize}
@@ -157,7 +218,7 @@
         %\end{figure}
      %\end{flushright}
      
-     => Handbücher ganz genau lesen
+     $\Rightarrow$ Handbücher ganz genau lesen
 }
 
 \frame{
