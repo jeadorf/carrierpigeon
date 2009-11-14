@@ -16,6 +16,8 @@ doc/*.snm
 doc/*.nav
 doc/*.log
 doc/*.toc
+doc/*.h
+doc/*.c
 mobile/mobile-letterbox-client/nbproject/private
 mobile/mobile-letterbox-client/dist
 mobile/mobile-letterbox-client/build
