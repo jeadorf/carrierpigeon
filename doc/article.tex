@@ -191,7 +191,7 @@ mit unterschiedlichen Verantwortlichkeiten aufgeteilt ist.
 \subsection{Robustheit}
 
 Zu dem C-Programm müssen wir ehrlicherweise anmerken, dass wir uns nicht besonders
-um programmweite Konsistenz bei den verwendeten Datentypen gekümmert haben. Im Folgenden
+um programmweite Konsistenz bei den verwendeten Datentypen ge\-kümmert haben. Im Folgenden
 kommen nun die Modulbeschreibungen. Sie enthalten je eine Übersicht der deklarierten
 Prozeduren um einen Zusammenhang zur tatsächlichen Implementierung herzustellen.
 
@@ -256,8 +256,7 @@ Die Nachrichtenverwaltung ist kümmert sich um das Auslesen, Speichern und Lösc
 der empfangenen Nachrichten. Die Nachrichteninhalte sind im EEPROM gespeichert.
 Da die Nachrichten zwar in geordneter Reihenfolge beim Briefkasten eingehen, diese aber
 vom Empfänger in beliebiger Reihenfolge gelöscht werden können, liegt über dem
-EEPROM-Speicher noch eine In\-di\-rek\-tions\-schicht, wie sie auch bei vielen anderen
-Dateiverwaltungssystemen zu finden ist. Der EEPROM-Speicher wird von der
+EEPROM-Speicher noch eine In\-di\-rek\-tions\-schicht. Der EEPROM-Speicher wird von der
 Nachrichtenverwaltung ist in verschiedene Blöcke aufgeteilt, und zwar in
 sogenannte \textit{Nachrichtenblöcke} und einen sogenannten
 \textit{Superblock}.
@@ -295,7 +294,11 @@ Der Text und der Status der Nachrichten sind in
 Nachrichtenblöcken zu je 120 Byte gespeichert. Der Grund, dass die
 Größe keiner Zweierpotenz entspricht, liegt an der geringen Größe
 des EEPROM-Speichers. In den 512 Bytes dieses Speichers muss auch
-noch der Superblock Platz finden.
+noch der Superblock Platz finden. Das Limit der Nachrichtenlänge
+auf 112 Bytes ersparte uns auch die Implementierung einer Scrollfunktion, damit 
+die Nachricht auch dann gelesen werden kann, wenn sie nicht ganz
+auf die Anzeige passt. Das hätte natürlich ein schönes Feature
+dargestellt.
 
 Der Superblock besteht aus \textit{Blockzeigern} und einem \textit{Nachrichtenzähler},
 der angibt, wie viele Nachrichten momentan auf dem Briefkasten
@@ -314,8 +317,8 @@ erhöht. Die neue Nachricht erhält die größte Nummer.
 
 Löscht der Empfänger eine Nachricht, so wird der zugehörige
 Blockzeiger entfernt. Die Nummern aller neueren Nachrichten werden
-dekrementiert, die Blockzeiger rücken auf. Zuletzt wird der
-Nachrichtenzähler erniedrigt.
+dekrementiert, die Blockzeiger rücken auf (eine verkettete Liste würde
+diese Prozedur ersparen). Zuletzt wird der Nachrichtenzähler erniedrigt.
 
 Dieses Prinzip führt dazu, dass sich die zeitliche Ordnung der
 Nachrichten stets in den ihnen zugewiesenen Nummern wiederspiegelt,
@@ -349,6 +352,10 @@ den gleichen Nachrichtenblock zeigen. Auf all diese Fälle wird beim Einlesen
 des Superblocks geprüft und im Fehlerfall wird der Superblock in einen
 validen Nullzustand überführt.
 
+Für die Nachrichtenverwaltung existieren gründliche automatische Tests.
+Damit diese Tests auf jedem Rechner laufen - und nicht nur auf dem AVR -
+kommt ein gemocktes EEPROM-Modul zum Einsatz.
+
 Das Message-Modul exportiert die folgenden Funktionen:
 
 \lstinputlisting{message.h}
@@ -376,7 +383,7 @@ Vollständigkeit.
 Ein Buchstabe wird durch eine 8x5-Bit-Matrix repräsentiert. Die
 Spaltenvektoren werden in je einem Byte gespeichert. Das oberste Bit
 entspricht dem höchstwertigen Bit. Eine 1 entspricht einem schwarzen
-Bildpunkt, die 0 einem weißen Bildpunkt. Mit der XOR-Maske {\tt 0xff}lässt
+Bildpunkt, die 0 einem weißen Bildpunkt. Mit der XOR-Maske {\tt 0xff} lässt
 sich so ein Schwarz-auf-Weiß-Buchstabe auf einfache Art und Weise
 invertieren. Diese Technik wird beim Zeichnen von Dialogen und Bedienelementen 
 verwendet. Die Speicherung der Spaltenvektoren bietet sich auf an,
@@ -569,6 +576,42 @@ programmiert worden ist. Die Verteilung des Wissens über die Entwickler war des
 nahezu optimal.
 
 \subsection{Werkzeuge}
+
+\section{Ausbaumöglichkeiten}
+
+Wie immer gibt es eine Menge Möglichkeiten, die derzeitige Implementation zu erweitern 
+und verbessern. Wir listen hier einige Verbesserungsmöglichkeiten auf:
+
+\begin{description}
+    \item[Scrollen durch den Nachrichtentext] Wenn genügend persistenter Speicher vorhanden wäre, könnte man 
+        längere Nachrichten zulassen. Eine Scrollfunktion würde notwendig, ein nettes
+        Feature.
+    \item[Erweiterung des persistenten Speichers] 512 Byte reichen gerade so für vier Nachrichten. Für Test-
+        und Demonstrationszwecke ist dies natürlich völlig ausreichend, eine Erweiterung wäre aber vielleicht
+        technisch interessant.
+    \item[Nachrichtenverwaltung mit verketteter Liste] Abschaffen des Superblocks und Einführung einer verketteten
+        Liste, sowohl in der programminternen Darstellung im Arbeitsspeicher als auch in den Nachrichtenblöcken
+        des EEPROMs. Das würde wohl zu einem natürlicheren und leichter ver\-ständ\-lichen Modell der 
+        Nachrichtenverwaltung führen.
+    \item[Empfangsbestätigung senden] Dem Mobiltelefon erhält eine Rückmeldung vom Briefkasten nach dem
+        dieser die Nachricht erhalten hat. Damit lässt sich auch das Problem lösen, was zu tun ist, 
+        wenn der Briefkasten voll ist.
+    \item[Automatische Tests] Es ist uns gelungen, SimulAVR als AVR-Simulator mit dem GNU Debugger
+        zu verbinden und dort auch das AVR-Programm auszuführen. Allerdings hatten wir Probleme mit
+        der Simulation des EEPROMs und haben diesen Faden nicht weiter verfolgt. Auch die Möglichkeiten
+        zum Testen der Anwendung des Mobiltelefon haben wir nicht ausgeschöpft.
+    \item[Vervollständigung des Zeichensatzes] Bisher sind mehr als 45 Zeichen darstellbar. Nachdem im
+        Programmspeicher noch einiger Platz verfügbar ist, könnte man den Zeichensatz auf Umlaute
+        und andere Sonderzeichen erweitern.
+    \item[Korrektes Encoding auf dem Mobiltelefon] Momentan gibt es bei dem Programm auf dem Mobiltelefon
+        die typischen Probleme mit Umlauten. Das Eingabetextfeld ist auf 112 Zeichen beschränkt. Das
+        Mobiltelefon sendet aber zwei Bytes für einen Umlaut.
+    \item[Einsatz der Leuchtdioden] Kosmetisches Feature. Implementierung mit derzeitigem zyklischen Servermodell
+        ist allerdings nicht ganz trivial. Eine Lösung wäre die Verwendung der Technik des Timers, um z.B.
+        Blinken der LEDs während des Empfangens einer Nachricht zu ermöglichen.
+    \item[Filterung der Geräte] Auf dem Mobiltelefon werden derzeit alle Bluetooth-Geräte aufgelistet. Schön
+        wäre es hier, wenn nur die Geräte angezeigt werden, die auch eine solche Nachricht erwarten.
+\end{description}
 
 \section{Fazit}
 
