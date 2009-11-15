@@ -80,7 +80,9 @@ static const char NOTICE[] PROGMEM =
     "                     "
     "    Hey, look.       "
     "    You got mail!    "
-    "                     " "                     " "    press any key    ";
+    "                     "
+    "                     "
+    "    press any key    ";
 
 static const char CANCEL[] PROGMEM =
     "                     "
@@ -88,7 +90,9 @@ static const char CANCEL[] PROGMEM =
     "                     "
     "        FAIL!        "
     "                     "
-    "                     " "                     " "                     ";
+    "                     "
+    "                     "
+    "                     ";
 
 
 static const char MESSAGE_FULL[] PROGMEM =
@@ -97,7 +101,9 @@ static const char MESSAGE_FULL[] PROGMEM =
     "  There is no space  "
     "  left for any new   "
     "  messages!          "
-    "                     " "                     " "    press any key    ";
+    "                     "
+    "                     "
+    "    press any key    ";
 
 /** Initializes all components required by the letterbox. */
 void lb_init(void)

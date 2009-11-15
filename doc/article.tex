@@ -65,6 +65,12 @@ mit seinem Handy auf Betas elektronischen Briefkasten hinterlassen. Kommt Beta n
 so kann Beta sich die empfangenen Nachrichten durchlesen.
 \end{quote}
 
+In dieser Projektbeschreibung geht es uns nicht darum, ein Referenzhandbuch zu erstellen.
+Vielmehr möchten wir hier die Ideen hinter der Implementierung vorzustellen und die Konzepte
+beleuchten, die aus dem Quelltext nicht immer so leicht erkennbar sind.
+
+\lstinputlisting{current-hg-tip}
+
 \section{Begriffe}
 
 In dem gerade beleuchteten Szenario treten verschiedene Rollen und technische Komponenten auf.
@@ -177,10 +183,18 @@ mit unterschiedlichen Verantwortlichkeiten aufgeteilt ist.
     \hline
 \end{tabular}
 
+
+\subsection{Technische Anforderungen}
+
+\subsection{Arbeitsspeicher}
+
+\subsection{Robustheit}
+
 Zu dem C-Programm müssen wir ehrlicherweise anmerken, dass wir uns nicht besonders
 um programmweite Konsistenz bei den verwendeten Datentypen gekümmert haben. Im Folgenden
 kommen nun die Modulbeschreibungen. Sie enthalten je eine Übersicht der deklarierten
 Prozeduren um einen Zusammenhang zur tatsächlichen Implementierung herzustellen.
+
 
 \subsection{E/A-Controller}
 
@@ -387,17 +401,71 @@ Das Zeichenausgabe-Modul stellt die folgenden Prozeduren bereit:
 
 \subsubsection{Timer}
 
+Eine robuste Kommunikation ist ohne Timeouts nicht vorstellbar.
+Das Timer-Modul bietet die Möglichkeit, Timeouts zu verwenden.
+Die Timeouts basieren auf Polling. Beim Aufruf
+an {\tt timer\_start} übergibt man die gewünschte Zeitspanne in
+Sekunden, nach der {\tt timer\_poll} den Wert {\tt true}
+zurückgeben soll, um einen Timeout anzuzeigen. 
+
 Das Timer-Modul stellt die folgenden Prozeduren bereit:
 \lstinputlisting{timer.h}
 
 
 \subsubsection{Assertions}
 
-Das Assertion-Modul stellt die folgenden Prozeduren bereit:
+Das Assertion-Modul ist eine nützliche Methode zum Debuggen.
+Der problematische Teil ist die Ausgabe einer Nachricht, falls
+eine Assertion nicht zutrifft. Derzeit sind die Assertions
+von der LC-Anzeige und deren Steuerung abhängig. Das Assertion-Modul
+stellt die folgenden Prozeduren bereit:
+
 \lstinputlisting{assert.h}
 
 
 \subsection{Server}
+
+Der Server ist das Hauptmodul, das alle anderen Module benutzt. Er
+erledigt drei Aufgaben, das Empfangen von Nachrichten, die Verarbeitung
+der Benutzeranfragen und die Steuerung der Bedienungsoberfläche. Der Server arbeitet in einer
+hier natürlich erwünschten Endlosschleife. Aus Sicht des Servers gibt es
+keinerlei Interrupts. Tatsächlich verwenden die UART-Funktionen Interrupts, 
+wovon der Server allerdings nichts mitbekommt und sich deshalb auf das
+re\-gel\-mä\-ßige, zyklische Abfragen von Zuständen beschränkt.
+
+Zum Empfangen einer Nachricht wartet der Server auf eine über die
+serielle Schnittstelle eingehende 'CONNECT XYZ'-Nachricht. Das Lesen
+der eingehenden Daten erfolgt über das Bluetooth-Modul. Nach Aufbau
+der Verbindung wartet der Server ein bestimmtes Zeitfenster auf die 
+Nachricht. Die eingehende Nachricht wird direkt über die Nachrichtenverwaltung
+ind das EEPROM ge\-schrie\-ben. In beiden Fällen, ob nun eine Nachricht kommt
+oder nicht - wird die Bluetooth-Verbindung nach diesem Zeitfenster bzw. nach
+dem Lesen einer Zeile (mit Limit!) durch den Server mit einem AT-Kommando
+an den BTM-222 beendet. Dieses Vorgehen sorgt für eine stabilen Server, der auch
+durch Fehlverhalten oder Absicht des Clients nicht angreifbar ist. Eine
+Denial-of-Service-Attacke ist natürlich immer noch möglich.
+
+Das Senden einer Empfangsbestätigung ist bisher nicht implementiert. Der
+Client muss sich also mit dem Prinzip `fire and forget' begnügen.
+
+Zwischen den Abfragen, ob eine neue Verbindung angenommen wurde, bearbeitet
+der Server Anfragen des Benutzers. Ist eine Taste gedrückt, so wird die
+entsprechende Aktion ausgelöst und gewartet, bis die Taste wieder losgelassen
+wurde.
+
+Der Server steuert auch die Bedienungsoberfläche. Dabei unterstützt er das
+Anzeigen von modalen Dialogen, die in bestimmten Fällen auch vom Benutzer
+geschlossen werden können. Diese Dialoge bestehen aus Text, der die gesamte
+Anzeige füllt. Da diese Texte viel Speicher im SRAM benötigen, sind sie in
+den Programmspeicher ausgelagert. Um deren benötigten Speicherplatz 
+ein\-zu\-schrän\-ken könnte man sie noch komprimieren, in dem man Leerzeilen mit
+entsprechendem Linefeed kodiert anstelle der expliziten Form mit
+Leerzeichen. Davon haben wir allerdings mangels Notwendigkeit abgesehen.
+
+Um die Knöpfe auf der Anzeige und die Dialoge in weißer Schrift auf
+schwarzem Hintergrund zu zeichnen, verwendet der Server die Möglichkeit
+des LCD-Moduls die Ausgabe zu maskieren. Die LC-Anzeige wird also nicht
+invertiert, sondern nur die Daten, die an die LC-Anzeige gehen.
 
 Das Server-Modul ist in die folgenden, privaten Prozeduren unterteilt:
 \lstinputlisting{main.c}
@@ -405,20 +473,118 @@ Das Server-Modul ist in die folgenden, privaten Prozeduren unterteilt:
 
 \section{Mobiltelefon}
 
+Die Client-Anwendung auf dem Mobiltelefon ist in Java geschrieben. Sie baut
+auf drei Spezifikationen auf. Zum einen auf dem CDLC (Connected Limited Device Profile), 
+das die grundlegenden Klassen der Standardbibliothek und die unterstützte
+Sprachfunktionalität auf den mobilen Geräten festlegt. Des weiteren benötigt
+die Anwendung noch eine Möglichkeit, eine graphische Benutzeroberfläche 
+darzustellen. Dies liefert das MIDP (Mobile Information Device Profile). Zu
+allerletzt ist der Zugriff auf den Bluetooth-Stack im Mobiltelefon notwendig.
+Dafür sorgt die JSR-82-Spezifikation. Insgesamt ist das eine typische Umgebung
+für die Entwicklung einer Java-Anwendung. Man programmiert gegen eine Menge
+von Schnittstellen an und kümmert sich nicht um die spätere Implementierung.
+
+Die Client-Anwendung auf dem Mobiltelefon hat grundsätzlich zwei Aufgaben, zum
+einen die Kommunikation mit dem Benutzer, zum anderen die Suche nach 
+Bluetooth-Geräten. Damit der Benutzer nicht lange auf das Ende der Gerätesuche
+warten muss, wird die Suche direkt bei Programmstart in einem eigenen Thread
+gestartet. Dies war eine kleine Herausforderung, da wir uns bei der
+Entwicklung der Anwendung nun mit drei verschiedenen Threads beschäftigen mussten.
+
+Die Benutzerführung soll so einfach wie möglich gestrickt sein. Bevor der Em\-pfänger
+ausgewählt werden kann, muss natürlich auf den Abschluss der Ge\-rä\-te\-suche gewartet
+werden, falls dies bis dahin noch nicht erfolgt ist.
+
+\begin{figure}[h!] \begin{center}
+    \includegraphics[width=0.4\textwidth]{media/mobile-client-flow}
+\end{center} \end{figure}
+
+Die Anwendung ist in folgende Klassen untergliedert:
+
+\begin{tabular}{|l|l|}
+    \hline
+    {\bf Klasse} & {\bf Superklasse} \\
+    \hline
+    {\tt CarrierpigeonMIDlet} & {\tt javax.microedition.midlet.MIDlet} \\
+    \hline
+    {\tt MessagePanel} & {\tt javax.microedition.lcdui.Form} \\
+    \hline
+    {\tt WaitPanel} & {\tt javax.microedition.lcdui.Form} \\
+    \hline
+    {\tt SendPanel} & {\tt javax.microedition.lcdui.List} \\
+    \hline
+    {\tt ErrorPanel} & {\tt javax.microedition.lcdui.Form} \\
+    \hline
+    {\tt DeviceDetector} & {\tt java.lang.Object}\\
+    \hline
+    {\tt DefaultDeviceDetector} & {\tt DeviceDetector} \\
+    \hline
+    {\tt MockDeviceDetector} & {\tt DeviceDetector} \\
+    \hline
+\end{tabular}
+
+Im Nachrichteneditor ({\tt MessagePanel}) kann der Benutzer eine Nachricht eintippen.
+In der Regel bietet das Mobiltelefon dabei automatisch eine Schreibhilfe mit T9. Drückt
+man als Benutzer auf Senden, so erscheint unter Umständen ein Wartedialog ({\tt WaitPanel}) 
+bis die  Gerätesuche beendet ist. Eine Filterung der gefundenen Geräte erfolgt nicht, dem Benutzer
+wird also eine Liste von sichtbaren Geräten in seinem Umfeld präsentiert ({\tt SendPanel}),
+in der ein Empfänger ausgewählt werden kann. Nach dem Senden der Nachricht wird eine
+Sen\-de\-be\-stä\-ti\-gung angezeigt (keine Empfangsbestätigung).
+
+Die Gerätesuche erfolgt mittels einem Observer-Pattern und der Klasse \\{\tt javax.bluetooth.DiscoveryAgent}.
+Dabei haben wir sorgfältig auf korrektes Multi-Threading geachtet, und die beteiligten Klassen entsprechend 
+synchronisiert, insbesondere um Race-Conditions zu vermeiden. Eine solche Race-Condi\-tion könnte z.B. in
+{\tt DefaultDeviceDetector.waitForCompletion} auftreten, die dazu führt, dass das Mobiltelefon ewig den
+Wartedialog anzeigt, obwohl die Suche tatsächlich schon abgeschlossen ist. Die in der obigen Illustration
+sichtbare Barriere wird mit der Kombination aus {\tt wait} und {\tt notifyAll} erreicht. Die sonst übliche
+Technik mit {\tt Thread.join} hat sich hier nicht angeboten.
+
+Wie auch in Java Swing verwendet auch die Oberfläche auf dem Mobiltelefon zwei verschiedene
+Threads. Bei Swing ist das der \textit{Event-Dispatching-Thread} und der \textit{Realizing Thread}.
+Bei MIDP funktioniert das analog. Die MIDP-Spezifikation zeigt, dass man mit {\tt Display.callSerially}
+Aufgaben in die Warteschlange des Event-Dispatching-Threads einreihen kann. Diese Möglichkeit
+haben wir intensiv genutzt, um eine korrekte Bedienungsoberfläche mit schnellen Antwortzeiten
+zu implementieren.
+
+Die Anwendung besitzt leider keine automatischen Tests. Dafür allerdings
+unterstützt sie das manuelle Testen in einer simulierten Umgebung. Mit
+dem {\tt MockDeviceDetector} kann das Programm im Simulator ohne
+einer echten Ge\-rä\-te\-suche und echten Bluetooth-Verbindungen laufen.
+
 \section{Projektumgebung}
 
-\section{Lessons learned}
+\subsection{Zusammenarbeit}
+
+Das Projekt ist bei bitbucket.org registriert, wo wir unser Open-Source-Projekt
+entgeltfrei in einem Mercurial-Repository liegen haben. Vielen Dank an dieser Stelle!
+Mercurial hat sich als sehr gute Wahl herausgestellt. Als verteiltes Versionierungssystem
+glänzte es besonders, wenn wir uns mal wieder in Räumen oder Zügen ohne Internetanschluss
+bewegten oder gelegentlich ohne größere Absprachen treffen zu müssen, an den gleichen Dateien
+arbeiteten.
+
+Bei der Entwicklung saßen wir in der Regel mindestens zu zweit an jeder Aufgabe, 
+was zu der erfreulichen Tatsache geführt hat, dass es kaum zu solchen Situationen
+gekommen ist, in denen \textit{keiner} von zwei Leuten wusste, warum ein bestimmte Funktion wie
+programmiert worden ist. Die Verteilung des Wissens über die Entwickler war deshalb 
+nahezu optimal.
+
+\subsection{Werkzeuge}
 
 \section{Fazit}
 
-\newpage
-
+%\begin{tabular}{|l|l|l|}Zeilen Worte  Bytes
+%614    1782   19744
+%2595    8945   71127
+%\newpage
+%
 \appendix
 
 \newpage
 
 % include sources that are not cited explicitly
 % \nocite{}
+
+% http://java.sun.com/products/jfc/tsc/articles/threads/threads1.html
 
 \bibliographystyle{plain}
 \bibliography{article} 

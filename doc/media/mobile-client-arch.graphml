@@ -10,7 +10,6 @@
   <key for="edge" id="d6" yfiles.type="edgegraphics"/>
   <graph edgedefault="directed" id="G">
     <node id="n0" yfiles.foldertype="group">
-      <data key="d2"/>
       <data key="d3">
         <y:ProxyAutoBoundsNode>
           <y:Realizers active="0">
@@ -39,7 +38,6 @@
       </data>
       <graph edgedefault="directed" id="n0:">
         <node id="n0::n0">
-          <data key="d2"/>
           <data key="d3">
             <y:ShapeNode>
               <y:Geometry height="100.0" width="458.0" x="23.0" y="542.0"/>
@@ -51,33 +49,30 @@
           </data>
         </node>
         <node id="n0::n1">
-          <data key="d2"/>
           <data key="d3">
             <y:ShapeNode>
               <y:Geometry height="40.0" width="458.0" x="23.0" y="708.0"/>
               <y:Fill hasColor="false" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
-              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="34.0" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="253.0" x="102.5" y="3.0">CLDC 1.1
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="34.0" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="253.0" x="102.5" y="3.0">CLDC 1.1 (JSR 139)
 Connected Limited Device Configuration</y:NodeLabel>
               <y:Shape type="roundrectangle"/>
             </y:ShapeNode>
           </data>
         </node>
         <node id="n0::n2">
-          <data key="d2"/>
           <data key="d3">
             <y:ShapeNode>
               <y:Geometry height="40.0" width="220.0" x="23.0" y="655.0"/>
               <y:Fill hasColor="false" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
-              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="34.0" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="207.0" x="6.5" y="3.0">MIDP 2.1
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="34.0" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="207.0" x="6.5" y="3.0">MIDP 2.1 (JSR 118)
 Mobile Information Device Profile</y:NodeLabel>
               <y:Shape type="roundrectangle"/>
             </y:ShapeNode>
           </data>
         </node>
         <node id="n0::n3">
-          <data key="d2"/>
           <data key="d3">
             <y:ShapeNode>
               <y:Geometry height="40.0" width="223.0" x="258.0" y="655.0"/>
