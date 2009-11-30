@@ -102,9 +102,9 @@ man als Empfänger gespeicherte Nachrichten löschen können.
 
 \subsection{Hardware-Architektur des Briefkastens}
 
-Der Briefkasten besteht aus einem ATmega8515-Mikrocontroller, der über Ports
-die auf Register abgebildet werden eine ST565-Flüssigkristallanzeige bedienen
-kann. Der Mikrocontroller ist mit einen UART-Baustein -- also über eine serielle
+Der Briefkasten besteht aus einem ATmega8515-Mikrocontroller, der über Ports,
+die auf Register abgebildet werden, eine ST565-Flüssigkristallanzeige bedienen
+kann. Der Mikrocontroller kann mit einen UART-Baustein -- also über eine serielle
 Schnittstelle -- mit dem BTM-222-Bluetooth-Modul kommunizieren. Im Folgenden
 gibt ein Schaubild eine grobe Übersicht der wichtigsten Hardware-Elemente. Für
 eine genaue Spezifikation sei hier auf die Refernenzhandbücher des ATmega8515,
@@ -122,7 +122,7 @@ vergleichsweise großzügig bemessenen Programmspeicher (Flash), die
 Programmdaten, der Stack und der Heap teilen sich den mit 512 Byte knapp
 bemessenen Datenspeicher (SRAM). Für die persistente Speicherung von Daten über
 Zeiten ohne Stromzufuhr hinweg existiert ein dritter persistenter Speicher
-(EEPROM).  Ohne Erweiterung kann man auch im EEPROM nur 512 Byte speichern.
+(EEPROM). Auch im EEPROM kann an nur 512 Byte speichern.
 
 
 \subsection{Software-Architektur des Briefkastens}
@@ -202,29 +202,29 @@ mit unterschiedlichen Verantwortlichkeiten aufgeteilt ist.
 
 \subsection{Technische Anforderungen}
 
-Die Platform ist prinzipiell betriebssystemneutral, die Serversoftware kann mit
+Die Plattform ist prinzipiell betriebssystemunabhängig, die Serversoftware kann mit
 AVR-GCC (wir haben die Versionen 4.3 und 4.4 verwendet) und der avr-libc
-prinzipiell unter jedem Betriebssystem kompiliert werden. Das aufspielen der
-kompilierten Software geschieht über avrdude und ab diesem Zeitpunkt ist das
+prinzipiell unter jedem Betriebssystem kompiliert werden. Das Aufspielen der
+kompilierten Software geschieht über \texttt{avrdude} und ab diesem Zeitpunkt ist das
 Gerät unabhängig vom Hostsystem.
 
-Die Software ist in C99 geschrieben nutzt aber spezielle Erweiterungen des
+Die Software ist in C99 geschrieben, nutzt aber spezielle Erweiterungen des
 AVR-GCC, sodass die Portierbarkeit in dieser Hinsicht eingeschränkt ist. Dies
 scheint aber kein großes Problem zu sein, da der GCC sich in der Community der
 AVR-Programmierer als ein Standardtool etabliert hat.
 
 \subsection{Arbeitsspeicher}
 
-Der Arbeitsspeicher (SRAM) des Mikrocontrollers ist auf 512 Byte beschränkt,
-dies entspricht 512 ASCII-Zeichen was für ein System das mit Textnachrichten
-umgeht nicht gerade viel ist. So hat sich letztendlich der Arbeitsspeicher als
-größte Hardwareeinschränkung ergeben, weit vor der Taktrate die mit 16 MHz
+Der Arbeitsspeicher (SRAM) des Mikrocontrollers ist auf 512 Byte beschränkt.
+Dies entspricht 512 ASCII-Zeichen, was für ein System, das mit Textnachrichten
+umgeht, nicht gerade viel ist. So hat sich letztendlich der Arbeitsspeicher als
+größte Hardwareeinschränkung ergeben, weit vor der Taktrate, die mit 16 MHz
 überaus großzügig bemessen war. Wir haben darauf geachtet, dass der Code
-möglichst effizient ist, wobei wir jedoch den Fokus soweit es ging auf klaren,
+möglichst effizient ist, wobei wir jedoch den Fokus - soweit es ging - auf klaren,
 verständlichen Code gelegt haben.
 
-Jedoch mussten wir einige Abstriche machen um Speicher zu sparen. So ist
-es trotz unseres zeilenbasierten Übertragungsprotokolls nicht möglich eine
+Jedoch mussten wir einige Abstriche machen, um Speicher zu sparen. So ist
+es trotz unseres zeilenbasierten Übertragungsprotokolls nicht möglich, eine
 Zeile Text direkt vom UART in den Arbeitsspeicher einzulesen, da die
 eingelesene Zeile kein Längenlimit hat, unser Arbeitsspeicher jedoch schnell
 an seine Grenzen kommt. Daher werden eingehende Zeilen direkt in den EEPROM
@@ -276,9 +276,9 @@ ungenutzt sind. Dieser Code ist strikt gesehen redundant, wir haben uns jedoch
 entschieden, keine eigenen Änderungen an der Library vorzunehmen um eventuelle
 zukünfige Updates der Library einfach zu halten.
 
-Die UART-Library ermöglicht das nichtbrokierende Lesen von einzelnen Bytes
-sowie das schreiben von Bytes sowie ganzen Bytestrings. Eine Unterstützung für
-das Lesen von ganzen Strings wie etwa einzelnen Zeilen bietet diese Komponente
+Die UART-Library ermöglicht das nichtblockierende Lesen von einzelnen Bytes,
+sowie das Schreiben von Bytes oder ganzer Bytefolgen. Eine Unterstützung für
+das Lesen von ganzen Strings, wie etwa einzelnen Zeilen bietet diese Komponente
 nicht -- diese Funktionalität wird von der Bluetooth-Komponente übernommen.
 
 \subsubsection{Tasten}
@@ -288,10 +288,10 @@ Das BUTTONS-Modul stellt die folgenden Prozeduren bereit:
 \lstinputlisting{buttons.h}
 
 Es gibt nur eine Funktionalität, die das Modul bereitstellt: die Möglichkeit
-abzufragen ob und welcher Button gedrückt ist. Unsere Hardware verfügt über 12
+abzufragen, ob und welcher Button gedrückt ist. Unsere Hardware verfügt über 12
 Buttons, somit wird ein Rückgabewert von 1 bis 12 geliefert, der spezifiziert
-welcher Button gedrückt wurde. Auch diese Funktion ist nichtblokierend, daher
-wird 0 zurückgegeben falls kein Button gedrückt wurde.
+welcher Button gedrückt wurde. Auch diese Funktion ist nichtblockierend, daher
+wird 0 zurückgegeben, falls kein Button gedrückt wurde.
 
 Im fertigen Projekt werden jedoch nur die vier Buttons direkt unterhalb des
 Displays berücksichtigt -- wir sahen keine sinnvolle Verwendung für die
@@ -303,18 +303,18 @@ Das LED-Modul stellt die folgenden Prozeduren bereit:
 
 \lstinputlisting{led.h}
 
-Das LED-Modul ist wie sich das für Mikrocontroller fast schon gehört als
-erstes entstanden um überhaupt herauszubekommen wie die Interaktion mit
+Das LED-Modul ist, wie sich das für Mikrocontroller fast schon gehört, als
+erstes entstanden, um überhaupt herauszubekommen wie die Interaktion mit
 der Hardware abläuft. Das Board enthält drei LEDs: eine rote, eine grüne
 sowie eine blaue, die links neben dem Display angebracht sind.
 
 Die LEDs waren im Laufe des Projektes hauptsächlich für Debugging-Zwecke
 dienlich, da die Unterstützung des Displays erst relativ spät hinzugefügt
 wurde. So konnten durch das Blinken der LEDs auf einfache Weise kleine
-Integerwerte wie etwa der aktuell gedrückte Button dargestellt werden.
+Integerwerte, wie etwa der aktuell gedrückte Button dargestellt werden.
 
 Das fertige Projekt nutzt die LEDs nur noch für Statusinformationen
-wie den Vrbindungsaufbau oder das Vorhandensein neuer Nachrichten.
+wie den Verbindungsaufbau oder das Vorhandensein neuer Nachrichten.
 
 \subsubsection{Flüssigkristallanzeige}
 
