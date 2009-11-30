@@ -195,24 +195,40 @@ mit unterschiedlichen Verantwortlichkeiten aufgeteilt ist.
     \hline
     Timer & {\tt letterbox/timer/timer.h} \\
     \hline
-    Server  & {\tt letterbox/main.c} \\
+    Server & {\tt letterbox/main.c} \\
     \hline
 \end{tabular}
 
 
 \subsection{Technische Anforderungen}
 
+Die Platform ist prinzipiell betriebssystemneutral, die Serversoftware kann mit
+AVR-GCC (wir haben die Versionen 4.3 und 4.4 verwendet) und der avr-libc
+prinzipiell unter jedem Betriebssystem kompiliert werden. Das aufspielen der
+kompilierten Software geschieht über avrdude und ab diesem Zeitpunkt ist das
+Gerät unabhängig vom Hostsystem.
+
+Die Software ist in C99 geschrieben nutzt aber spezielle Erweiterungen des
+AVR-GCC, sodass die Portierbarkeit in dieser Hinsicht eingeschränkt ist. Dies
+scheint aber kein großes Problem zu sein, da der GCC sich in der Community der
+AVR-Programmierer als ein Standardtool etabliert hat.
+
 \subsection{Arbeitsspeicher}
 
 Der Arbeitsspeicher (SRAM) des Mikrocontrollers ist auf 512 Byte beschränkt,
 dies entspricht 512 ASCII-Zeichen was für ein System das mit Textnachrichten
-umgeht nicht gerade viel ist. So hat sich letztendlich der Arbeitsspeicher
-als größte Hardwareeinschränkung ergeben, weit vor der Taktrate die mit 16 MHz
-überaus großzügig bemessen war. Wir haben darauf geachtet, dass der
-Code möglichst effizient ist, wobei wir jedoch den Fokus soweit es ging auf
-klaren, verständlichen Code gelegt haben.
+umgeht nicht gerade viel ist. So hat sich letztendlich der Arbeitsspeicher als
+größte Hardwareeinschränkung ergeben, weit vor der Taktrate die mit 16 MHz
+überaus großzügig bemessen war. Wir haben darauf geachtet, dass der Code
+möglichst effizient ist, wobei wir jedoch den Fokus soweit es ging auf klaren,
+verständlichen Code gelegt haben.
 
-Jedoch mussten wir einige Abstriche machen um Speicher zu sparen.
+Jedoch mussten wir einige Abstriche machen um Speicher zu sparen. So ist
+es trotz unseres zeilenbasierten Übertragungsprotokolls nicht möglich eine
+Zeile Text direkt vom UART in den Arbeitsspeicher einzulesen, da die
+eingelesene Zeile kein Längenlimit hat, unser Arbeitsspeicher jedoch schnell
+an seine Grenzen kommt. Daher werden eingehende Zeilen direkt in den EEPROM
+geschrieben.
 
 \subsection{Robustheit}
 
