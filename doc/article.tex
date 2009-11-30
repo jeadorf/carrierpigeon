@@ -10,7 +10,7 @@
 \author{Julius Adorf, Marek Kubica, Hong-Khoan Quach\\Technische Universität München}
 
 \title{ETI-Großprojekt 8\\
-       Sommersemester 2009 \\
+       Sommersemester 2009\\
        {\bf Das Carrierpigeon-Projekt}
 }
 
@@ -47,7 +47,6 @@ Bluetooth-Modul.
 
 \end{abstract}
 
-
 \section{Motivation}
 
 Das Carrierpigeon-Projekt ist 2009 am Lehrstuhl für Rechnertechnik und
@@ -73,7 +72,7 @@ durchlesen.
 \end{quote}
 
 In dieser Projektbeschreibung geht es uns nicht darum, ein Referenzhandbuch zu
-erstellen.  Vielmehr möchten wir hier die Ideen hinter der Implementierung
+erstellen. Vielmehr möchten wir hier die Ideen hinter der Implementierung
 vorzustellen und die Konzepte beleuchten, die aus dem Quelltext nicht immer so
 leicht erkennbar sind.
 
@@ -100,7 +99,7 @@ man als Empfänger gespeicherte Nachrichten löschen können.
 
 \section{Architektur}
 
-        \subsection{Hardware-Architektur des Briefkastens}
+\subsection{Hardware-Architektur des Briefkastens}
 
 Der Briefkasten besteht aus einem ATmega8515-Mikrocontroller, der über Ports
 eine ST565-Flüssigkristallanzeige bedienen kann. Der Mikrocontroller ist mit
@@ -114,18 +113,18 @@ bzw. des BTM-222 verwiesen.
     \includegraphics[width=0.6\textwidth]{media/letterbox-atmega-arch}
 \end{center} \end{figure}
 
-Die einzelnen Bauteile kommunizieren über einen 8-bit-Datenbus. Besonders
+Die einzelnen Bauteile kommunizieren über einen 8-Bit-Datenbus. Besonders
 auffällig ist, dass der ATmega8515 eine Harvard-Architektur darstellt. Im
 Gegensatz zu einem Von-Neumann-Rechner liegen in einer Harvard-Architektur
 Daten und Programm in unterschiedlichen Speichern. Die Programme liegen im
-vergleichsweise großzügig bemessenen Programmspeicher (FLASH), die
+vergleichsweise großzügig bemessenen Programmspeicher (Flash), die
 Programmdaten, der Stack und der Heap teilen sich den mit 512 Byte knapp
 bemessenen Datenspeicher (SRAM). Für die persistente Speicherung von Daten über
 Zeiten ohne Stromzufuhr hinweg existiert ein dritter persistenter Speicher
 (EEPROM).  Ohne Erweiterung kann man auch im EEPROM nur 512 Byte speichern.
 
 
-        \subsection{Software-Architektur des Briefkastens}
+\subsection{Software-Architektur des Briefkastens}
 
 Auf der Hardware des Briefkastens läuft ein C-Programm, das aus verschiedenen,
 handlichen Modulen zusammen gesetzt ist. Eine Schaubild illustriert den Zweck,
@@ -147,7 +146,7 @@ besteht ein Assertion-Modul, das mangels besserer Ausgabemöglichkeiten vom LCD
 abhängig ist.
 
 
-        \subsection{Software-Architektur des Mobiltelefons}
+\subsection{Software-Architektur des Mobiltelefons}
 
 Die Applikation für das Mobiltelefon ist plattformunabhängig und auf
 Betriebssystemen und Mobiltelefonen ganz verschiedener Hersteller laufen. Sie
@@ -160,7 +159,7 @@ implementiert sind, interessiert uns nicht weiter.
 
 Die Installation der Applikation erfolgt je nach Handy-Hersteller
 unterschiedlich. Auf den meisten Geräten lässt sich die Applikation sehr
-einfach installieren, in dem man sie z.B.  über Bluetooth an das Handy schickt. 
+einfach installieren, in dem man sie z.B. über Bluetooth an das Handy schickt.
 
 
 \section{Briefkasten}
@@ -170,32 +169,32 @@ Code sollen sich möglichst nur lokal auswirken. Das Finden und Ausbessern von
 Schwachstellen wird dadurch erleichtert, dass das Programm in einzelne Module
 mit unterschiedlichen Verantwortlichkeiten aufgeteilt ist.
 
-\begin{tabular}{|l|l|l|}
+\begin{tabular}{|l|l|}
     \hline
-    {\bf Modul} & {\bf Pfad} & \\
+    {\bf Modul} & {\bf Pfad} \\
     \hline
     \hline
-    EEPROM E/A & {\tt letterbox/eeprom/eeprom.h} & \\
+    EEPROM E/A & {\tt letterbox/eeprom/eeprom.h} \\
     \hline
-    UART E/A & {\tt letterbox/uart/uart.h} & \\
+    UART E/A & {\tt letterbox/uart/uart.h} \\
     \hline
-    BUTTON E/A & {\tt letterbox/buttons/buttons.h} & \\
+    BUTTON E/A & {\tt letterbox/buttons/buttons.h} \\
     \hline
-    LED & {\tt letterbox/buttons/led.h} & \\
+    LED & {\tt letterbox/buttons/led.h} \\
     \hline
-    LCD & {\tt letterbox/lcd/lcd.h} & \\
+    LCD & {\tt letterbox/lcd/lcd.h} \\
     \hline
-    Zeichenausgabe & {\tt letterbox/lcd/text.h} & \\
+    Zeichenausgabe & {\tt letterbox/lcd/text.h} \\
     \hline
-    Bluetooth-Kommunikation & {\tt letterbox/uart/bt.h} & \\
+    Bluetooth-Kommunikation & {\tt letterbox/uart/bt.h} \\
     \hline
-    Nachrichtenverwaltung & {\tt letterbox/message/message.h} & \\
+    Nachrichtenverwaltung & {\tt letterbox/message/message.h} \\
     \hline
-    Assertions & {\tt letterbox/assert/assert.h} &  \\
+    Assertions & {\tt letterbox/assert/assert.h} \\
     \hline
-    Timer & {\tt letterbox/timer/timer.h} & \\
+    Timer & {\tt letterbox/timer/timer.h} \\
     \hline
-    Server  & {\tt letterbox/main.c} & \\
+    Server  & {\tt letterbox/main.c} \\
     \hline
 \end{tabular}
 
@@ -219,7 +218,8 @@ Die E/A-Controller sind dafür zuständig, die Hardware auf der Ebene von Bits
 und Bytes zu steuern. Zu ihren Aufgaben gehört das Auslesen der Tasten, das An-
 und Ausknipsen der Leuchtdioden,  das Beschreiben des Speichers, die
 Ansteuerung des LC-Displays und letztendlich die Kommunikation über die
-serielle Schnittstelle mit dem Bluetooth-Modul.
+serielle Schnittstelle mit dem Bluetooth-Modul. Sie sind sozusagen die Treiber
+für das Server-System.
 
 \subsubsection{EEPROM}
 
@@ -241,13 +241,34 @@ Das UART-Modul stellt die folgenden Prozeduren bereit:
 
 \lstinputlisting{uart.h}
 
+Zu bemerken ist, dass wir Peter Fleurys UART-Library benutzen, die wiederrum
+auf dem UART-Beispielcode von Atmel basiert. Die Library bietet Unterstützung
+für zwei separate UARTs, daher wird jede Funktion in zwei Varianten angeboten.
+Unser Mikrocontroller hat jedoch nur einen UART, sodass die 1-er Varianten
+ungenutzt sind. Dieser Code ist strikt gesehen redundant, wir haben uns jedoch
+entschieden, keine eigenen Änderungen an der Library vorzunehmen um eventuelle
+zukünfige Updates der Library einfach zu halten.
+
+Die UART-Library ermöglicht das nichtbrokierende Lesen von einzelnen Bytes
+sowie das schreiben von Bytes sowie ganzen Bytestrings. Eine Unterstützung für
+das Lesen von ganzen Strings wie etwa einzelnen Zeilen bietet diese Komponente
+nicht -- diese Funktionalität wird von der Bluetooth-Komponente übernommen.
 
 \subsubsection{Tasten}
 
-
 Das BUTTONS-Modul stellt die folgenden Prozeduren bereit:
+
 \lstinputlisting{buttons.h}
 
+Es gibt nur eine Funktionalität, die das Modul bereitstellt: die Möglichkeit
+abzufragen ob und welcher Button gedrückt ist. Unsere Hardware verfügt über 12
+Buttons, somit wird ein Rückgabewert von 1 bis 12 geliefert, der spezifiziert
+welcher Button gedrückt wurde. Auch diese Funktion ist nichtblokierend, daher
+wird 0 zurückgegeben falls kein Button gedrückt wurde.
+
+Im fertigen Projekt werden jedoch nur die vier Buttons direkt unterhalb des
+Displays berücksichtigt -- wir sahen keine sinnvolle Verwendung für die
+restlichen acht Buttons, die über die restliche Länge des Boards verteilt sind.
 
 \subsubsection{Leuchtdioden}
 
@@ -255,6 +276,18 @@ Das LED-Modul stellt die folgenden Prozeduren bereit:
 
 \lstinputlisting{led.h}
 
+Das LED-Modul ist wie sich das für Mikrocontroller fast schon gehört als
+erstes entstanden um überhaupt herauszubekommen wie die Interaktion mit
+der Hardware abläuft. Das Board enthält drei LEDs: eine rote, eine grüne
+sowie eine blaue, die links neben dem Display angebracht sind.
+
+Die LEDs waren im Laufe des Projektes hauptsächlich für Debugging-Zwecke
+dienlich, da die Unterstützung des Displays erst relativ spät hinzugefügt
+wurde. So konnten durch das Blinken der LEDs auf einfache Weise kleine
+Integerwerte wie etwa der aktuell gedrückte Button dargestellt werden.
+
+Das fertige Projekt nutzt die LEDs nur noch für Statusinformationen
+wie den Vrbindungsaufbau oder das Vorhandensein neuer Nachrichten.
 
 \subsubsection{Flüssigkristallanzeige}
 
@@ -415,7 +448,7 @@ da die Ausgabe an den LC-Display sowieso schon Spalte für Spalte erfolgt.
 Mit diesem Format benötigt jedes Zeichen genau 5 Byte. Der Zeichensatz enthält
 über 45 Zeichen, womit er insgesamt über 225 Byte an Speicherplatz benötigt.
 Damit im Arbeitsspeicher kein wertvoller Platz  verschwendet wird, ist der
-Zeichensatz mit der {\tt pgmspace}-Erweiterung in den Programmspeicher
+Zeichensatz mit der {\tt pgmspace}-Erweiterung des GCC in den Programmspeicher
 ausgelagert.
 
 Das Zeichenausgabe-Modul stellt die folgenden Prozeduren bereit:
@@ -428,12 +461,16 @@ Das Zeichenausgabe-Modul stellt die folgenden Prozeduren bereit:
 
 \subsubsection{Timer}
 
-Eine robuste Kommunikation ist ohne Timeouts nicht vorstellbar.
-Das Timer-Modul bietet die Möglichkeit, Timeouts zu verwenden.
-Die Timeouts basieren auf Polling. Beim Aufruf
-an {\tt timer\_start} übergibt man die gewünschte Zeitspanne in
-Sekunden, nach der {\tt timer\_poll} den Wert {\tt true}
-zurückgeben soll, um einen Timeout anzuzeigen. 
+Eine robuste Kommunikation ist ohne Timeouts nicht vorstellbar, jedoch ist die
+Timeout-Behandlung sehr lowlevel, daher haben wir einen Wrapper geschrieben um
+uns das Leben einfacher zu machen.  Das Timer-Modul bietet die Möglichkeit auf
+einfachere Art mit Timeouts zu arbeiten. Dazu wird zuallererst eine gewünschte
+Zeitspanne in \texttt{timer\_start} definiert. Danach kann der Nutzer
+\texttt{timer\_poll} aufrufen um herauszufinden ob diese Zeitspanne bereits
+überschritten wurde oder noch nicht. Intern benutzen wir den Quarz und setzen
+die Timer-Skalierung des Mikrocontrollers auf den Maximalwert 1024 und prüfen
+ob der Timer einen bestimmten, errechneten Wert überschritten hat -- sobald
+dies der Fall ist, kann dem User ein abgelaufenes Timeout signalisiert werden.
 
 Das Timer-Modul stellt die folgenden Prozeduren bereit:
 
