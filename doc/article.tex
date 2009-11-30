@@ -55,8 +55,8 @@ studentischen Praktikums entstanden. Uns ging es darum, zu untersuchen, wie man
 mit einem Mikrocontroller über Bluetooth mit Geräten in der Umgebung
 kommunizieren kann, und zudem eine Anwendung zu entwickeln, die diese Form der
 Kommunikation integriert. Es ging nicht darum, einen Prototypen für ein
-markttaugliches System zu erstellen.  Stattdessen der Lerneffekt und die Lösung
-der technischen Fragestellungen im Vordergrund.
+markttaugliches System zu erstellen. Stattdessen stand der Lerneffekt und die
+Lösung der technischen Fragestellungen im Vordergrund.
 
 Trotzdem haben wir in der Entwicklung nicht nur experimentiert, sondern uns an
 einer bestimmten Idee orientiert, um klare Anforderungen an das System zu
@@ -82,19 +82,19 @@ Carrierpigeon-Repositories erstellt.
 \section{Begriffe}
 
 In dem gerade beleuchteten Szenario treten verschiedene Rollen und technische
-Komponenten auf.  Die beiden technischen Komponenten sind der
-\textit{Briefkasten} und das \textit{Mobiltelefon}.  Den \textit{Sender} ist
-der Benutzer, der vom Mobiltelefon aus Nachrichten sendet. Den Benutzer, an den
-die Nachrichten adressiert sind und diese lesen kann, nennen wir
+Komponenten auf. Die beiden technischen Komponenten sind der
+\textit{Briefkasten} und das \textit{Mobiltelefon}. Den \textit{Sender} ist der
+Benutzer, der vom Mobiltelefon aus Nachrichten sendet. Den Benutzer, an den die
+Nachrichten adressiert sind und diese lesen kann, nennen wir
 \textit{Empfänger}.
 
 Die Rollen des Senders stellen einige Anforderungen an das Programm auf dem
-Mobiltelefon.  Als Sender soll man auf einfache Art und Weise eine Nachricht
+Mobiltelefon. Als Sender soll man auf einfache Art und Weise eine Nachricht
 eingeben können. Als Sender soll man einen Briefkasten aus einer Liste wählen
 und diesem eine Nachricht senden können.
 
 Analog dazu legt die Rolle des Empfängers die Anforderungen an den Briefkasten
-fest: Als Empfänger bekommt man die neueste Nachricht an\-gezeigt.  Man soll
+fest: Als Empfänger bekommt man die neueste Nachricht an\-gezeigt. Man soll
 eine beliebige der gespeicherten Nachrichten anzeigen können. Schließlich soll
 man als Empfänger gespeicherte Nachrichten löschen können.
 
@@ -103,12 +103,12 @@ man als Empfänger gespeicherte Nachrichten löschen können.
 \subsection{Hardware-Architektur des Briefkastens}
 
 Der Briefkasten besteht aus einem ATmega8515-Mikrocontroller, der über Ports
-eine ST565-Flüssigkristallanzeige bedienen kann. Der Mikrocontroller ist mit
-einen UART-Baustein - also über eine serielle Schnittstelle - mit dem
-BTM-222-Bluetooth-Modul kommunizieren. Im Folgenden gibt ein Schaubild eine
-grobe Übersicht der wichtigsten Hardware-Elemente. Für eine genaue
-Spezifikation sei hier auf die Refernenzhandbücher des ATmega8515, des ST565
-bzw. des BTM-222 verwiesen. 
+die auf Register abgebildet werden eine ST565-Flüssigkristallanzeige bedienen
+kann. Der Mikrocontroller ist mit einen UART-Baustein -- also über eine serielle
+Schnittstelle -- mit dem BTM-222-Bluetooth-Modul kommunizieren. Im Folgenden
+gibt ein Schaubild eine grobe Übersicht der wichtigsten Hardware-Elemente. Für
+eine genaue Spezifikation sei hier auf die Refernenzhandbücher des ATmega8515,
+des ST565 bzw. des BTM-222 verwiesen.
 
 \begin{figure}[h!] \begin{center}
     \includegraphics[width=0.6\textwidth]{media/letterbox-atmega-arch}
@@ -203,6 +203,16 @@ mit unterschiedlichen Verantwortlichkeiten aufgeteilt ist.
 \subsection{Technische Anforderungen}
 
 \subsection{Arbeitsspeicher}
+
+Der Arbeitsspeicher (SRAM) des Mikrocontrollers ist auf 512 Byte beschränkt,
+dies entspricht 512 ASCII-Zeichen was für ein System das mit Textnachrichten
+umgeht nicht gerade viel ist. So hat sich letztendlich der Arbeitsspeicher
+als größte Hardwareeinschränkung ergeben, weit vor der Taktrate die mit 16 MHz
+überaus großzügig bemessen war. Wir haben darauf geachtet, dass der
+Code möglichst effizient ist, wobei wir jedoch den Fokus soweit es ging auf
+klaren, verständlichen Code gelegt haben.
+
+Jedoch mussten wir einige Abstriche machen um Speicher zu sparen.
 
 \subsection{Robustheit}
 
@@ -670,12 +680,13 @@ auf:
         und andere Sonderzeichen erweitern.
     \item[Korrektes Encoding auf dem Mobiltelefon] Momentan gibt es bei dem Programm auf dem Mobiltelefon
         die typischen Probleme mit Umlauten. Das Eingabetextfeld ist auf 112 Zeichen beschränkt. Das
-        Mobiltelefon sendet aber zwei Bytes für einen Umlaut.
+        Mobiltelefon sendet aber zwei Bytes für einen Umlaut (UTF-8).
     \item[Einsatz der Leuchtdioden] Kosmetisches Feature. Implementierung mit derzeitigem zyklischen Servermodell
         ist allerdings nicht ganz trivial. Eine Lösung wäre die Verwendung der Technik des Timers, um z.B.
         Blinken der LEDs während des Empfangens einer Nachricht zu ermöglichen.
     \item[Filterung der Geräte] Auf dem Mobiltelefon werden derzeit alle Bluetooth-Geräte aufgelistet. Schön
-        wäre es hier, wenn nur die Geräte angezeigt werden, die auch eine solche Nachricht erwarten.
+        wäre es hier, wenn nur die Geräte angezeigt werden, die das entsprechende Nachrichtenprotokoll
+	sprechen.
 \end{description}
 
 \section{Fazit}
