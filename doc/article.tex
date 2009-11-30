@@ -202,17 +202,6 @@ mit unterschiedlichen Verantwortlichkeiten aufgeteilt ist.
 
 \subsection{Technische Anforderungen}
 
-Die Plattform ist prinzipiell betriebssystemunabhängig, die Serversoftware kann mit
-AVR-GCC (wir haben die Versionen 4.3 und 4.4 verwendet) und der avr-libc
-prinzipiell unter jedem Betriebssystem kompiliert werden. Das Aufspielen der
-kompilierten Software geschieht über \texttt{avrdude} und ab diesem Zeitpunkt ist das
-Gerät unabhängig vom Hostsystem.
-
-Die Software ist in C99 geschrieben, nutzt aber spezielle Erweiterungen des
-AVR-GCC, sodass die Portierbarkeit in dieser Hinsicht eingeschränkt ist. Dies
-scheint aber kein großes Problem zu sein, da der GCC sich in der Community der
-AVR-Programmierer als ein Standardtool etabliert hat.
-
 \subsection{Arbeitsspeicher}
 
 Der Arbeitsspeicher (SRAM) des Mikrocontrollers ist auf 512 Byte beschränkt.
@@ -231,6 +220,10 @@ an seine Grenzen kommt. Daher werden eingehende Zeilen direkt in den EEPROM
 geschrieben.
 
 \subsection{Robustheit}
+
+Eingebettete Systeme haben hohe Anforderungen, was die Zuverlässigkeit
+der Programme anbelangt. Besonders sorgfältig muss die Kommunikation
+zwischen Briefkasten und dem Mobilgerät ablaufen.
 
 Zu dem C-Programm müssen wir ehrlicherweise anmerken, dass wir uns nicht
 besonders um programmweite Konsistenz bei den verwendeten Datentypen
@@ -264,22 +257,30 @@ Daten aus dem flüchtigen Arbeitsspeicher zu arbeiten.
 
 \subsubsection{UART}
 
+Die Kommunikation zwischen dem Briefkasten und dem Bluetooth-Bauteil erfolgt
+über eine serielle Schnittstelle. Diese serielle Schnittstelle wird von
+einem UART-Baustein implementiert. Für die Steuerung des UART-Bausteins haben
+wir  Peter Fleurys UART-Library benutzt, die wiederum auf dem UART-Beispielcode 
+von Atmel basiert. Die Library bietet Unterstützung für die Ansteuerung zweier
+separater UART-Bausteine, daher gibt es in der Bibliothek für jede Funktion
+zwei Versionen. Unser Mikrocontroller hat jedoch nur einen UART, sodass ein
+Teil der Funktionen ungenutzt sind. Dieser Code ist streng genommen redundant,
+wir haben uns jedoch entschieden, keine eigenen Änderungen an der Library
+vorzunehmen um eventuelle zukünfige Updates der Library einfach zu halten.
+
 Das UART-Modul stellt die folgenden Prozeduren bereit:
 
 \lstinputlisting{uart.h}
 
-Zu bemerken ist, dass wir Peter Fleurys UART-Library benutzen, die wiederrum
-auf dem UART-Beispielcode von Atmel basiert. Die Library bietet Unterstützung
-für zwei separate UARTs, daher wird jede Funktion in zwei Varianten angeboten.
-Unser Mikrocontroller hat jedoch nur einen UART, sodass die 1-er Varianten
-ungenutzt sind. Dieser Code ist strikt gesehen redundant, wir haben uns jedoch
-entschieden, keine eigenen Änderungen an der Library vorzunehmen um eventuelle
-zukünfige Updates der Library einfach zu halten.
-
 Die UART-Library ermöglicht das nichtblockierende Lesen von einzelnen Bytes,
 sowie das Schreiben von Bytes oder ganzer Bytefolgen. Eine Unterstützung für
-das Lesen von ganzen Strings, wie etwa einzelnen Zeilen bietet diese Komponente
-nicht -- diese Funktionalität wird von der Bluetooth-Komponente übernommen.
+das Lesen von ganzen Strings, wie etwa einzelnen Zeilen, bietet diese Komponente
+nicht -- diese Funktionalität wurde in der Bluetooth-Komponente selbst implementiert.
+
+Wichtig bei der Benutzung der seriellen Schnittstelle ist die korrekte Konfiguration.
+Die Baudrate, also die Geschwindigkeit, mit der Symbole pro Sekunde über die Leitung
+geschickt werden, muss korrekt eingestellt sein. Ebenso muss geachtet werden, ob
+ein Paritätsbit gesendet werden muss oder nicht.
 
 \subsubsection{Tasten}
 
@@ -667,6 +668,36 @@ Wissens über die Entwickler war deshalb nahezu optimal.
 
 \subsection{Werkzeuge}
 
+Die Programmierung erfolgte auf handelsüblichen Notebooks, die dazu benötigten
+Build-Skripte und Werkzeuge sind auf den meisten Betriebssystemen zu bekommen.
+Das Serverprogramm für den Briefkasten kann mit dem AVR-GCC (wir haben die
+Versionen 4.3 und 4.4 verwendet) und der avr-libc
+prinzipiell unter jedem Betriebssystem kompiliert werden. Das Aufspielen der
+kompilierten Software geschieht über \texttt{avrdude} und ab diesem Zeitpunkt ist das
+Gerät unabhängig vom Notebook.
+
+Die Software ist in C99 geschrieben, nutzt aber spezielle Erweiterungen des
+AVR-GCC, sodass die Portierbarkeit in dieser Hinsicht eingeschränkt ist. Dies
+scheint aber kein großes Problem zu sein, da der GCC sich in der Community der
+AVR-Programmierer als ein Standardtool etabliert hat.
+
+    \begin{tabular}{|r||l|}
+        \hline
+        Hardware & ATmega 8515, BTM-222, ST7565 LCD, AVRISP2 \\
+        \hline
+        Languages & C, Java, Python\\
+        \hline
+        Framework & Java Micro Edition, Peter Fleury's UART library\\
+        \hline
+        Compilation & {\tt avr-gcc, avr-objcopy, avr-strip, avrdude,} \\
+                    & {\tt avr-nm, avr-size, splint, python, ant} \\
+        \hline
+        Helpers & {\tt hcitool, rfcomm, gtkterm, jpnevulator} \\
+        \hline
+    \end{tabular}
+
+
+
 \section{Ausbaumöglichkeiten}
 
 Wie immer gibt es eine Menge Möglichkeiten, die derzeitige Implementation zu
@@ -705,7 +736,6 @@ auf:
 	sprechen.
 \end{description}
 
-\section{Fazit}
 
 %\begin{tabular}{|l|l|l|}Zeilen Worte  Bytes
 %614    1782   19744
