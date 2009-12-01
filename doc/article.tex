@@ -39,7 +39,7 @@
 
 Das Carrierpigeon-Projekt ist ein studentisches Lernprojekt, dessen Ziel es
 war, ein System zu erstellen, in dem man mit einem Handy mittels Bluetooth
-Nachrichten an einen elektronischen Briefkasten zu senden. Auf dem
+Nachrichten an einen elektronischen Briefkasten senden kann. Auf dem
 elektronischen Briefkasten kann man die empfangenen Nachrichten anzeigen und
 anschließend auch löschen. Der Briefkasten besteht aus einem Mikrocontroller,
 einer kleinen Flüssig\-kristall\-an\-zeige, einigen Tasten und einem
@@ -73,7 +73,7 @@ durchlesen.
 
 In dieser Projektbeschreibung geht es uns nicht darum, ein Referenzhandbuch zu
 erstellen. Vielmehr möchten wir hier die Ideen hinter der Implementierung
-vorzustellen und die Konzepte beleuchten, die aus dem Quelltext nicht immer so
+vorstellen und die Konzepte beleuchten, die aus dem Quelltext nicht immer so
 leicht erkennbar sind.
 
 Dieses Dokument wurde aus Revision \texttt{\input{current-hg-tip}} des
@@ -83,9 +83,9 @@ Carrierpigeon-Repositories erstellt.
 
 In dem gerade beleuchteten Szenario treten verschiedene Rollen und technische
 Komponenten auf. Die beiden technischen Komponenten sind der
-\textit{Briefkasten} und das \textit{Mobiltelefon}. Den \textit{Sender} ist der
+\textit{Briefkasten} und das \textit{Mobiltelefon}. Der \textit{Sender} ist der
 Benutzer, der vom Mobiltelefon aus Nachrichten sendet. Den Benutzer, an den die
-Nachrichten adressiert sind und diese lesen kann, nennen wir
+Nachrichten adressiert sind und der diese lesen kann, nennen wir
 \textit{Empfänger}.
 
 Die Rollen des Senders stellen einige Anforderungen an das Programm auf dem
@@ -107,7 +107,7 @@ die auf Register abgebildet werden, eine ST565-Flüssigkristallanzeige bedienen
 kann. Der Mikrocontroller kann mit einen UART-Baustein -- also über eine serielle
 Schnittstelle -- mit dem BTM-222-Bluetooth-Modul kommunizieren. Im Folgenden
 gibt ein Schaubild eine grobe Übersicht der wichtigsten Hardware-Elemente. Für
-eine genaue Spezifikation sei hier auf die Refernenzhandbücher des ATmega8515,
+eine genaue Spezifikation sei hier auf die Referenzhandbücher des ATmega8515,
 des ST565 bzw. des BTM-222 verwiesen.
 
 \begin{figure}[h!] \begin{center}
@@ -128,7 +128,7 @@ Zeiten ohne Stromzufuhr hinweg existiert ein dritter persistenter Speicher
 \subsection{Software-Architektur des Briefkastens}
 
 Auf der Hardware des Briefkastens läuft ein C-Programm, das aus verschiedenen,
-handlichen Modulen zusammen gesetzt ist. Eine Schaubild illustriert den Zweck,
+handlichen Modulen zusammen gesetzt ist. Ein Schaubild illustriert den Zweck,
 die verschiedenen Abstraktionsebenen und das Zusammenspiel der einzelnen
 Module.
 
@@ -149,8 +149,8 @@ abhängig ist.
 
 \subsection{Software-Architektur des Mobiltelefons}
 
-Die Applikation für das Mobiltelefon ist plattformunabhängig und auf
-Betriebssystemen und Mobiltelefonen ganz verschiedener Hersteller laufen. Sie
+Die Applikation für das Mobiltelefon ist plattformunabhängig um auf
+Betriebssystemen und Mobiltelefonen ganz verschiedener Hersteller zu laufen. Sie
 ist in Java implementiert und baut auf drei Spezifikationen auf. Wie diese
 implementiert sind, interessiert uns nicht weiter.
 
@@ -266,7 +266,7 @@ separater UART-Bausteine, daher gibt es in der Bibliothek für jede Funktion
 zwei Versionen. Unser Mikrocontroller hat jedoch nur einen UART, sodass ein
 Teil der Funktionen ungenutzt sind. Dieser Code ist streng genommen redundant,
 wir haben uns jedoch entschieden, keine eigenen Änderungen an der Library
-vorzunehmen um eventuelle zukünfige Updates der Library einfach zu halten.
+vorzunehmen um eventuelle zukünfige Updates einfach zu halten.
 
 Das UART-Modul stellt die folgenden Prozeduren bereit:
 
@@ -334,13 +334,13 @@ der Anzeige.
 
 \subsubsection{Nachrichtenverwaltung}
 
-Die Nachrichtenverwaltung ist kümmert sich um das Auslesen, Speichern und
+Die Nachrichtenverwaltung kümmert sich um das Auslesen, Speichern und
 Löschen der empfangenen Nachrichten. Die Nachrichteninhalte sind im EEPROM
 gespeichert.  Da die Nachrichten zwar in geordneter Reihenfolge beim
 Briefkasten eingehen, diese aber vom Empfänger in beliebiger Reihenfolge
 gelöscht werden können, liegt über dem EEPROM-Speicher noch eine
 In\-di\-rek\-tions\-schicht. Der EEPROM-Speicher wird von der
-Nachrichtenverwaltung ist in verschiedene Blöcke aufgeteilt, und zwar in
+Nachrichtenverwaltung in verschiedene Blöcke aufgeteilt, und zwar in
 sogenannte \textit{Nachrichtenblöcke} und einen sogenannten
 \textit{Superblock}.
 
