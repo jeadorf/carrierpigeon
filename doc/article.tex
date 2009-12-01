@@ -111,7 +111,11 @@ eine genaue Spezifikation sei hier auf die Referenzhandbücher des ATmega8515,
 des ST565 bzw. des BTM-222 verwiesen.
 
 \begin{figure}[h!] \begin{center}
-    \includegraphics[width=0.6\textwidth]{media/letterbox-atmega-arch}
+    \includegraphics[width=0.5\textwidth]{media/board}
+\end{center} \end{figure}
+
+\begin{figure}[h!] \begin{center}
+    \includegraphics[width=0.7\textwidth]{media/letterbox-atmega-arch}
 \end{center} \end{figure}
 
 Die einzelnen Bauteile kommunizieren über einen 8-Bit-Datenbus. Besonders
@@ -266,7 +270,7 @@ separater UART-Bausteine, daher gibt es in der Bibliothek für jede Funktion
 zwei Versionen. Unser Mikrocontroller hat jedoch nur einen UART, sodass ein
 Teil der Funktionen ungenutzt sind. Dieser Code ist streng genommen redundant,
 wir haben uns jedoch entschieden, keine eigenen Änderungen an der Library
-vorzunehmen um eventuelle zukünfige Updates einfach zu halten.
+vorzunehmen, um eventuelle zukünfige Updates einfach zu halten.
 
 Das UART-Modul stellt die folgenden Prozeduren bereit:
 
@@ -279,8 +283,8 @@ nicht -- diese Funktionalität wurde in der Bluetooth-Komponente selbst implemen
 
 Wichtig bei der Benutzung der seriellen Schnittstelle ist die korrekte Konfiguration.
 Die Baudrate, also die Geschwindigkeit, mit der Symbole pro Sekunde über die Leitung
-geschickt werden, muss korrekt eingestellt sein. Ebenso muss geachtet werden, ob
-ein Paritätsbit gesendet werden muss oder nicht.
+geschickt werden, muss korrekt eingestellt sein. Ebenso muss darauf geachtet werden, ob
+ein Paritätsbit gesendet wird oder nicht.
 
 \subsubsection{Tasten}
 
@@ -288,15 +292,15 @@ Das BUTTONS-Modul stellt die folgenden Prozeduren bereit:
 
 \lstinputlisting{buttons.h}
 
-Es gibt nur eine Funktionalität, die das Modul bereitstellt: die Möglichkeit
-abzufragen, ob und welcher Button gedrückt ist. Unsere Hardware verfügt über 12
-Buttons, somit wird ein Rückgabewert von 1 bis 12 geliefert, der spezifiziert
-welcher Button gedrückt wurde. Auch diese Funktion ist nichtblockierend, daher
-wird 0 zurückgegeben, falls kein Button gedrückt wurde.
+Das Modul stellt nur die Möglichkeit bereit, abzufragen, ob und welcher Button gedrückt ist.
+Die Interaktion mit dem Benutzer wird nicht über Interrupts geregelt, sondern geht 
+ausschließlich über regelmäßiges Abfragen. Die Hardware des Briefkastens verfügt über zwölf Tasten.
+Eine Abfrage liefert einen Rückgabewert von 1 bis 12 zurück, der spezifiziert,
+welche Taste gedrückt wurde. Auch diese Funktion blockiert nicht, daher
+wird 0 zurückgegeben, falls keine Taste gedrückt wurde.
 
-Im fertigen Projekt werden jedoch nur die vier Buttons direkt unterhalb des
-Displays berücksichtigt -- wir sahen keine sinnvolle Verwendung für die
-restlichen acht Buttons, die über die restliche Länge des Boards verteilt sind.
+Nur die vier Tasten direkt unterhalb des Displays finden Verwendung -- 
+die verbleibenden acht Tasten auf dem Boards dienen keinem Zweck..
 
 \subsubsection{Leuchtdioden}
 
