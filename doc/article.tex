@@ -332,7 +332,9 @@ wie den Verbindungsaufbau oder das Vorhandensein neuer Nachrichten.
 
 \subsubsection{Flüssigkristallanzeige}
 
-Das LCD-Modul stellt die folgenden Prozeduren bereit:
+Das LCD-Modul bietet die Möglichkeit das LC-Display zu initialisieren.
+Es werden die grundlegenden Funktionen wie die Einstellung der Helligkeit, des  Kontrastes
+und vieles mehr angeboten. Folgende Auflistung enthält alle Prozeduren:
 
 \lstinputlisting{lcd.h}
 
@@ -463,7 +465,8 @@ Das Bluetooth-Modul stellt die folgenden Prozeduren bereit:
 
 \subsubsection{Zeichenausgabe}
 
-Das Modul zur Zeichenausgabe ermöglicht die Ausgabe von Text auf der
+Das Modul zur Zeichenausgabe bedient sich der Funktionen des LCD-Moduls und
+ermöglicht die Ausgabe von Text auf der
 Flüs\-sig\-kris\-tall\-an\-zei\-ge. Es kümmert sich um die Umwandlung eines
 Zeichens ({\tt char}) in eine darstellbare Bitmatrix und sorgt für einen
 automatischen Zeilenumbruch. Maskierungen erlauben es, dass die Textausgabe
@@ -479,7 +482,7 @@ entspricht dem höchstwertigen Bit. Eine 1 entspricht einem schwarzen
 Bildpunkt, die 0 einem weißen Bildpunkt. Mit der XOR-Maske {\tt 0xff} lässt
 sich so ein Schwarz-auf-Weiß-Buchstabe auf einfache Art und Weise
 invertieren. Diese Technik wird beim Zeichnen von Dialogen und Bedienelementen 
-verwendet. Die Speicherung der Spaltenvektoren bietet sich auf an,
+verwendet. Die Speicherung der Spaltenvektoren bietet sich auch an,
 da die Ausgabe an den LC-Display sowieso schon Spalte für Spalte erfolgt.
 
 \begin{figure}[h!] \begin{center}
@@ -714,7 +717,7 @@ AVR-Programmierer als ein Standardtool etabliert hat.
 \section{Ausbaumöglichkeiten}
 
 Wie immer gibt es eine Menge Möglichkeiten, die derzeitige Implementation zu
-erweitern und verbessern. Wir listen hier einige Verbesserungsmöglichkeiten
+erweitern und zu verbessern. Wir listen hier einige Verbesserungsmöglichkeiten
 auf:
 
 \begin{description}
@@ -728,7 +731,7 @@ auf:
         Liste, sowohl in der programminternen Darstellung im Arbeitsspeicher als auch in den Nachrichtenblöcken
         des EEPROMs. Das würde wohl zu einem natürlicheren und leichter ver\-ständ\-lichen Modell der 
         Nachrichtenverwaltung führen.
-    \item[Empfangsbestätigung senden] Dem Mobiltelefon erhält eine Rückmeldung vom Briefkasten nach dem
+    \item[Empfangsbestätigung senden] Das Mobiltelefon erhält eine Rückmeldung vom Briefkasten nach dem
         dieser die Nachricht erhalten hat. Damit lässt sich auch das Problem lösen, was zu tun ist, 
         wenn der Briefkasten voll ist.
     \item[Automatische Tests] Es ist uns gelungen, SimulAVR als AVR-Simulator mit dem GNU Debugger
