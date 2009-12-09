@@ -76,7 +76,8 @@ erstellen. Vielmehr möchten wir hier die Ideen hinter der Implementierung
 vorstellen und die Konzepte beleuchten, die aus dem Quelltext nicht immer so
 leicht erkennbar sind.
 
-Dieses Dokument wurde aus Revision \texttt{\input{current-hg-tip}} des
+Dieses Dokument wurde aus Revision \\
+\texttt{\input{current-hg-tip}} \\des
 Carrierpigeon-Repositories erstellt.
 
 \section{Begriffe}
@@ -112,6 +113,7 @@ des ST565 bzw. des BTM-222 verwiesen.
 
 \begin{figure}[h!] \begin{center}
     \includegraphics[width=0.5\textwidth]{media/board}
+    \includegraphics[width=0.17\textwidth]{media/bluetooth.jpg}
 \end{center} \end{figure}
 
 \begin{figure}[h!] \begin{center}
@@ -128,6 +130,13 @@ bemessenen Datenspeicher (SRAM). Für die persistente Speicherung von Daten übe
 Zeiten ohne Stromzufuhr hinweg existiert ein dritter persistenter Speicher
 (EEPROM). Auch im EEPROM kann man nur 512 Byte speichern.
 
+Der BTM-222-Baustein dient der Bluetooth-Kommunikation und arbeitet als Black-Box.
+Beispielsweise nimmt der Baustein bei entsprechender Konfiguration automatisch
+Verbindungen an. Der BTM-222 ist über eine serielle Schnittstelle ansprechbar.
+Die Schnittstelle dient zur Übertragung von Nachrichtentext und
+der Meldung von eingehenden Verbindungen. Man kann allerdings auch vom
+Mikrokontroller aus über die serielle Schnittstelle AT-Befehle an den
+BTM-222 übergeben.
 
 \subsection{Software-Architektur des Briefkastens}
 
