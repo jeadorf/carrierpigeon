@@ -213,7 +213,6 @@ mit unterschiedlichen Verantwortlichkeiten aufgeteilt ist.
 \end{tabular}
 
 
-\subsection{Technische Anforderungen}
 
 \subsection{Arbeitsspeicher}
 
@@ -436,14 +435,14 @@ Schreibzugriffe jedoch nicht: Das Aufrücken der Blockzeiger soll nicht direkt
 auf dem EEPROM geschehen, sondern im Arbeitsspeicher.
 
 Die Nachrichtenverwaltung ist so ausgelegt, dass sie auch mit einem korruptem
-Superblock umgehen kann. Dies ist extrem wichtig. Man stelle sich vor, durch
+Superblock umgehen kann. Dies ist recht wichtig. Man stelle sich vor, durch
 einen Stromausfall, ein sonstiges unerwartetes Ereignis oder durch ein erneutes
 Flashen der Software wird der Superblock korrumpiert.  Das kann direkt dazu
 führen, dass der Briefkasten sich nicht mehr starten lässt. Bei Programmstart
 wird der Superblock in den Arbeitsspeicher kopiert.  Nun könnte durch den
-korrupten Superblock der Nachrichtenzähler negativ sein was das Programm unter
+korrupten Superblock der Nachrichtenzähler negativ sein, was das Programm unter
 Umständen in eine Endlosschleife geraten lässt. Oder die Blockzeiger führen ins
-Nirvana. Ebenso könnten zwei Blockzeiger auf den gleichen Nachrichtenblock
+Nichts. Ebenso könnten zwei Blockzeiger auf den gleichen Nachrichtenblock
 zeigen. Auf all diese Fälle wird beim Einlesen des Superblocks geprüft und im
 Fehlerfall wird der Superblock in einen validen Nullzustand überführt.
 
@@ -575,7 +574,7 @@ schwarzem Hintergrund zu zeichnen, verwendet der Server die Möglichkeit
 des LCD-Moduls die Ausgabe zu maskieren. Die LC-Anzeige wird also nicht
 invertiert, sondern nur die Daten, die an die LC-Anzeige gehen.
 
-Das Server-Modul ist in die folgenden, privaten Prozeduren unterteilt:
+Das Server-Modul ist in die folgenden privaten Prozeduren unterteilt:
 \lstinputlisting{main.c}
 
 
